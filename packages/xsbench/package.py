@@ -73,31 +73,31 @@ class Xsbench(MakefilePackage):
 	#if self.compiler.name == 'gcc':
         	# Use the Spack compiler wrappers
         	#makefile.filter('COMPILER    =.*', 'COMPILER = gnu')
-		#cflags += '-fopenmp'
+		#cflags += ' -fopenmp'
 
 	if self.compiler.name == 'intel':
                 # Use the Spack compiler wrappers
 		#makefile.filter('COMPILER    =.*', 'COMPILER = icc')
-                cflags += '-fopenmp'
+                cflags += ' -fopenmp'
 
 	if self.compiler.name == 'bluegene':
                 # Use the Spack compiler wrappers
 		makefile.filter('COMPILER    =.*', 'COMPILER = mpicc')
 
 	if '+debug' in spec:		
-		cflags += '-ftree-vectorizer-verbose=6'
+		cflags += ' -ftree-vectorizer-verbose=6'
 		print('Debugging enabled...')	
 	if '+verify' in spec:
-		cflags += '-DVERIFICATION'
+		cflags += ' -DVERIFICATION'
 
 	if '+benchmark' in spec:
-                cflags += '-DBENCHMARK'
+                cflags += ' -DBENCHMARK'
 
 	if '+binarydump' in spec:
-                cflags += '-DBINARY_DUMP'
+                cflags += ' -DBINARY_DUMP'
 
 	if '+binaryread' in spec:
-                cflags += '-DBINARY_READ'
+                cflags += ' -DBINARY_READ'
 
 	makefile.filter('CFLAGS .*', 'CFLAGS = {0}'.format(cflags))
 
