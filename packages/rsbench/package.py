@@ -27,11 +27,11 @@
 # next to all the things you'll want to change. Once you've handled
 # them, you can save this file and test your package like this:
 #
-#     spack install xsbench
+#     spack install rsbench
 #
 # You can edit this file again by typing:
 #
-#     spack edit xsbench
+#     spack edit rsbench
 #
 # See the Spack documentation for more information on packaging.
 # If you submit this package back to Spack as a pull request,
@@ -40,20 +40,20 @@
 from spack import *
 
 
-class Xsbench(MakefilePackage):
+class Rsbench(MakefilePackage):
     """FIXME: Put a proper description of your package here."""
 
     # FIXME: Add a proper url for your package's homepage here.
-    homepage = "http://www.example.com"
-    url      = "https://github.com/ANL-CESAR/XSBench/archive/v13.tar.gz"
+    homepage = "https://github.com/ANL-CESAR/RSBench"
+    url      = "https://github.com/ANL-CESAR/RSBench/archive/v2.tar.gz"
 
-    version('13', '72a92232d2f5777fb52f5ea4082aff37')
+    version('2', '15a3ac5ea72529ac1ed9ed016ee68b4f')
+    version('0', '3427634dc5e7cd904d88f9955b371757')
 
     variant('debug',     default=False,  description='Enable debugging.')
-    variant('verify',     default=False,  description='Enable verification.')
-    variant('benchmark',     default=False,  description='Adds outer benchmarking loop to do multiple trials for 1 < threads <= max_threads.')
-    variant('binarydump',     default=False,  description='Binary dump for file I/O based initialization.')
-    variant('binaryread',     default=False,  description='Binary read for file I/O based initialization.')
+    variant('optimize',     default=False,  description='Do Optimizations.')
+    variant('papi',     default=False,  description='Enable PAPI support.')
+    variant('status', default=False, description='Enable status flag.')
 
     # FIXME: Add dependencies if required.
     # depends_on('foo')
@@ -61,46 +61,36 @@ class Xsbench(MakefilePackage):
     build_targets = ['--directory=src']
 
     def edit(self, spec, prefix):
-	# FIXME: Unknown build system
-	
-	makefile = FileFilter('src/Makefile')
 
-	cflags = '-std=gnu99 -fopenmp'
-	LDFLAGS = '-lm'
+	makefile = FileFilter('src/makefile')
 
-	makefile.filter('CC =.*', 'CC = gcc')
+        cflags = '-std=gnu99 -fopenmp -ffast-math'
+        ldflags = '-lm'
 
-        if len(self.compiler.name) <= 0 or self.compiler.name == 'gcc':
+	if len(self.compiler.name) <= 0 or self.compiler.name == 'gcc':
                 makefile.filter('CC =.*', 'CC = gcc')
 
-	if self.compiler.name == 'icc':
-                # Use the Spack compiler wrappers
-		makefile.filter('CC =.*', 'CC = icc')
-                cflags += ' -fopenmp'
+	if '+debug' in spec: 
+                cflags += ' ' + '-g'
+        
+        if '+profile' in spec:
+                cflags += ' ' + '-pg'
 
-	if self.compiler.name == 'mpicc':
-                # Use the Spack compiler wrappers
-		makefile.filter('CC =.*', 'CC = mpicc')
+	if '+optimize' in spec and self.compiler.name == 'icc':
+                cflags += ' ' + '-O3'
 
-	if '+debug' in spec:		
-		cflags += ' -ftree-vectorizer-verbose=6'
-		print('Debugging enabled...')	
-	if '+verify' in spec:
-		cflags += ' -DVERIFICATION'
+	if '+status' in spec:
+		cflags += ' ' + '-DSTATUS'
 
-	if '+benchmark' in spec:
-                cflags += ' -DBENCHMARK'
+	if '+papi' in spec:
+                cflags += ' ' + '-DPAPI'
+		ldflags += ' ' + '-lpapi'
+		makefile.filter('source =.*', 'source = {0}'.format('papi.c \\'))
 
-	if '+binarydump' in spec:
-                cflags += ' -DBINARY_DUMP'
-
-	if '+binaryread' in spec:
-                cflags += ' -DBINARY_READ'
 
 	makefile.filter('CFLAGS .*', 'CFLAGS = {0}'.format(cflags))
-
+	
     def install(self, spec, prefix):
-        # Manual installation
-        mkdir(prefix.bin)
-        install('src/XSBench', prefix.bin)
-
+        # FIXME: Unknown build system
+	mkdir(prefix.bin)
+        make('src/rsbench', prefix.bin)
