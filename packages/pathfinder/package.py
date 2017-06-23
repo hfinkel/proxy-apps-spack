@@ -33,13 +33,11 @@ class Pathfinder(MakefilePackage):
 
     version('1.0.0', '374269e8d42c305eda3e392444e22dde')
 
-    depends_on('mpi')
-
     build_targets = ['--directory=PathFinder_ref']
 
     def edit(self, spec, prefix):
         makefile = FileFilter('PathFinder_ref/Makefile')
-        makefile.filter('CC=.*', 'CC={}'.format(spec['mpi'].mpicc))
+        makefile.filter('CC=.*', 'CC=cc')
 
     def install(self, spec, prefix):
         # Manual installation
