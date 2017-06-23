@@ -1,4 +1,4 @@
-#proxy-apps-spack
+# proxy-apps-spack
 
 #### Adding Repo into Spack:
 cd $SPACK_ROOT/var/spack/repos  
