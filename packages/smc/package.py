@@ -27,11 +27,11 @@
 # next to all the things you'll want to change. Once you've handled
 # them, you can save this file and test your package like this:
 #
-#     spack install nut
+#     spack install smc
 #
 # You can edit this file again by typing:
 #
-#     spack edit nut
+#     spack edit smc
 #
 # See the Spack documentation for more information on packaging.
 # If you submit this package back to Spack as a pull request,
@@ -40,28 +40,30 @@
 from spack import *
 
 
-class Nut(CMakePackage):
-    """NuT is Monte Carlo code for neutrino transport and is a C++ analog to the Haskell McPhD code. NuT is principally aimed at exploring on-node parallelism and performance issues."""
+class Smc(MakefilePackage):
+    """A minimalist high-order finite difference algorithm for combustion problems. It includes core discretizations for advection, diffusive transport and chemical kinetics. The models for computing diffusive transport coefficients have been replaced by a simplified approximation but the full structure of the discretization of the diffusive terms have been preserved."""
 
-    homepage = "https://github.com/lanl/NuT"
-    url      = ""
+    homepage = "https://ccse.lbl.gov/ExaCT/index.html"
+    url      = "https://ccse.lbl.gov/ExaCT/SMC.tar.gz"
 
-    version('serial', git='https://github.com/lanl/NuT.git', branch='master')
-    version('openmp', git='https://github.com/lanl/NuT.git', branch='openmp')
+    variant('mpi', default=TRUE, description='Build with MPI support')
+    variant('openmp', default=TRUE, description='Build with OpenMP support')
+    variant('ndebug', default=FALSE, description='Turn off debugging')
+    variant('mic', default=FALSE, description='Compile for Intel Xeon Phi')
+    variant('k_use_automatic', default=TRUE, description='Some arrays in kernels.F90 will be automatic)
+    variant('mkverbose', default=TRUE, description='Verbosity of building process')
 
-    depends_on('random123')
-    if spec.satisfies('@openmp'):
+    if '-mpi' not in spec:
+        depends_on('mpi')
+    if '-openmp' not in spec:
         depends_on('openmp')
+    if '+ndebug' in spec:
+    if '+mic' in spec:
+    if '-k_use_automatic' not in spec:
+    if '-mkverbose' not in spec:
 
-    # def cmake_args(self):
-        # FIXME: Add arguments other than
-        # FIXME: CMAKE_INSTALL_PREFIX and CMAKE_BUILD_TYPE
+    # def edit(self, spec, prefix):
+        # FIXME: Edit the Makefile if necessary
         # FIXME: If not needed delete this function
-        # export RANDOM123_DIR=
-        # export CC = 
-        # export CXX = 
-        # mkdir build
-        # cmake -DCMAKE_INSTALL_PREFIX=./nut ..
-        # make VERBOSE=on -j 4 2>&1 | tee -a make.out
-        # args = []
-        # return args
+        # makefile = FileFilter('Makefile')
+        # makefile.filter('CC = .*', 'CC = cc')
