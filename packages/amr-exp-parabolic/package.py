@@ -27,11 +27,11 @@
 # next to all the things you'll want to change. Once you've handled
 # them, you can save this file and test your package like this:
 #
-#     spack install nut
+#     spack install amr-exp-parabolic
 #
 # You can edit this file again by typing:
 #
-#     spack edit nut
+#     spack edit amr-exp-parabolic
 #
 # See the Spack documentation for more information on packaging.
 # If you submit this package back to Spack as a pull request,
@@ -40,28 +40,27 @@
 from spack import *
 
 
-class Nut(CMakePackage):
-    """NuT is Monte Carlo code for neutrino transport and is a C++ analog to the Haskell McPhD code. NuT is principally aimed at exploring on-node parallelism and performance issues."""
+class AmrExpParabolic(MakefilePackage):
+    """ simplified block-structured adaptive mesh refinement algorithm in two and three dimensions with subcycling in time. The algorithm solves a linear advection diffusion equation with a simple numerical method. This proxy app is intended to capture the communication pattern of an explicit AMR algorithm but does not represent an accurate characterization of floating point effort or relative costs of communication to computation."""
 
-    homepage = "https://github.com/lanl/NuT"
-    url      = ""
+    homepage = "https://ccse.lbl.gov/ExaCT/index.html"
+    url      = "https://ccse.lbl.gov/ExaCT/AMR_Exp_Parabolic.tgz"
 
-    version('serial', git='https://github.com/lanl/NuT.git', branch='master')
-    version('openmp', git='https://github.com/lanl/NuT.git', branch='openmp')
+    variant('ndebug', default=FALSE, description='Turn off debugging')
+    variant('mpi', default=TRUE, description='Build with MPI support')
+    variant('openmp', default=FALSE, description='Build with OpenMP support')
+    variant('prof', default=FALSE, description='Use profiler')
+    variant('mkverbose', default=TRUE, description='Verbosity of building process')
 
-    depends_on('random123')
-    if spec.satisfies('@openmp'):
+    if '-mpi' not in spec:
+        depends_on('mpi')
+    if '+openmp' in spec:
         depends_on('openmp')
+    if '+prof' in spec:
+    if '-mkverbose' in spec:
 
-    # def cmake_args(self):
-        # FIXME: Add arguments other than
-        # FIXME: CMAKE_INSTALL_PREFIX and CMAKE_BUILD_TYPE
+    def edit(self, spec, prefix):
+        # FIXME: Edit the Makefile if necessary
         # FIXME: If not needed delete this function
-        # export RANDOM123_DIR=
-        # export CC = 
-        # export CXX = 
-        # mkdir build
-        # cmake -DCMAKE_INSTALL_PREFIX=./nut ..
-        # make VERBOSE=on -j 4 2>&1 | tee -a make.out
-        # args = []
-        # return args
+        # makefile = FileFilter('Makefile')
+        # makefile.filter('CC = .*', 'CC = cc')

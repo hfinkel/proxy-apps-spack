@@ -27,11 +27,11 @@
 # next to all the things you'll want to change. Once you've handled
 # them, you can save this file and test your package like this:
 #
-#     spack install nut
+#     spack install hpgmg
 #
 # You can edit this file again by typing:
 #
-#     spack edit nut
+#     spack edit hpgmg
 #
 # See the Spack documentation for more information on packaging.
 # If you submit this package back to Spack as a pull request,
@@ -40,28 +40,25 @@
 from spack import *
 
 
-class Nut(CMakePackage):
-    """NuT is Monte Carlo code for neutrino transport and is a C++ analog to the Haskell McPhD code. NuT is principally aimed at exploring on-node parallelism and performance issues."""
+class Hpgmg(AutotoolsPackage):
+    """HPGMG implements full multigrid (FMG) algorithms using finite-volume and finite-element methods. Different algorithmic variants adjust the arithmetic intensity and architectural properties that are tested. These FMG methods converge up to discretization error in one F-cycle, thus may be considered direct solvers. An F-cycle visits the finest level a total of two times, the first coarsening (8x smaller) 4 times, the second coarsening 6 times, etc."""
 
-    homepage = "https://github.com/lanl/NuT"
-    url      = ""
+    homepage = "https://bitbucket.org/hpgmg/hpgmg"
+    url      = "https://bitbucket.org/hpgmg/hpgmg/get/master.tar.gz"
 
-    version('serial', git='https://github.com/lanl/NuT.git', branch='master')
-    version('openmp', git='https://github.com/lanl/NuT.git', branch='openmp')
+    variant('fe', default=TRUE, description='Build Finite Element FAS solver')
+    variant('fv', default=TRUE, description='Build Finite Volume solver')
+    variant('mpi', default=FALSE, description='Build with MPI support')
 
-    depends_on('random123')
-    if spec.satisfies('@openmp'):
+    if '-fe' not in spec:
+        depends_on('petsc')
+    if '-fv' not in spec:
         depends_on('openmp')
+    if '+mpi' in spec:
+        depends_on('mpi')
 
-    # def cmake_args(self):
-        # FIXME: Add arguments other than
-        # FIXME: CMAKE_INSTALL_PREFIX and CMAKE_BUILD_TYPE
+    # def configure_args(self):
+        # FIXME: Add arguments other than --prefix
         # FIXME: If not needed delete this function
-        # export RANDOM123_DIR=
-        # export CC = 
-        # export CXX = 
-        # mkdir build
-        # cmake -DCMAKE_INSTALL_PREFIX=./nut ..
-        # make VERBOSE=on -j 4 2>&1 | tee -a make.out
         # args = []
         # return args

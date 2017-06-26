@@ -27,11 +27,11 @@
 # next to all the things you'll want to change. Once you've handled
 # them, you can save this file and test your package like this:
 #
-#     spack install nut
+#     spack install minigmg
 #
 # You can edit this file again by typing:
 #
-#     spack edit nut
+#     spack edit minigmg
 #
 # See the Spack documentation for more information on packaging.
 # If you submit this package back to Spack as a pull request,
@@ -40,28 +40,22 @@
 from spack import *
 
 
-class Nut(CMakePackage):
-    """NuT is Monte Carlo code for neutrino transport and is a C++ analog to the Haskell McPhD code. NuT is principally aimed at exploring on-node parallelism and performance issues."""
+class Minigmg(Package):
+    """miniGMG is a compact benchmark for understanding the performance challenges associated with geometric multigrid solvers found in applications built from AMR MG frameworks like CHOMBO or BoxLib when running on modern multi- and manycore-based supercomputers. It includes both productive reference examples as well as highly-optimized implementations for CPUs and GPUs. It is sufficiently general that it has been used to evaluate a broad range of research topics including PGAS programming models and algorithmic tradeoffs inherit in multigrid. miniGMG was developed under the CACHE Joint Math-CS Institute.
 
-    homepage = "https://github.com/lanl/NuT"
-    url      = ""
+Note, miniGMG code has been supersceded by HPGMG. """
 
-    version('serial', git='https://github.com/lanl/NuT.git', branch='master')
-    version('openmp', git='https://github.com/lanl/NuT.git', branch='openmp')
+    homepage = "http://crd.lbl.gov/departments/computer-science/PAR/research/previous-projects/miniGMG/"
+    url      = "http://crd.lbl.gov/assets/Uploads/FTG/Projects/miniGMG/miniGMG.tar.gz"
 
-    depends_on('random123')
-    if spec.satisfies('@openmp'):
-        depends_on('openmp')
+    version('cuda', url='http://crd.lbl.gov/assets/Uploads/FTG/Projects/miniGMG/miniGMG.cuda.tar.gz')
 
-    # def cmake_args(self):
-        # FIXME: Add arguments other than
-        # FIXME: CMAKE_INSTALL_PREFIX and CMAKE_BUILD_TYPE
-        # FIXME: If not needed delete this function
-        # export RANDOM123_DIR=
-        # export CC = 
-        # export CXX = 
-        # mkdir build
-        # cmake -DCMAKE_INSTALL_PREFIX=./nut ..
-        # make VERBOSE=on -j 4 2>&1 | tee -a make.out
-        # args = []
-        # return args
+    depends_on('mpi')
+    depends_on('openmp')
+    if spec.satisfies('@cuda'):
+        depends_on('cuda')
+
+    def install(self, spec, prefix):
+        # FIXME: Unknown build system
+        make()
+        make('install')
