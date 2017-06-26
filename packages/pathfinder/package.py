@@ -43,8 +43,8 @@ class Pathfinder(MakefilePackage):
     def install(self, spec, prefix):
         # Manual installation
         mkdirp(prefix.bin)
-        mkdirp(join_path(prefix, 'generatedData'))
-        mkdirp(join_path(prefix, 'scaleData'))
+        mkdirp(prefix.generatedData)
+        mkdirp(prefix.scaleData)
 
         install('PathFinder_ref/PathFinder.x', prefix.bin)
         for f in listdir(join_path(self.build_directory, 'generatedData')):
