@@ -48,6 +48,6 @@ class Pathfinder(MakefilePackage):
 
         install('PathFinder_ref/PathFinder.x', prefix.bin)
         for f in listdir(join_path(self.build_directory, 'generatedData')):
-            install('generatedData/{}'.format(f), join_path(prefix, 'generatedData'))
+            install('generatedData/{}'.format(f), prefix.generatedData)
         for f in listdir(join_path(self.build_directory, 'scaleData')):
-            install('scaleData/{}'.format(f), join_path(prefix, 'scaleData'))
+            install('scaleData/{}'.format(f), prefix.scaleData)
