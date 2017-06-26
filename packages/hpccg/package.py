@@ -60,5 +60,9 @@ class Hpccg(MakefilePackage):
 
     def install(self, spec, prefix):
         # Manual installation
-        mkdir(prefix.bin)
+        mkdirp(prefix.bin)
+        mkdirp(prefix.doc)
         install('test_HPCCG', prefix.bin)
+        install('README', prefix.doc)
+        install('weakScalingRunScript', prefix.doc)
+        install('strongScalingRunScript', prefix.doc)

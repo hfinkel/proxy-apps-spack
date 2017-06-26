@@ -53,7 +53,7 @@ class Plasma(MakefilePackage):
     depends_on('mpi')
     depends_on('cuda', when='+cuda')
 
-    def edit(self, spec, prefix):
+    #def edit(self, spec, prefix):
         # FIXME: Edit the Makefile if necessary
         # FIXME: If not needed delete this function
         # makefile = FileFilter('Makefile')
