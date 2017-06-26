@@ -42,9 +42,9 @@ class Pathfinder(MakefilePackage):
 
     def install(self, spec, prefix):
         # Manual installation
-        mkdir(prefix.bin)
-        mkdir(join_path(prefix, 'generatedData'))
-        mkdir(join_path(prefix, 'scaleData'))
+        mkdirp(prefix.bin)
+        mkdirp(join_path(prefix, 'generatedData'))
+        mkdirp(join_path(prefix, 'scaleData'))
 
         install('PathFinder_ref/PathFinder.x', prefix.bin)
         for f in listdir(join_path(self.build_directory, 'generatedData')):
