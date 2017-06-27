@@ -47,7 +47,11 @@ class Miniamr(MakefilePackage):
     def install(self, spec, prefix):
         # Manual installation
         mkdir(prefix.bin)
+        mkdir(prefix.doc)
         if '+mpi' in spec:
             install('miniAMR_ref/miniAMR.x', prefix.bin)
         else:
             install('miniAMR_serial/miniAMR.x', prefix.bin)
+        install('miniAMR_ref/README', prefix.doc)
+        install('miniAMR_ref/param.h', prefix.doc)
+        install('miniAMR_ref/LICENSE', prefix.doc)
