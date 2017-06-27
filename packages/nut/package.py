@@ -50,8 +50,7 @@ class Nut(CMakePackage):
     version('openmp', git='https://github.com/lanl/NuT.git', branch='openmp')
 
     depends_on('random123')
-    if spec.satisfies('@openmp'):
-        depends_on('openmp')
+    depends_on('openmp', when='@openmp')
 
     # def cmake_args(self):
         # FIXME: Add arguments other than

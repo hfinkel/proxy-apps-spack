@@ -46,24 +46,22 @@ class Smc(MakefilePackage):
     homepage = "https://ccse.lbl.gov/ExaCT/index.html"
     url      = "https://ccse.lbl.gov/ExaCT/SMC.tar.gz"
 
-    variant('mpi', default=TRUE, description='Build with MPI support')
-    variant('openmp', default=TRUE, description='Build with OpenMP support')
-    variant('ndebug', default=FALSE, description='Turn off debugging')
-    variant('mic', default=FALSE, description='Compile for Intel Xeon Phi')
-    variant('k_use_automatic', default=TRUE, description='Some arrays in kernels.F90 will be automatic)
-    variant('mkverbose', default=TRUE, description='Verbosity of building process')
+    variant('mpi', default=True, description='Build with MPI support')
+    variant('openmp', default=True, description='Build with OpenMP support')
+    variant('ndebug', default=False, description='Turn off debugging')
+    variant('mic', default=False, description='Compile for Intel Xeon Phi')
+    variant('k_use_automatic', default=True, description='Some arrays in kernels.F90 will be automatic')
+    variant('mkverbose', default=True, description='Verbosity of building process')
 
-    if '-mpi' not in spec:
-        depends_on('mpi')
-    if '-openmp' not in spec:
-        depends_on('openmp')
-    if '+ndebug' in spec:
-    if '+mic' in spec:
-    if '-k_use_automatic' not in spec:
-    if '-mkverbose' not in spec:
+    depends_on('mpi', when='+mpi')
+    depends_on('openmp', when='+openmp')
 
     # def edit(self, spec, prefix):
         # FIXME: Edit the Makefile if necessary
         # FIXME: If not needed delete this function
         # makefile = FileFilter('Makefile')
         # makefile.filter('CC = .*', 'CC = cc')
+        # if '+ndebug' in spec:
+        # if '+mic' in spec:
+        # if '-k_use_automatic' not in spec:
+        # if '-mkverbose' not in spec:
