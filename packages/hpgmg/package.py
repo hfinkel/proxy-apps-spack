@@ -46,16 +46,13 @@ class Hpgmg(AutotoolsPackage):
     homepage = "https://bitbucket.org/hpgmg/hpgmg"
     url      = "https://bitbucket.org/hpgmg/hpgmg/get/master.tar.gz"
 
-    variant('fe', default=TRUE, description='Build Finite Element FAS solver')
-    variant('fv', default=TRUE, description='Build Finite Volume solver')
-    variant('mpi', default=FALSE, description='Build with MPI support')
+    variant('fe', default=True, description='Build Finite Element FAS solver')
+    variant('fv', default=True, description='Build Finite Volume solver')
+    variant('mpi', default=False, description='Build with MPI support')
 
-    if '-fe' not in spec:
-        depends_on('petsc')
-    if '-fv' not in spec:
-        depends_on('openmp')
-    if '+mpi' in spec:
-        depends_on('mpi')
+    depends_on('petsc', when='+fe')
+    depends_on('openmp', when='+fv')
+    depends_on('mpi', when='+mpi')
 
     # def configure_args(self):
         # FIXME: Add arguments other than --prefix

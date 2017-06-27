@@ -46,21 +46,22 @@ class AmrExpParabolic(MakefilePackage):
     homepage = "https://ccse.lbl.gov/ExaCT/index.html"
     url      = "https://ccse.lbl.gov/ExaCT/AMR_Exp_Parabolic.tgz"
 
-    variant('ndebug', default=FALSE, description='Turn off debugging')
-    variant('mpi', default=TRUE, description='Build with MPI support')
-    variant('openmp', default=FALSE, description='Build with OpenMP support')
-    variant('prof', default=FALSE, description='Use profiler')
-    variant('mkverbose', default=TRUE, description='Verbosity of building process')
+    variant('ndebug', default=False, description='Turn off debugging')
+    variant('mpi', default=True, description='Build with MPI support')
+    variant('openmp', default=False, description='Build with OpenMP support')
+    variant('prof', default=False, description='Use profiler')
+    variant('mkverbose', default=True, description='Verbosity of building process')
 
-    if '-mpi' not in spec:
-        depends_on('mpi')
-    if '+openmp' in spec:
-        depends_on('openmp')
-    if '+prof' in spec:
-    if '-mkverbose' in spec:
+    depends_on('mpi', when='+mpi')
+    depends_on('openmp', when='+openmp')
 
-    def edit(self, spec, prefix):
+
+    # def edit(self, spec, prefix):
         # FIXME: Edit the Makefile if necessary
         # FIXME: If not needed delete this function
         # makefile = FileFilter('Makefile')
         # makefile.filter('CC = .*', 'CC = cc')
+        # if '+ndebug' in spec:
+        # if '+mic' in spec:
+        # if '-k_use_automatic' not in spec:
+        # if '-mkverbose' not in spec:
