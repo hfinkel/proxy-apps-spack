@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2013-2016, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2012-2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
 #
 # This file is part of Spack.
@@ -27,11 +27,11 @@
 # next to all the things you'll want to change. Once you've handled
 # them, you can save this file and test your package like this:
 #
-#     spack install mcb
+#     spack install comd
 #
 # You can edit this file again by typing:
 #
-#     spack edit mcb
+#     spack edit comd
 #
 # See the Spack documentation for more information on packaging.
 # If you submit this package back to Spack as a pull request,
@@ -40,19 +40,24 @@
 from spack import *
 
 
-class Mcb(MakefilePackage):
-    """FIXME: Put a proper description of your package here."""
+class Comd(MakefilePackage):
+    """The molecular dynamics (MD) computer simulation method is a 
+    well-established and important tool for the study of the dynamical 
+    properties of liquids, solids, and other systems of interest in 
+    Materials Science and Engineering, Chemistry and Biology. 
+    A material is represented in terms of atoms and molecules."""
 
     # FIXME: Add a proper url for your package's homepage here.
-    homepage = "http://www.example.com"
-    url      = "https://codesign.llnl.gov/downloads/mcb-20130723.tar.gz"
+    homepage = "http://www.exmatex.org/comd.html"
+    url      = "https://github.com/exmatex/CoMD/archive/master.tar.gz"
 
-    version('20130723', 'ed9c97edb45c8918184b4eba280bd884')
-
+    # FIXME: Add proper versions and checksums here.
+    # version('1.2.3', '0123456789abcdef0123456789abcdef')
+    version('master',git='https://github.com/exmatex/CoMD.git',branch='master')    
     # FIXME: Add dependencies if required.
     # depends_on('foo')
 
-    #def edit(self, spec, prefix):
+    def edit(self, spec, prefix):
         # FIXME: Edit the Makefile if necessary
         # FIXME: If not needed delete this function
         # makefile = FileFilter('Makefile')

@@ -41,16 +41,21 @@ from spack import *
 
 
 class KripkeOpenmp(CMakePackage):
-    """FIXME: Put a proper description of your package here."""
+    """Kripke is a simple, scalable, 3D Sn deterministic particle transport
+    code. Its primary purpose is to research how data layout, programming 
+    paradigms and architectures effect the implementation and performance 
+    of Sn transport. A main goal of Kripke is investigating how different 
+    data-layouts effect instruction, thread and task level parallelism, 
+    and what the implications are on overall solver performance."""
 
     # FIXME: Add a proper url for your package's homepage here.
-    homepage = "http://www.example.com"
+    homepage = "https://codesign.llnl.gov/kripke.php"
     url      = "https://codesign.llnl.gov/downloads/kripke-openmp-1.1.tar.gz"
 
     version('1.1', '7fe6f2b26ed983a6ce5495ab701f85bf')
 
     # FIXME: Add dependencies if required.
-    # depends_on('foo')
+    depends_on('mpi')
 
     def cmake_args(self):
         # FIXME: Add arguments other than
