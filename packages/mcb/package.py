@@ -52,7 +52,7 @@ class Mcb(MakefilePackage):
     # FIXME: Add dependencies if required.
     # depends_on('foo')
 
-    def edit(self, spec, prefix):
+    #def edit(self, spec, prefix):
         # FIXME: Edit the Makefile if necessary
         # FIXME: If not needed delete this function
         # makefile = FileFilter('Makefile')
