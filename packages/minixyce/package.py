@@ -48,11 +48,15 @@ class Minixyce(MakefilePackage):
 
     version('1.0', '6fc0e5a561af0b8ff581d9f704194133')
 
+    variant('mpi', default=True, description='Build with MPI Support')
+
+    depends_on('mpi', when='+mpi')
+
     def edit(self, spec, prefix):
         makefile = FileFilter('miniXyce_ref/Makefile')
         
         if '+mpi' in spec:
-            makefile.filter('CXX=.*', 'CC = {}'.format(spec['mpi'].mpicxx))
+            makefile.filter('CXX=.*', 'CXX = {}'.format(spec['mpi'].mpicxx))
             makefile.filter('LINKER=.*', 'LINKER = {}'.format(spec['mpi'].mpicxx))
             makefile.filter('USE_MPI = .*', 'USE_MPI = -DHAVE_MPI -DMPICH_IGNORE_CXX_SEEK')
         else:
@@ -74,8 +78,10 @@ class Minixyce(MakefilePackage):
         # Manual Installation
         mkdirp(prefix.bin)
         mkdirp(prefix.tests)
+        mkdirp(prefix.doc)
         install('miniXyce.x', prefix.bin)
         install('default_params.txt', prefix.bin)
+        install('../README', prefix.doc)
 
         # Install test data files
         for f in os.listdir('tests'):
