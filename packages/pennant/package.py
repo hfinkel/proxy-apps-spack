@@ -53,11 +53,43 @@ class Pennant(MakefilePackage):
     version('0.5', '534547878c698b9926e2886c74e10831')
     version('0.4', '0f67d8da0a92bd42d92a4823d3e4dbe1')
 
-    variant('mpi', default=False, description='Build with MPI support')
-    variant('openmp', default=False, description='Build with OpenMP support')
+    variant('mpi', default=True, description='Build with MPI support')
+    variant('openmp', default=True, description='Build with OpenMP support')
+    variant('debug', default=False, description='Enable debug')
 
-    # Optional dependencies
     depends_on('mpi', when='+mpi')
 
     def edit(self, spec, prefix):
         makefile = FileFilter('Makefile')
+
+        debug = '-g'
+        opt = '-O3'
+
+        if self.compiler.name == 'icpc':
+            opt += ' -fast -fno-alias'
+        if self.compiler.name == 'pgCC':
+            compiler = 'pgCC'
+            opt += ' -fastsse'
+
+        makefile.filter('CXX .*', 'CXX := c++')
+        makefile.filter('CXXFLAGS_DEBUG .*', 'CXXFLAGS_DEBUG := {0}'.format(debug))
+        makefile.filter('CXXFLAGS_OPT .*', 'CXXFLAGS_OPT := {0}'.format(opt))
+        makefile.filter('CXXFLAGS_OPENMP .*', 'CXXFLAGS_OPENMP := {0}'.format(self.compiler.openmp_flag))
+        
+        if '+mpi' in spec:
+            makefile.filter('CXX .*', 'CXX := {0}'.format(spec['mpi'].mpicxx))
+
+        if '+mpi' not in spec:
+            makefile.filter('CXX := mpicxx', '#')
+            makefile.filter('-DUSE_MPI', '#')
+            makefile.filter('CXX .*', 'CXX := c++')
+
+        if '+openmp' not in spec:
+            makefile.filter('.*CXXFLAGS_OPENMP.*', '#')
+        
+        if '+debug' in spec:
+            makefile.filter('.*(CXXFLAGS_OPT).*', 'CXXFLAGS := $(CXXFLAGS_DEBUG)')
+
+    def install(self, spec, prefix):
+        mkdirp(prefix.bin)
+        install('build/pennant', prefix.bin)
