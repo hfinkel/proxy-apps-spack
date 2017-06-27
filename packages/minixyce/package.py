@@ -41,22 +41,14 @@ import os
 from spack import *
 
 class Minixyce(MakefilePackage):
-    """FIXME: Put a proper description of your package here."""
+    """A portable proxy of some of the key capabilities in the electrical modeling Xyce."""
 
-    # FIXME: Add a proper url for your package's homepage here.
-    homepage = "http://www.example.com"
+    homepage = "https://mantevo.org"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/MiniXyce/miniXyce_1.0.tar.gz"
 
     version('1.0', '6fc0e5a561af0b8ff581d9f704194133')
 
-    # FIXME: Add dependencies if required.
-    # depends_on('foo')
-
-    #build_targets = ['--directory=miniXyce_ref', 'generate_info']
-
     def edit(self, spec, prefix):
-        # FIXME: Edit the Makefile if necessary
-        # FIXME: If not needed delete this function
         makefile = FileFilter('miniXyce_ref/Makefile')
         
         if '+mpi' in spec:
@@ -72,17 +64,20 @@ class Minixyce(MakefilePackage):
 
     def build(self, spec, prefix):
         os.chdir('miniXyce_ref')
+        # Script targets must be called in order for created files to be visible
         make('generate_info')
         make('common_files')
         make()
         
      
     def install(self, spec, prefix):
+        # Manual Installation
         mkdirp(prefix.bin)
         mkdirp(prefix.tests)
-        #mkdirp(prefix.lib)
         install('miniXyce.x', prefix.bin)
         install('default_params.txt', prefix.bin)
+
+        # Install test data files
         for f in os.listdir('tests'):
             print(f)
             if os.path.isfile(join_path(self.build_directory, 'tests/{}'.format(f))) == True:
@@ -91,4 +86,3 @@ class Minixyce(MakefilePackage):
                 mkdirp(join_path(prefix.tests, f))
                 for d in os.listdir(join_path(self.build_directory, 'tests/{}'.format(f))):
                     install('tests/{}/{}'.format(f,d), join_path(prefix.tests, f))
-        print(self.rpath)
