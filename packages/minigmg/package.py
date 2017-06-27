@@ -52,8 +52,7 @@ Note, miniGMG code has been supersceded by HPGMG. """
 
     depends_on('mpi')
     depends_on('openmp')
-    if spec.satisfies('@cuda'):
-        depends_on('cuda')
+    depends_on('cuda', when='@cuda')
 
     def install(self, spec, prefix):
         # FIXME: Unknown build system
