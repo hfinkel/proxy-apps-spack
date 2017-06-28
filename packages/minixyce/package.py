@@ -64,10 +64,14 @@ class Minixyce(MakefilePackage):
             makefile.filter('LINKER=.*', 'LINKER = c++')
             makefile.filter('USE_MPI = .*', 'USE_MPI = ')
 
-        makefile.filter('CPP_OPT_FLAGS = .*', 'CPP_OPT_FLAGS = -O3')
+        if '%gcc' in spec:
+            makefile.filter('CPP_OPT_FLAGS = .*', 'CPP_OPT_FLAGS = -O3 -funroll-all-loops')
+        else:
+            makefile.filter('CPP_OPT_FLAGS = .*', 'CPP_OPT_FLAGS = ')
 
     def build(self, spec, prefix):
         os.chdir('miniXyce_ref')
+        
         # Script targets must be called in order for created files to be visible
         make('generate_info')
         make('common_files')
@@ -77,18 +81,17 @@ class Minixyce(MakefilePackage):
     def install(self, spec, prefix):
         # Manual Installation
         mkdirp(prefix.bin)
-        mkdirp(prefix.tests)
-        mkdirp(prefix.doc)
+        mkdirp(prefix.doc.tests)
+
         install('miniXyce.x', prefix.bin)
         install('default_params.txt', prefix.bin)
         install('../README', prefix.doc)
 
         # Install test data files
         for f in os.listdir('tests'):
-            print(f)
             if os.path.isfile(join_path(self.build_directory, 'tests/{}'.format(f))) == True:
-                install('tests/{}'.format(f), prefix.tests)
+                install('tests/{}'.format(f), prefix.doc.tests)
             else:
-                mkdirp(join_path(prefix.tests, f))
+                mkdirp(join_path(prefix.doc.tests, f))
                 for d in os.listdir(join_path(self.build_directory, 'tests/{}'.format(f))):
-                    install('tests/{}/{}'.format(f,d), join_path(prefix.tests, f))
+                    install('tests/{}/{}'.format(f,d), join_path(prefix.doc.tests, f))
