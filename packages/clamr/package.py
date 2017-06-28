@@ -40,7 +40,7 @@
 from spack import *
 
 
-class Clamr(Package):
+class Clamr(CMakePackage):
     """The CLAMR code is a cell-based adaptive mesh refinement (AMR) mini-app developed as a testbed for hybrid algorithm development using MPI and OpenCL GPU code."""
 
     homepage = "https://github.com/lanl/CLAMR"
@@ -48,12 +48,14 @@ class Clamr(Package):
 
     version('2.0.7', '2f017fb80cb23e3771048e4c73c22dfa')
 
-    # FIXME: Add dependencies if required.
-    # depends_on('foo')
-    # depends_on('mpi')
-    # depends_on('
+    variant('nographics', default=False, description='Build without GPU support')
+    # variant('opengl', default=True, description='Build with OpenGL')
+    variant('debug', default=False, description='Debugging enabled')
+    variant('release', default=False, description='Release version')
+    variant('full', default=False, description='full double precision')
+    variant('mixed', default=False, description='intermediates double, arrays single precision')
+    variant('single', default=False, description='single precision')
 
-    #def install(self, spec, prefix):
-        # FIXME: Unknown build system
-        # make()
-        # make('install')
+    depends_on('mpi')
+    depends_on('opengl', when='+opengl')
+    depends_on('mpe', when='-opengl')
