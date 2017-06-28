@@ -34,8 +34,8 @@ class Hpccg(MakefilePackage):
 
     version('1.0', '2e99da1a89de5ef0844da5e6ffbf39dc')
 
-    variant('mpi', default=False, description='Build with MPI support')
-    variant('openmp', default=False, description='Build with OpenMP support')
+    variant('mpi', default=True, description='Build with MPI support')
+    variant('openmp', default=True, description='Build with OpenMP support')
 
     # Optional dependencies
     depends_on('mpi', when= '+mpi')
@@ -47,7 +47,6 @@ class Hpccg(MakefilePackage):
 
         if '%gcc' not in self.spec:
             makefile.filter('CPP_OPT_FLAGS = -O3 -ftree-vectorize -ftree-vectorizer-verbose=2', '#')
-
 
         if '+mpi' in self.spec:
             makefile.filter('USE_MPI =', 'USE_MPI = -DUSING_MPI')
