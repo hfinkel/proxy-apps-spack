@@ -59,3 +59,5 @@ class Clamr(CMakePackage):
     depends_on('mpi')
     depends_on('opengl', when='+opengl')
     depends_on('mpe', when='-opengl')
+
+    #where cmake arg config function goes
