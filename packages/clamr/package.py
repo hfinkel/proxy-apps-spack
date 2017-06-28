@@ -49,7 +49,7 @@ class Clamr(CMakePackage):
     version('2.0.7', '2f017fb80cb23e3771048e4c73c22dfa')
 
     variant('nographics', default=False, description='Build without GPU support')
-    # variant('opengl', default=True, description='Build with OpenGL')
+    variant('opengl', default=True, description='Build with OpenGL')
     variant('debug', default=False, description='Debugging enabled')
     variant('release', default=False, description='Release version')
     variant('full', default=False, description='full double precision')
@@ -57,9 +57,15 @@ class Clamr(CMakePackage):
     variant('single', default=False, description='single precision')
 
     depends_on('mpi')
-    depends_on('opengl', when='+opengl')
     depends_on('mpe', when='-opengl')
 
-    #where cmake arg config function goes
-    #
-    #
+    # def build_type(self):
+        # if '+debug' in spec:
+            # return 'Debug'
+        # if '+release' in spec:
+            # return 'Release'
+        # return 'RelWithDebInfo'
+
+    # def cmake_args(self):
+        # args = '-DGRAPHICS_TYPE='
+        # if '+opengl' in 
