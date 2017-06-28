@@ -43,11 +43,16 @@ class Pathfinder(MakefilePackage):
     def install(self, spec, prefix):
         # Manual installation
         mkdirp(prefix.bin)
-        mkdirp(prefix.generatedData)
-        mkdirp(prefix.scaleData)
+        mkdirp(prefix.doc.generatedData)
+        mkdirp(prefix.doc.scaleData)
 
         install('PathFinder_ref/PathFinder.x', prefix.bin)
+        install('README', prefix.doc)
+        install('COPYING', prefix.doc)
+        install('COPYING.LESSER', prefix.doc)
+
+        # Install Sample Run Data
         for f in listdir(join_path(self.build_directory, 'generatedData')):
-            install('generatedData/{}'.format(f), prefix.generatedData)
+            install('generatedData/{}'.format(f), prefix.doc.generatedData)
         for f in listdir(join_path(self.build_directory, 'scaleData')):
-            install('scaleData/{}'.format(f), prefix.scaleData)
+            install('scaleData/{}'.format(f), prefix.doc.scaleData)
