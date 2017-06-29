@@ -22,21 +22,6 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-#
-# This is a template package file for Spack.  We've put "FIXME"
-# next to all the things you'll want to change. Once you've handled
-# them, you can save this file and test your package like this:
-#
-#     spack install cloverleaf
-#
-# You can edit this file again by typing:
-#
-#     spack edit cloverleaf
-#
-# See the Spack documentation for more information on packaging.
-# If you submit this package back to Spack as a pull request,
-# please first remove this boilerplate and all FIXME comments.
-#
 from spack import *
 import re
 import glob
@@ -50,31 +35,53 @@ class Cloverleaf(MakefilePackage):
     version('1.1', '65652b30a64eb237ec844a6fdd4cd518')
 
     variant('build', default='ref', description='Type of Parallelism Build', 
-            values=('CUDA', 'MPI', 'Offload', 'OpenACC_CRAY', 'OpenMP', 'OpenMP4', 'ref', 'Serial'))
+            values=('CUDA', 'MPI', 'Offload', 'OpenACC_CRAY', 'OpenMP', 'ref', 'Serial'))
 
     depends_on('mpi') 
 
     depends_on('cuda', when='build=CUDA')
 
+    type_of_build = ''
+
     def edit(self, spec, prefix):
-        build_type = re.search('build=([.\S]+)', str(spec))
-        if build_type:
-            self.build_targets.extend(['--directory=CloverLeaf_{}'.format(build_type.group(1))])
+        build_search = re.search('build=([.\S]+)', str(spec))
+        self.type_of_build = build_search.group(1)
+
+        if self.type_of_build:
+            if self.type_of_build == 'OpenMP':
+                if int(self.compiler.version.up_to(1)) >= 5:
+                    self.type_of_build = 'OpenMP4'
+                else:
+                    self.type_of_build = 'OpenMP'
+
+            self.build_targets.extend(['--directory=CloverLeaf_{}'.format(self.type_of_build)])
 
         self.build_targets.extend(['MPI_COMPILER={}'.format(spec['mpi'].mpifc), 
                                    'C_MPI_COMPILER={}'.format(spec['mpi'].mpicc)])
 
         if '%gcc' in spec:
             self.build_targets.extend(['COMPILER=GNU'])
+        elif '%cce' in spec:
+            self.build_targets.extend(['COMPILER=CRAY'])
+        elif '%intel' in spec:
+            self.build_targets.extend(['COMPILER=INTEL'])
+        elif '%pgi' in spec:
+            self.build_targets.extend(['COMPILER=PGI'])
+        elif 'xl' in spec:
+            self.build_targets.extend(['COMPILER=XLF'])
+
 
     def install(self, spec, prefix):
         mkdirp(prefix.bin)
-        mkdirp(prefix.doc)
+        mkdirp(prefix.doc.tests)
 
-        build_type = re.search('build=([.\S]+)', str(spec))
-        if build_type:
-            folder = build_type.group(1)
-            install('CloverLeaf_{}/clover_leaf'.format(folder), prefix.bin)
-            install('CloverLeaf_{}/clover.in'.format(folder), prefix.bin)
-            for f in glob.glob('CloverLeaf_{}/*.in'.format(folder)):
-                install(f, prefix.doc)
+        install('COPYING', prefix.doc)
+        install('COPYING.LESSER', prefix.doc)
+        install('README.md', prefix.doc)
+        install('documentation.txt', prefix.doc)
+
+        if self.type_of_build:
+            install('CloverLeaf_{}/clover_leaf'.format(self.type_of_build), prefix.bin)
+            install('CloverLeaf_{}/clover.in'.format(self.type_of_build), prefix.bin)
+            for f in glob.glob('CloverLeaf_{}/*.in'.format(self.type_of_build)):
+                install(f, prefix.doc.tests)
