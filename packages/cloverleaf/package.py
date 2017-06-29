@@ -43,7 +43,7 @@ class Cloverleaf(MakefilePackage):
     # Holds build variant value
     type_of_build = ''
 
-    def edit(self, spec, prefix):i
+    def edit(self, spec, prefix):
         # Capture build value in spec
         build_search = re.search('build=([.\S]+)', str(spec))
         self.type_of_build = build_search.group(1)
