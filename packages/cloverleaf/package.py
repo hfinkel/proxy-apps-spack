@@ -49,20 +49,16 @@ class Cloverleaf(MakefilePackage):
 
     version('1.1', '65652b30a64eb237ec844a6fdd4cd518')
 
-    variant('build', default='ref', description='Type of Parallelism Build', 
-            values=('CUDA', 'MPI', 'Offload', 'OpenACC_CRAY', 'OpenMP', 'OpenMP4', 'ref', 'Serial'))
+    variant('build', default='ref', description='Type of Parallelism Build', values=('CUDA', 'MPI', 'Offload', 'OpenACC_CRAY', 'OpenMP', 'OpenMP4', 'ref', 'Serial'))
 
     depends_on('mpi') 
-
     depends_on('cuda', when='build=CUDA')
 
     def edit(self, spec, prefix):
         build_type = re.search('build=([.\S]+)', str(spec))
         if build_type:
             self.build_targets.extend(['--directory=CloverLeaf_{}'.format(build_type.group(1))])
-
-        self.build_targets.extend(['MPI_COMPILER={}'.format(spec['mpi'].mpifc), 
-                                   'C_MPI_COMPILER={}'.format(spec['mpi'].mpicc)])
+            self.build_targets.extend(['MPI_COMPILER={}'.format(spec['mpi'].mpifc), 'C_MPI_COMPILER={}'.format(spec['mpi'].mpicc)])
 
         if '%gcc' in spec:
             self.build_targets.extend(['COMPILER=GNU'])
@@ -70,7 +66,6 @@ class Cloverleaf(MakefilePackage):
     def install(self, spec, prefix):
         mkdirp(prefix.bin)
         mkdirp(prefix.doc)
-
         build_type = re.search('build=([.\S]+)', str(spec))
         if build_type:
             folder = build_type.group(1)

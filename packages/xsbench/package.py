@@ -61,43 +61,33 @@ class Xsbench(MakefilePackage):
     build_targets = ['--directory=src']
 
     def edit(self, spec, prefix):
-	# FIXME: Unknown build system
-	
-	makefile = FileFilter('src/Makefile')
-
-	cflags = '-std=gnu99 -fopenmp'
-	LDFLAGS = '-lm'
-
-	makefile.filter('CC =.*', 'CC = gcc')
-
+    # FIXME: Unknown build system
+        makefile = FileFilter('src/Makefile')
+        cflags = '-std=gnu99 -fopenmp'
+        LDFLAGS = '-lm'
+        makefile.filter('CC =.*', 'CC = gcc')
         if len(self.compiler.name) <= 0 or self.compiler.name == 'gcc':
-                makefile.filter('CC =.*', 'CC = gcc')
+            makefile.filter('CC =.*', 'CC = gcc')
+        if self.compiler.name == 'icc':
+            # Use the Spack compiler wrappers
+            makefile.filter('CC =.*', 'CC = icc')
+            cflags += ' -fopenmp'
+        if self.compiler.name == 'mpicc':
+            # Use the Spack compiler wrappers
+            makefile.filter('CC =.*', 'CC = mpicc')
+        if '+debug' in spec:        
+            cflags += ' -ftree-vectorizer-verbose=6'
+            print('Debugging enabled...')   
+        if '+verify' in spec:
+            cflags += ' -DVERIFICATION'
+        if '+benchmark' in spec:
+            cflags += ' -DBENCHMARK'
+        if '+binarydump' in spec:
+            cflags += ' -DBINARY_DUMP'                
+        if '+binaryread' in spec:
+            cflags += ' -DBINARY_READ'
 
-	if self.compiler.name == 'icc':
-                # Use the Spack compiler wrappers
-		makefile.filter('CC =.*', 'CC = icc')
-                cflags += ' -fopenmp'
-
-	if self.compiler.name == 'mpicc':
-                # Use the Spack compiler wrappers
-		makefile.filter('CC =.*', 'CC = mpicc')
-
-	if '+debug' in spec:		
-		cflags += ' -ftree-vectorizer-verbose=6'
-		print('Debugging enabled...')	
-	if '+verify' in spec:
-		cflags += ' -DVERIFICATION'
-
-	if '+benchmark' in spec:
-                cflags += ' -DBENCHMARK'
-
-	if '+binarydump' in spec:
-                cflags += ' -DBINARY_DUMP'
-
-	if '+binaryread' in spec:
-                cflags += ' -DBINARY_READ'
-
-	makefile.filter('CFLAGS .*', 'CFLAGS = {0}'.format(cflags))
+        makefile.filter('CFLAGS .*', 'CFLAGS = {0}'.format(cflags))
 
     def install(self, spec, prefix):
         # Manual installation
