@@ -48,13 +48,27 @@ class Plasma(MakefilePackage):
 
     # version('1.2.3', '0123456789abcdef0123456789abcdef')
 
-    # FIXME: Add dependencies if required.
-    # depends_on('foo')
+    variant('cuda', default='False', description='Build with CUDA support')
+    variant('single_p', default='False', description='Use single precision')
+    variant('nohandvec', default='False', description='Disable hand vectorization')
+
+    depends_on('%gcc')
     depends_on('mpi')
     depends_on('cuda', when='+cuda')
 
-    #def edit(self, spec, prefix):
-        # FIXME: Edit the Makefile if necessary
-        # FIXME: If not needed delete this function
-        # makefile = FileFilter('Makefile')
-        # makefile.filter('CC = .*', 'CC = cc')
+    def edit(self, spec, prefix):
+        makefile = FileFilter('Makefile')
+        makefile.filter('CC = .*', 'CC = {0}'.format(spec['mpi'].mpicc))
+        
+        if '+cuda' in spec:
+            makefile.filter('CC = .*', 'CC = nvcc')
+
+    def install(self, spec, prefix):
+        install_targets = []
+        if '+cuda' in spec:
+            install_targets.append('USECUDA=1')
+        if '+nohandvec' in spec:
+            install_targets.append('NOHANDVEC=1')
+        
+        mkdirp(prefix.bin)
+        install('PlasmaApp/src/tests', prefix.tests)

@@ -47,18 +47,77 @@ class Comd(MakefilePackage):
     Materials Science and Engineering, Chemistry and Biology. 
     A material is represented in terms of atoms and molecules."""
 
-    # FIXME: Add a proper url for your package's homepage here.
     homepage = "http://www.exmatex.org/comd.html"
     url      = "https://github.com/exmatex/CoMD/archive/master.tar.gz"
 
-    # FIXME: Add proper versions and checksums here.
-    # version('1.2.3', '0123456789abcdef0123456789abcdef')
     version('master',git='https://github.com/exmatex/CoMD.git',branch='master')    
-    # FIXME: Add dependencies if required.
-    # depends_on('foo')
+    
+    variant('precision', default=True, description='for Precision options')
+    variant('mpi', default=True, description='Build with MPI support')
+    variant('openmp', default=True, description='Build with OpenMP support')
+   
+    depends_on('mpi', when='+mpi')    
 
-    #def edit(self, spec, prefix):
-        # FIXME: Edit the Makefile if necessary
-        # FIXME: If not needed delete this function
-        # makefile = FileFilter('Makefile')
-        # makefile.filter('CC = .*', 'CC = cc')
+    def edit(self, spec, prefix):
+        if '+openmp' in spec: 
+            makefile = FileFilter('src-openmp/Makefile.vanilla')
+        else:
+            makefile = FileFilter('src-mpi/Makefile.vanilla')
+            
+
+        makefile.filter('CC   = .*', 'CC = {}'.format(spec['mpi'].mpicc))
+
+        if '+openmp' in spec:
+            self.build_targets.extend(['--directory=src-oprmmp', '--file=Makefile.vanilla'])
+            makefile = FileFilter('src-openmp/Makefile.vanilla')
+            if '+mpi' in spec:
+                ### mpi and opemmp variant 
+
+                pass
+            else:
+                ## openmp variant
+
+                pass
+        else:
+            ### MPI variant
+            self.build_targets.extend(['--directory=src-oprmmp', '--file=Makefile.vanilla'])
+            makefile = FileFilter('src-mpi/Makefile.vanilla')
+            if '+mpi' not in spec:
+                ### serial variant
+                makefile.filter('CC   = .*', 'CC = gcc')
+                
+
+
+    def install(self, spec, prefix):
+        mkdir(prefix.bin)
+        mkdirp(prefix.examples)
+        mkdirp(prefix.pots)
+        mkdirp(prefix.doc)
+        install("examples/*",prefix.examples)
+        install("pots/*",prefix.pots)
+        install('README', prefix.doc)
+        install('LICENSE', prefix.doc)
+
+        if '+openmp' in spec:
+            if '+mpi' in spec:
+                ### mpi and opemmp variant 
+                install('CoMD-openmp', prefix.bin)
+            else:
+                ## openmp variant
+                install('CoMD-openmp-mpi', prefix.bin)
+        else:
+            if '+mpi' in spec:
+                ### mpi variant
+                install('CoMD-mpi', prefix.bin)
+            else:
+                ### serial variant
+                install('CoMD-serial', prefix.bin)
+
+
+
+
+
+
+
+
+

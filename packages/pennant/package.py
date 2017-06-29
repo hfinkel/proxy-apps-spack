@@ -61,7 +61,6 @@ class Pennant(MakefilePackage):
 
     def edit(self, spec, prefix):
         makefile = FileFilter('Makefile')
-
         debug = '-g'
         opt = '-O3'
 
@@ -91,5 +90,13 @@ class Pennant(MakefilePackage):
             makefile.filter('.*(CXXFLAGS_OPT).*', 'CXXFLAGS := $(CXXFLAGS_DEBUG)')
 
     def install(self, spec, prefix):
-        mkdirp(prefix.bin)
+        
+        def install_dir(dirname):
+            install_tree(dirname, join_path(prefix, dirname))
+
+        mkdirp('bin')
         install('build/pennant', prefix.bin)
+        install_dir('doc')
+        install_dir('test')
+        install('LICENSE', prefix)
+        install('README', prefix)

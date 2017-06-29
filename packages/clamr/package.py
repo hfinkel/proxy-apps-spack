@@ -38,18 +38,18 @@
 # please first remove this boilerplate and all FIXME comments.
 #
 from spack import *
-
+import inspect
 
 class Clamr(CMakePackage):
     """The CLAMR code is a cell-based adaptive mesh refinement (AMR) mini-app developed as a testbed for hybrid algorithm development using MPI and OpenCL GPU code."""
 
     homepage = "https://github.com/lanl/CLAMR"
-    url      = "https://github.com/lanl/CLAMR/archive/PowerParser_v2.0.7.tar.gz"
+    url      = ""
 
-    version('2.0.7', '2f017fb80cb23e3771048e4c73c22dfa')
+    version('master', git='https://github.com/lanl/CLAMR.git')
 
     variant('nographics', default=False, description='Build without GPU support')
-    # variant('opengl', default=True, description='Build with OpenGL')
+    variant('opengl', default=True, description='Build with OpenGL')
     variant('debug', default=False, description='Debugging enabled')
     variant('release', default=False, description='Release version')
     variant('full', default=False, description='full double precision')
@@ -57,9 +57,43 @@ class Clamr(CMakePackage):
     variant('single', default=False, description='single precision')
 
     depends_on('mpi')
-    depends_on('opengl', when='+opengl')
     depends_on('mpe', when='-opengl')
 
-    #where cmake arg config function goes
-    #
-    #
+    def build_type(self):
+        if '+debug' in self.spec:
+            return 'Debug'
+        if '+release' in self.spec:
+            return 'Release'
+        return 'RelWithDebInfo'
+
+    def cmake_args(self):
+       cmake_args = []
+       if '+nographics' in self.spec:
+           cmake_args.append('-DGRAPHICS_TYPE=None')
+       elif '-opengl' in self.spec:
+           cmake_args.append('-DGRAPHICS_TYPE=MPE')
+       else:
+           cmake_args.append('-DGRAPHICS_TYPE=OpenGL')
+
+       if '+full' in self.spec:
+           cmake_args.append('-DPRECISION_TYPE=full_precision')
+       if '+single' in self.spec:
+           cmake_args.append('-DPRECISION_TYPE=minimum_precision')
+       if '+mixed' in self.spec:
+           cmake_args.append('-DPRECISION_TYPE=mixed_precision')
+        
+       # if MIC, then -DMIC_NATIVE=yes
+       return cmake_args
+
+    def build(self, spec, prefix):
+        build_targets = ['', 'check', 'clamr_tests', 'doc']
+        with working_dir(self.build_directory):
+            inspect.getmodule(self).make(*self.build_targets)
+
+    def install(self, spec, prefix):
+        install('README', prefix)
+        install('LICENSE', prefix)
+        install_tree('docs', join_path(prefix, 'docs'))
+        install_tree('tests', join_path(prefix, 'tests'))
+        with working_dir(self.build_directory):
+            inspect.getmodule(self).make(*self.install_targets)

@@ -71,7 +71,6 @@ class Minixyce(MakefilePackage):
 
     def build(self, spec, prefix):
         os.chdir('miniXyce_ref')
-        
         # Script targets must be called in order for created files to be visible
         make('generate_info')
         make('common_files')
@@ -82,7 +81,6 @@ class Minixyce(MakefilePackage):
         # Manual Installation
         mkdirp(prefix.bin)
         mkdirp(prefix.doc.tests)
-
         install('miniXyce.x', prefix.bin)
         install('default_params.txt', prefix.bin)
         install('../README', prefix.doc)

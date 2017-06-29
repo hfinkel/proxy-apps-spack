@@ -38,7 +38,6 @@ class Cloverleaf(MakefilePackage):
             values=('CUDA', 'MPI', 'Offload', 'OpenACC_CRAY', 'OpenMP', 'ref', 'Serial'))
 
     depends_on('mpi') 
-
     depends_on('cuda', when='build=CUDA')
 
     type_of_build = ''

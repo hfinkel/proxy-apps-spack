@@ -42,9 +42,9 @@ from spack import *
 
 class Simplemoc(MakefilePackage):
     """The purpose of this mini-app is to demonstrate the performance
-	characterterics and viability of the Method of Characteristics (MOC)
-	for 3D neutron transport calculations in the context of full scale
-	light water reactor simulation."""
+    characterterics and viability of the Method of Characteristics (MOC)
+    for 3D neutron transport calculations in the context of full scale
+    light water reactor simulation."""
 
     # FIXME: Add a proper url for your package's homepage here.
     homepage = "https://github.com/ANL-CESAR/SimpleMOC/"
@@ -63,54 +63,51 @@ class Simplemoc(MakefilePackage):
     build_targets = ['--directory=src']
 
     def edit(self, spec, prefix):
-
-	makefile = FileFilter('src/Makefile')
-
-	cflags = '-std=gnu99'
-	ldflags = '-lm'
+        makefile = FileFilter('src/Makefile')
+        cflags = '-std=gnu99'
+        ldflags = '-lm'
 
         if len(self.compiler.name) <= 0 or self.compiler.name == 'gcc':
-                makefile.filter('CC =.*', 'CC = gcc')
+            makefile.filter('CC =.*', 'CC = gcc')
 
-	if self.compiler.name == 'icc':
-		makefile.filter('CC = .*', 'CC = icc')
+        if self.compiler.name == 'icc':
+            makefile.filter('CC = .*', 'CC = icc')
 
-	if self.compiler.name == 'mpicc':
-		makefile.filter('CC =.*', 'CC = mpicc')
-		cflags += ' ' + '-O5 -qhot -qsimd=auto -qalias=ansi:allptrs -qarch=qp -DIBM -DMPI'
+        if self.compiler.name == 'mpicc':
+            makefile.filter('CC =.*', 'CC = mpicc')
+            cflags += ' ' + '-O5 -qhot -qsimd=auto -qalias=ansi:allptrs -qarch=qp -DIBM -DMPI'
 
+        if '+debug' in spec:
+            cflags += ' ' + '-g'
+        
+        if '+profile' in spec:
+            cflags += ' ' + '-pg'
 
-	if '+debug' in spec:
-		cflags += ' ' + '-g'
-	
-	if '+profile' in spec:
-		cflags += ' ' + '-pg'
+        if '+optimize' in spec and self.compiler.name == 'gcc':
+            cflags += ' ' + '-Ofast -ffast-math -ftree-vectorize -msse2'
 
-	if '+optimize' in spec and self.compiler.name == 'gcc':
-		cflags += ' ' + '-Ofast -ffast-math -ftree-vectorize -msse2'
+        if '+optimize' in spec and self.compiler.name == 'icc':
+            cflags += ' ' + '-O3 -xhost -ansi-alias -no-prec-div -DINTEL'
 
-	if '+optimize' in spec and self.compiler.name == 'icc':
-		cflags += ' ' + '-O3 -xhost -ansi-alias -no-prec-div -DINTEL'
+        if '+papi' in spec:
+            cflags += ' ' + '-DPAPI -DOPENMP'
+            ldflags += ' ' + '-lpapi'
 
-	if '+papi' in spec:
-		cflags += ' ' + '-DPAPI -DOPENMP'
-		ldflags += ' ' + '-lpapi'
+        if '+papi' in spec and self.compiler.name == 'gcc':
+            cfflags += ' ' + '-fopenmp'
 
-	if '+papi' in spec and self.compiler.name == 'gcc':
-		cfflags += ' ' + '-fopenmp'
+        if '+papi' in spec and self.compiler.name == 'icc':
+            cfflags += ' ' + '-openmp'
 
-	if '+papi' in spec and self.compiler.name == 'icc':
-                cfflags += ' ' + '-openmp'
+        if '+papi' in spec and self.compiler.name == 'mpicc':
+            cfflags += ' ' + '-qsmp'
 
-	if '+papi' in spec and self.compiler.name == 'mpicc':
-                cfflags += ' ' + '-qsmp'
+        if '+papi' in spec and self.compiler.name == 'icc':
+            cfflags += ' ' + '-openmp'
 
-	if '+papi' in spec and self.compiler.name == 'icc':
-                cfflags += ' ' + '-openmp'
-
-	makefile.filter('CFLAGS .*', 'CFLAGS = {0}'.format(cflags))
+        makefile.filter('CFLAGS .*', 'CFLAGS = {0}'.format(cflags))
 
     def install(self, spec, prefix):
         # FIXME: Unknown build system
-	mkdir(prefix.bin)
+        mkdir(prefix.bin)
         make('src/SimpleMOC', prefix.bin)
