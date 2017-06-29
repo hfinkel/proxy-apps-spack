@@ -40,12 +40,15 @@ class Cloverleaf(MakefilePackage):
     depends_on('mpi') 
     depends_on('cuda', when='build=CUDA')
 
+    # Holds build variant value
     type_of_build = ''
 
-    def edit(self, spec, prefix):
+    def edit(self, spec, prefix):i
+        # Capture build value in spec
         build_search = re.search('build=([.\S]+)', str(spec))
         self.type_of_build = build_search.group(1)
 
+        # OpenMP build folder depends on openMP version
         if self.type_of_build:
             if self.type_of_build == 'OpenMP':
                 if int(self.compiler.version.up_to(1)) >= 5:
@@ -58,6 +61,7 @@ class Cloverleaf(MakefilePackage):
         self.build_targets.extend(['MPI_COMPILER={}'.format(spec['mpi'].mpifc), 
                                    'C_MPI_COMPILER={}'.format(spec['mpi'].mpicc)])
 
+        # Use Makefile compiler specific flags
         if '%gcc' in spec:
             self.build_targets.extend(['COMPILER=GNU'])
         elif '%cce' in spec:
@@ -71,6 +75,7 @@ class Cloverleaf(MakefilePackage):
 
 
     def install(self, spec, prefix):
+        # Manual Installation
         mkdirp(prefix.bin)
         mkdirp(prefix.doc.tests)
 
