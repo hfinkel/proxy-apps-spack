@@ -41,34 +41,43 @@ from spack import *
 
 
 class Plasma(MakefilePackage):
-    """PlasmaApp is a flexible implicit charge and energy conserving implicit PIC framework. This codes aims to demonstrate the potential of using a fluid plasma model to accelerate a kinetic model through a High-Low order system coupling. The multi-granularity of this problem gives it the ability to map well to emerging heterogeneous architectures with multiple levels of parallelism."""
+    """PlasmaApp is a flexible implicit charge and energy conserving implicit PIC framework. This codes aims to demonstrate the potential of using a fluid plasma model to accelerate a kinetic model through a High-Low order system coupling. The multi-granularity of this problem gives it the ability to map well to emerging heterogeneous architectures with multiple levels of parallelism.
+
+proxy-app
+ecp-proxy-app"""
 
     homepage = "https://github.com/cocomans/plasma/"
     url      = ""
 
-    # version('1.2.3', '0123456789abcdef0123456789abcdef')
+    version('master', git='https://github.com/cocomans/plasma.git')
 
     variant('cuda', default='False', description='Build with CUDA support')
     variant('single_p', default='False', description='Use single precision')
     variant('nohandvec', default='False', description='Disable hand vectorization')
 
-    depends_on('%gcc')
+    depends_on('gmake', type='build')
     depends_on('mpi')
     depends_on('cuda', when='+cuda')
 
     def edit(self, spec, prefix):
-        makefile = FileFilter('Makefile')
+        makefile = FileFilter('./PlasmaApp/Makefile')
         makefile.filter('CC = .*', 'CC = {0}'.format(spec['mpi'].mpicc))
         
         if '+cuda' in spec:
             makefile.filter('CC = .*', 'CC = nvcc')
+            # self.build_targets.extend('USECUDA=1')
 
-    def install(self, spec, prefix):
-        install_targets = []
-        if '+cuda' in spec:
-            install_targets.append('USECUDA=1')
         if '+nohandvec' in spec:
-            install_targets.append('NOHANDVEC=1')
+            # self.build_targets.extend('NOHANDVEC=1')
+
+    # def build(self, spec, prefix):
+        # self.build_directory = join_path(self.build_directory, 'PlasmaApp')
         
+        # optional_flags = ''
+        
+        # gmake('packages')
+        # gamke('tests')
+
+    def install(self, spec, prefix):       
         mkdirp(prefix.bin)
         install('PlasmaApp/src/tests', prefix.tests)
