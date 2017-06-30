@@ -57,6 +57,7 @@ class Clamr(CMakePackage):
     variant('single', default=False, description='single precision')
 
     depends_on('mpi')
+    depends_on('opencl')
     depends_on('mpe', when='-opengl')
 
     def build_type(self):
