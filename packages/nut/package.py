@@ -38,7 +38,7 @@
 # please first remove this boilerplate and all FIXME comments.
 #
 from spack import *
-
+import glob
 
 class Nut(CMakePackage):
     """NuT is Monte Carlo code for neutrino transport and is a C++ analog to the Haskell McPhD code. NuT is principally aimed at exploring on-node parallelism and performance issues."""
@@ -52,15 +52,18 @@ class Nut(CMakePackage):
     depends_on('random123')
     depends_on('openmp', when='@openmp')
 
-    # def cmake_args(self):
-        # FIXME: Add arguments other than
-        # FIXME: CMAKE_INSTALL_PREFIX and CMAKE_BUILD_TYPE
-        # FIXME: If not needed delete this function
-        # export RANDOM123_DIR=
-        # export CC = 
-        # export CXX = 
-        # mkdir build
-        # cmake -DCMAKE_INSTALL_PREFIX=./nut ..
-        # make VERBOSE=on -j 4 2>&1 | tee -a make.out
-        # args = []
-        # return args
+    def cmake_args(self):
+        cmakefile = FileFilter('CMakeLists.txt')
+        cmakefile.filter('# create variable.*', 'set(ENV{RANDOM123_DIR} prefix/../random123*)')
+        cmakefile.filter('# set compiler .*', 'set(ENV{CC} cc)')
+        cmakefile.filter('# GNU .*', 'set(ENV{CXX} c++)')
+
+        self.build_targets.extend(['VERBOSE=on -j 4 2>&1 | tee -a make.out'])
+
+        args = []
+        return args
+
+    def install(self, spec, prefix):
+        install('README.md', prefix)
+        mkdirp('test', prefix)
+        install_tree(join_path(self.build_directory, 'test'), join_path(prefix, 'test'))
