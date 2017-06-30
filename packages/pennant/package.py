@@ -41,7 +41,10 @@ from spack import *
 
 
 class Pennant(MakefilePackage):
-    """PENNANT is an unstructured mesh physics mini-app designed for advanced architecture research. It contains mesh data structures and a few physics algorithms adapted from the LANL rad-hydro code FLAG, and gives a sample of the typical memory access patterns of FLAG."""
+    """PENNANT is an unstructured mesh physics mini-app designed for advanced architecture research. It contains mesh data structures and a few physics algorithms adapted from the LANL rad-hydro code FLAG, and gives a sample of the typical memory access patterns of FLAG.
+
+proxy-app
+ecp-proxy-app"""
 
     homepage = "https://github.com/lanl/PENNANT"
     url      = "https://github.com/lanl/PENNANT/archive/pennant_v0.9.tar.gz"
