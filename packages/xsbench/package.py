@@ -41,22 +41,28 @@ from spack import *
 
 
 class Xsbench(MakefilePackage):
-    """FIXME: Put a proper description of your package here."""
+    """XSBench is a mini-app representing a key computational kernel of the Monte Carlo neutronics application OpenMC.
+
+       A full explanation of the theory and purpose of XSBench is provided in docs/XSBench_Theory.pdf."""
 
     # FIXME: Add a proper url for your package's homepage here.
-    homepage = "http://www.example.com"
+    homepage = "https://github.com/ANL-CESAR/XSBench/"
     url      = "https://github.com/ANL-CESAR/XSBench/archive/v13.tar.gz"
 
     version('13', '72a92232d2f5777fb52f5ea4082aff37')
 
-    variant('debug',     default=False,  description='Enable debugging.')
-    variant('verify',     default=False,  description='Enable verification.')
-    variant('benchmark',     default=False,  description='Adds outer benchmarking loop to do multiple trials for 1 < threads <= max_threads.')
-    variant('binarydump',     default=False,  description='Binary dump for file I/O based initialization.')
-    variant('binaryread',     default=False,  description='Binary read for file I/O based initialization.')
+    variant('vecinfo', default=False,  description='Compiler Vectorization (needs -O3 flag) information.')
+    variant('verify', default=False,  description='Enable verification.')
+    variant('benchmark', default=False,  description='Adds outer benchmarking loop to do multiple trials for 1 < threads <= max_threads.')
+    variant('binarydump', default=False,  description='Binary dump for file I/O based initialization.')
+    variant('binaryread', default=False,  description='Binary read for file I/O based initialization.')
+    variant('mpi', default=False,  description='Build with MPI support.')
+    variant('optimize', default=False,  description='Enable optimization flag.')
+    variant('openmp', default=True, description='Build with OpenMP support.')
 
     # FIXME: Add dependencies if required.
-    # depends_on('foo')
+    depends_on('mpi', when='+mpi')
+    depends_on('openmpi')
 
     build_targets = ['--directory=src']
 
@@ -82,9 +88,12 @@ class Xsbench(MakefilePackage):
                 # Use the Spack compiler wrappers
 		makefile.filter('CC =.*', 'CC = mpicc')
 
-	if '+debug' in spec:		
+	if '+mpi' in spec:
+		makefile.filter('CC =.*', 'CC = mpicc')
+		cflags += ' -DMPI'
+	if '+vecinfo' in spec:		
 		cflags += ' -ftree-vectorizer-verbose=6'
-		print('Debugging enabled...')	
+		cflags += ' -03'
 	if '+verify' in spec:
 		cflags += ' -DVERIFICATION'
 
@@ -96,6 +105,9 @@ class Xsbench(MakefilePackage):
 
 	if '+binaryread' in spec:
                 cflags += ' -DBINARY_READ'
+
+	if '+optimize' in spec:
+		cflags += ' -03'
 
 	makefile.filter('CFLAGS .*', 'CFLAGS = {0}'.format(cflags))
 

@@ -61,7 +61,6 @@ class Pennant(MakefilePackage):
 
     def edit(self, spec, prefix):
         makefile = FileFilter('Makefile')
-
         debug = '-g'
         opt = '-O3'
 

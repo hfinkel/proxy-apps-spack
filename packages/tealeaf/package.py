@@ -23,45 +23,23 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
 from spack import *
-import re
 import glob
 
-class Cloverleaf(MakefilePackage):
-    """CloverLeaf is a miniapp that solves the compressible Euler equations on a Cartesian grid, using an explicit, second-order accurate method."""
+class Tealeaf(MakefilePackage):
+    """Proxy Application. TeaLeaf is a mini-app that solves the linear heat conduction equation on a spatially decomposed regularly grid using a 5 point stencil with implicit solvers. """
 
-    homepage = "http://uk-mac.github.io/CloverLeaf"
-    url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/CloverLeaf/CloverLeaf-1.1.tar.gz"
+    homepage = "http://uk-mac.github.io/TeaLeaf/"
+    url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/TeaLeaf/TeaLeaf-1.0.tar.gz"
 
-    version('1.1', '65652b30a64eb237ec844a6fdd4cd518')
+    version('1.0', '02a907281ad2d09e70ca0a17551c6d79')
 
-    variant('build', default='ref', description='Type of Parallelism Build', 
-            values=('CUDA', 'MPI', 'Offload', 'OpenACC_CRAY', 'OpenMP', 'ref', 'Serial'))
-
-    depends_on('mpi') 
-    depends_on('cuda', when='build=CUDA')
-
-    # Holds build variant value
-    type_of_build = ''
+    depends_on('mpi')
 
     def edit(self, spec, prefix):
-        # Capture build value in spec
-        build_search = re.search('build=([.\S]+)', str(spec))
-        self.type_of_build = build_search.group(1)
+        self.build_targets.extend(['--directory=TeaLeaf_ref'])
+        self.build_targets.extend(['MPI_COMPILER={}'.format(spec['mpi'].mpifc)])
+        self.build_targets.extend(['C_MPI_COMPILER={}'.format(spec['mpi'].mpicc)])
 
-        # OpenMP build folder depends on openMP version
-        if self.type_of_build:
-            if self.type_of_build == 'OpenMP':
-                if int(self.compiler.version.up_to(1)) >= 5:
-                    self.type_of_build = 'OpenMP4'
-                else:
-                    self.type_of_build = 'OpenMP'
-
-            self.build_targets.extend(['--directory=CloverLeaf_{}'.format(self.type_of_build)])
-
-        self.build_targets.extend(['MPI_COMPILER={}'.format(spec['mpi'].mpifc), 
-                                   'C_MPI_COMPILER={}'.format(spec['mpi'].mpicc)])
-
-        # Use Makefile compiler specific flags
         if '%gcc' in spec:
             self.build_targets.extend(['COMPILER=GNU'])
         elif '%cce' in spec:
@@ -71,8 +49,7 @@ class Cloverleaf(MakefilePackage):
         elif '%pgi' in spec:
             self.build_targets.extend(['COMPILER=PGI'])
         elif 'xl' in spec:
-            self.build_targets.extend(['COMPILER=XLF'])
-
+            self.build_targets.extend(['COMPILER=XL'])
 
     def install(self, spec, prefix):
         # Manual Installation
@@ -82,10 +59,8 @@ class Cloverleaf(MakefilePackage):
         install('COPYING', prefix.doc)
         install('COPYING.LESSER', prefix.doc)
         install('README.md', prefix.doc)
-        install('documentation.txt', prefix.doc)
 
-        if self.type_of_build:
-            install('CloverLeaf_{}/clover_leaf'.format(self.type_of_build), prefix.bin)
-            install('CloverLeaf_{}/clover.in'.format(self.type_of_build), prefix.bin)
-            for f in glob.glob('CloverLeaf_{}/*.in'.format(self.type_of_build)):
-                install(f, prefix.doc.tests)
+        install('TeaLeaf_ref/tea_leaf', prefix.bin)
+        install('TeaLeaf_ref/tea.in', prefix.bin)
+        for f in glob.glob('TeaLeaf_ref/*.in'):
+            install(f, prefix.doc.tests)

@@ -67,7 +67,7 @@ class Amg(MakefilePackage):
 
 
 
-def edit(self, spec, prefix):
+    def edit(self, spec, prefix):
         makefile = FileFilter('*/Makefile')
         makefile.filter('INCLUDE_CFLAGS =', 'INCLUDE_CFLAGS = -DTIMER_USE_MPI')
         makefile.filter('CXX=.*', 'CXX={}'.format(spec['mpi'].mpicxx))
@@ -86,12 +86,12 @@ def edit(self, spec, prefix):
             makefile.filter('#INCLUDE_LFLAGS = -lm -fopenmp -qsmp ', 'INCLUDE_LFLAGS = {}'.format(self.compiler.openmp_flag))
 
 
-def install(self, spec, prefix):
+    def install(self, spec, prefix):
         # Manual installation
-    mkdirp(prefix.doc)
-    install('docs', prefix.doc)
-    install('COPYRIGHT', prefix.doc)
-    install('COPYRIGHT.LESSER', prefix.doc)
+        mkdirp(prefix.doc)
+        install('docs', prefix.doc)
+        install('COPYRIGHT', prefix.doc)
+        install('COPYRIGHT.LESSER', prefix.doc)
 
 
 

@@ -54,9 +54,10 @@ class Rsbench(MakefilePackage):
     variant('optimize',     default=False,  description='Do Optimizations.')
     variant('papi',     default=False,  description='Enable PAPI support.')
     variant('status', default=False, description='Enable status flag.')
+    variant('openmp', default=True, description='Built with OpenMP support.')
 
     # FIXME: Add dependencies if required.
-    # depends_on('foo')
+    depends_on('openmp')
 
     build_targets = ['--directory=src']
 

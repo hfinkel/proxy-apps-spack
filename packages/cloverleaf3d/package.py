@@ -26,37 +26,25 @@ from spack import *
 import re
 import glob
 
-class Cloverleaf(MakefilePackage):
-    """CloverLeaf is a miniapp that solves the compressible Euler equations on a Cartesian grid, using an explicit, second-order accurate method."""
+class Cloverleaf3d(MakefilePackage):
+    """CloverLeaf3D is 3D version of the CloverLeaf mini-app. """
 
-    homepage = "http://uk-mac.github.io/CloverLeaf"
-    url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/CloverLeaf/CloverLeaf-1.1.tar.gz"
+    homepage = "http://uk-mac.github.io/CloverLeaf3D/"
+    url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/CloverLeaf3D/CloverLeaf3D-1.0.tar.gz"
 
-    version('1.1', '65652b30a64eb237ec844a6fdd4cd518')
+    version('1.0', '2e86cadd7612487f9da4ddeb1a6de939')
 
-    variant('build', default='ref', description='Type of Parallelism Build', 
-            values=('CUDA', 'MPI', 'Offload', 'OpenACC_CRAY', 'OpenMP', 'ref', 'Serial'))
+    variant('OpenACC', default=False, description='Enable OpenACC Support')
 
-    depends_on('mpi') 
-    depends_on('cuda', when='build=CUDA')
+    depends_on('mpi')
 
-    # Holds build variant value
-    type_of_build = ''
+    type_of_build = 'ref'
 
     def edit(self, spec, prefix):
-        # Capture build value in spec
-        build_search = re.search('build=([.\S]+)', str(spec))
-        self.type_of_build = build_search.group(1)
-
-        # OpenMP build folder depends on openMP version
-        if self.type_of_build:
-            if self.type_of_build == 'OpenMP':
-                if int(self.compiler.version.up_to(1)) >= 5:
-                    self.type_of_build = 'OpenMP4'
-                else:
-                    self.type_of_build = 'OpenMP'
-
-            self.build_targets.extend(['--directory=CloverLeaf_{}'.format(self.type_of_build)])
+        if '+OpenACC' in spec:
+            type_of_build = 'OpenACC'
+        
+        self.build_targets.extend(['--directory=CloverLeaf3D_{}'.format(self.type_of_build)])
 
         self.build_targets.extend(['MPI_COMPILER={}'.format(spec['mpi'].mpifc), 
                                    'C_MPI_COMPILER={}'.format(spec['mpi'].mpicc)])
@@ -82,10 +70,9 @@ class Cloverleaf(MakefilePackage):
         install('COPYING', prefix.doc)
         install('COPYING.LESSER', prefix.doc)
         install('README.md', prefix.doc)
-        install('documentation.txt', prefix.doc)
 
         if self.type_of_build:
-            install('CloverLeaf_{}/clover_leaf'.format(self.type_of_build), prefix.bin)
-            install('CloverLeaf_{}/clover.in'.format(self.type_of_build), prefix.bin)
-            for f in glob.glob('CloverLeaf_{}/*.in'.format(self.type_of_build)):
+            install('CloverLeaf3D_{}/clover_leaf'.format(self.type_of_build), prefix.bin)
+            install('CloverLeaf3D_{}/clover.in'.format(self.type_of_build), prefix.bin)
+            for f in glob.glob('CloverLeaf3D_{}/*.in'.format(self.type_of_build)):
                 install(f, prefix.doc.tests)

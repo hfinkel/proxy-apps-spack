@@ -56,9 +56,13 @@ class Simplemoc(MakefilePackage):
     variant('debug',     default=False,  description='Enable debugging.')
     variant('optimize',     default=False,  description='Do Optimizations.')
     variant('papi',     default=False,  description='Enable PAPI support.')
+    variant('mpi',     default=False,  description='Built with MPI support.')
+    variant('openmp',     default=False,  description='Built with OpenMP support.')
+
 
     # FIXME: Add dependencies if required.
-    # depends_on('foo')
+    depends_on('mpi', when='+mpi')
+    depends_on('openmpi', when='+openmp')
 
     build_targets = ['--directory=src']
 
@@ -97,16 +101,16 @@ class Simplemoc(MakefilePackage):
 		ldflags += ' ' + '-lpapi'
 
 	if '+papi' in spec and self.compiler.name == 'gcc':
-		cfflags += ' ' + '-fopenmp'
+		cflags += ' ' + '-fopenmp'
 
 	if '+papi' in spec and self.compiler.name == 'icc':
-                cfflags += ' ' + '-openmp'
+                cflags += ' ' + '-openmp'
 
 	if '+papi' in spec and self.compiler.name == 'mpicc':
-                cfflags += ' ' + '-qsmp'
+                cflags += ' ' + '-qsmp'
 
 	if '+papi' in spec and self.compiler.name == 'icc':
-                cfflags += ' ' + '-openmp'
+                cflags += ' ' + '-openmp'
 
 	makefile.filter('CFLAGS .*', 'CFLAGS = {0}'.format(cflags))
 
