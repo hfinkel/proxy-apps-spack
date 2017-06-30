@@ -1,3 +1,5 @@
 packages:
     nut:
         compiler: [clang]
+    clamr:
+        compiler: [gcc, intel, pgi, clang, xl, nag]
