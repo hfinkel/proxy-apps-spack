@@ -34,20 +34,17 @@ class Cloverleaf3d(MakefilePackage):
 
     version('1.0', '2e86cadd7612487f9da4ddeb1a6de939')
 
-    variant('build', default='ref', description='Type of Parallelism Build', 
-            values=('OpenCL', 'OpenACC', 'ref'))
+    variant('OpenACC', default=False, description='Enable OpenACC Support')
 
     depends_on('mpi')
 
-    type_of_build = ''
+    type_of_build = 'ref'
 
     def edit(self, spec, prefix):
-        build_search = re.search('build=([.\S]+)', str(spec))
-        self.type_of_build = build_search.group(1)
-
-        # OpenMP build folder depends on openMP version
-        if self.type_of_build:
-            self.build_targets.extend(['--directory=CloverLeaf3D_{}'.format(self.type_of_build)])
+        if '+OpenACC' in spec:
+            type_of_build = 'OpenACC'
+        
+        self.build_targets.extend(['--directory=CloverLeaf3D_{}'.format(self.type_of_build)])
 
         self.build_targets.extend(['MPI_COMPILER={}'.format(spec['mpi'].mpifc), 
                                    'C_MPI_COMPILER={}'.format(spec['mpi'].mpicc)])
