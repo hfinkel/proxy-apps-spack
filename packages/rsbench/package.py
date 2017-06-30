@@ -54,39 +54,44 @@ class Rsbench(MakefilePackage):
     variant('optimize',     default=False,  description='Do Optimizations.')
     variant('papi',     default=False,  description='Enable PAPI support.')
     variant('status', default=False, description='Enable status flag.')
+    variant('openmp', default=True, description='Built with OpenMP support.')
 
     # FIXME: Add dependencies if required.
-    # depends_on('foo')
+    depends_on('openmp')
 
     build_targets = ['--directory=src']
 
     def edit(self, spec, prefix):
-        makefile = FileFilter('src/makefile')
+
+	makefile = FileFilter('src/makefile')
+
         cflags = '-std=gnu99 -fopenmp -ffast-math'
         ldflags = '-lm'
 
-        if len(self.compiler.name) <= 0 or self.compiler.name == 'gcc':
-            makefile.filter('CC =.*', 'CC = gcc')
+	if len(self.compiler.name) <= 0 or self.compiler.name == 'gcc':
+                makefile.filter('CC =.*', 'CC = gcc')
 
-        if '+debug' in spec: 
-            cflags += ' ' + '-g'
-            
-        if '+profile' in spec:
-            cflags += ' ' + '-pg'
-
-        if '+optimize' in spec and self.compiler.name == 'icc':
-            cflags += ' ' + '-O3'
-
-        if '+status' in spec:
-            cflags += ' ' + '-DSTATUS'
-
-        if '+papi' in spec:
-            cflags += ' ' + '-DPAPI'
-            ldflags += ' ' + '-lpapi'
-        makefile.filter('source =.*', 'source = {0}'.format('papi.c \\'))
-        makefile.filter('CFLAGS .*', 'CFLAGS = {0}'.format(cflags))
+	if '+debug' in spec: 
+                cflags += ' ' + '-g'
         
+        if '+profile' in spec:
+                cflags += ' ' + '-pg'
+
+	if '+optimize' in spec and self.compiler.name == 'icc':
+                cflags += ' ' + '-O3'
+
+	if '+status' in spec:
+		cflags += ' ' + '-DSTATUS'
+
+	if '+papi' in spec:
+                cflags += ' ' + '-DPAPI'
+		ldflags += ' ' + '-lpapi'
+		makefile.filter('source =.*', 'source = {0}'.format('papi.c \\'))
+
+
+	makefile.filter('CFLAGS .*', 'CFLAGS = {0}'.format(cflags))
+	
     def install(self, spec, prefix):
         # FIXME: Unknown build system
-        mkdir(prefix.bin)
+	mkdir(prefix.bin)
         make('src/rsbench', prefix.bin)
