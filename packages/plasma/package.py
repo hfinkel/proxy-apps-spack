@@ -61,22 +61,21 @@ ecp-proxy-app"""
 
     def edit(self, spec, prefix):
         makefile = FileFilter('./PlasmaApp/Makefile')
-        makefile.filter('CC = .*', 'CC = {0}'.format(spec['mpi'].mpicc))
-        
+        makefile.filter('CC = .*', 'CC = {}'.format(spec['mpi'].mpicc))
+        makefile.filter('CXX=.*, CXX = {}'.format(spec['mpi'].mpicxx))        
         if '+cuda' in spec:
             makefile.filter('CC = .*', 'CC = nvcc')
-            # self.build_targets.extend('USECUDA=1')
 
+    def build(self, spec, prefix):
+        opt = ''
+        if '+cuda' in spec:
+            opt += 'USECUDA=1 '
         if '+nohandvec' in spec:
-            # self.build_targets.extend('NOHANDVEC=1')
+            opt += 'NOHANDVEC=1 '
 
-    # def build(self, spec, prefix):
-        # self.build_directory = join_path(self.build_directory, 'PlasmaApp')
-        
-        # optional_flags = ''
-        
-        # gmake('packages')
-        # gamke('tests')
+        with working_dir(join_path(self.build_directory, 'PlasmaApp')):
+            gmake('{0}packages'.format(opt))
+            gmake('{0}tests'.format(opt))
 
     def install(self, spec, prefix):       
         mkdirp(prefix.bin)
