@@ -40,7 +40,7 @@
 from spack import *
 
 
-class KripkeOpenmp(CMakePackage):
+class Kripke(CMakePackage):
     """Kripke is a simple, scalable, 3D Sn deterministic particle transport
     code. Its primary purpose is to research how data layout, programming 
     paradigms and architectures effect the implementation and performance 
@@ -54,13 +54,21 @@ class KripkeOpenmp(CMakePackage):
 
     version('1.1', '7fe6f2b26ed983a6ce5495ab701f85bf')
 
+    variant('mpi', default=True, description='Build with MPI')
+    variant('openmp', default=True, description='Build with with OpenMP')
     # FIXME: Add dependencies if required.
     depends_on('mpi')
 
-    #def cmake_args(self):
+    def cmake_args(self):
+        pass
         # FIXME: Add arguments other than
         # FIXME: CMAKE_INSTALL_PREFIX and CMAKE_BUILD_TYPE
         # FIXME: If not needed delete this function
         #args = []
         #return args
      #   pass
+
+
+
+
+
