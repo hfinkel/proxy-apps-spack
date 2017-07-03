@@ -50,6 +50,8 @@ class Simplemoc(MakefilePackage):
     homepage = "https://github.com/ANL-CESAR/SimpleMOC/"
     url      = "https://github.com/ANL-CESAR/SimpleMOC/archive/master.tar.gz"
 
+    tags = ['proxy-app']
+
     # FIXME: Add proper versions and checksums here.
     version('1.2.3', 'd8827221a4ae76e9766a32e16d143e60')
 
@@ -74,13 +76,16 @@ class Simplemoc(MakefilePackage):
 	ldflags = '-lm'
 
         if len(self.compiler.name) <= 0 or self.compiler.name == 'gcc':
-                makefile.filter('CC =.*', 'CC = gcc')
+                #makefile.filter('CC =.*', 'CC = gcc')
+		self.build_targets.extend(['COMPILER=gnu'])
 
 	if self.compiler.name == 'icc':
-		makefile.filter('CC = .*', 'CC = icc')
+		#makefile.filter('CC = .*', 'CC = icc')
+		self.build_targets.extend(['COMPILER=intel'])
 
 	if self.compiler.name == 'mpicc':
-		makefile.filter('CC =.*', 'CC = mpicc')
+		#makefile.filter('CC =.*', 'CC = mpicc')
+		self.build_targets.extend(['COMPILER=bluegene'])
 		cflags += ' ' + '-O5 -qhot -qsimd=auto -qalias=ansi:allptrs -qarch=qp -DIBM -DMPI'
 
 
