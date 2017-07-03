@@ -56,7 +56,7 @@ class Cosp2(MakefilePackage):
 
     # FIXME: Add proper versions and checksums here.
     # version('1.2.3', '0123456789abcdef0123456789abcdef')
-    version('master',git='https://github.com/exmatex/CoSP2.git','master')
+    version('master',git='https://github.com/exmatex/CoSP2.git',description='master')
     variant('serial',default=True,description='Serial Build ')
     variant('parallel',default=True,description='Serial Build ')
     # FIXME: Add dependencies if required.
