@@ -26,11 +26,13 @@ from spack import *
 
 
 class Hpccg(MakefilePackage):
-    """Intended to be the 'best approximation to an unstructured implicit
+    """Proxy Application. Intended to be the 'best approximation to an unstructured implicit
     finite element or finite volume application in 800 lines or fewer.'"""
 
     homepage = "https://mantevo.org/about/applications/"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/HPCCG/HPCCG-1.0.tar.gz"
+
+    tags = ['proxy-app']
 
     version('1.0', '2e99da1a89de5ef0844da5e6ffbf39dc')
 

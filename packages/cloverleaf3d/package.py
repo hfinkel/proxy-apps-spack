@@ -27,10 +27,12 @@ import re
 import glob
 
 class Cloverleaf3d(MakefilePackage):
-    """CloverLeaf3D is 3D version of the CloverLeaf mini-app. """
+    """Proxy Application. CloverLeaf3D is 3D version of the CloverLeaf mini-app. """
 
     homepage = "http://uk-mac.github.io/CloverLeaf3D/"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/CloverLeaf3D/CloverLeaf3D-1.0.tar.gz"
+
+    tags = ['proxy-app']
 
     version('1.0', '2e86cadd7612487f9da4ddeb1a6de939')
 

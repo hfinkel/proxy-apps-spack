@@ -31,6 +31,8 @@ class Tealeaf(MakefilePackage):
     homepage = "http://uk-mac.github.io/TeaLeaf/"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/TeaLeaf/TeaLeaf-1.0.tar.gz"
 
+    tags = ['proxy-app']
+
     version('1.0', '02a907281ad2d09e70ca0a17551c6d79')
 
     depends_on('mpi')

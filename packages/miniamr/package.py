@@ -30,6 +30,8 @@ class Miniamr(MakefilePackage):
     homepage = "https://mantevo.org"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/MiniAMR/miniAMR_1.0_all.tgz"
 
+    tags = ['proxy-app']
+
     version('1.0', '812e5aaaab99689a4e9381a3bbd718a6')
 
     variant('mpi', default=True, description='Build with MPI support')

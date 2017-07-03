@@ -32,6 +32,8 @@ class Minife(MakefilePackage):
     homepage = "https://mantevo.org/"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/MiniFE/miniFE-2.0.1.tgz"
 
+    tags = ['proxy-app']
+
     version('2.0.1', '3113d7c8fc01495d08552672b0dbd015')
 
     variant('build', default='ref', description='Type of Parallelism',

@@ -26,10 +26,12 @@ from spack import *
 from os import listdir
 
 class Pathfinder(MakefilePackage):
-    """Signature search."""
+    """Proxy Application. Signature search."""
 
     homepage = "https://mantevo.org/packages/"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/PathFinder/PathFinder_1.0.0.tgz"
+
+    tags = ['proxy-app']
 
     version('1.0.0', '374269e8d42c305eda3e392444e22dde')
 

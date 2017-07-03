@@ -32,6 +32,8 @@ class Minimd(MakefilePackage):
     homepage = "http://mantevo.org"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/MiniMD/miniMD_1.2.tgz"
 
+    tags = ['proxy-app']
+
     version('1.2', '893ef1ca5062e32b43a8d11bcfe1a056')
 
     #variant('build', default='openmpi', description='Type of Build',
