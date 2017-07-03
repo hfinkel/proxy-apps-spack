@@ -49,6 +49,8 @@ class Xsbench(MakefilePackage):
     homepage = "https://github.com/ANL-CESAR/XSBench/"
     url      = "https://github.com/ANL-CESAR/XSBench/archive/v13.tar.gz"
 
+    tags = ['proxy-app']
+
     version('13', '72a92232d2f5777fb52f5ea4082aff37')
 
     variant('vecinfo', default=False,  description='Compiler Vectorization (needs -O3 flag) information.')
@@ -74,22 +76,22 @@ class Xsbench(MakefilePackage):
 	cflags = '-std=gnu99 -fopenmp'
 	LDFLAGS = '-lm'
 
-	makefile.filter('CC =.*', 'CC = gcc')
+	#makefile.filter('CC =.*', 'CC = gcc')
+
+	self.build_targets.extend(['COMPILER=GNU'])
 
         if len(self.compiler.name) <= 0 or self.compiler.name == 'gcc':
-                makefile.filter('CC =.*', 'CC = gcc')
-
-	if self.compiler.name == 'icc':
-                # Use the Spack compiler wrappers
-		makefile.filter('CC =.*', 'CC = icc')
-                cflags += ' -fopenmp'
+                #makefile.filter('CC =.*', 'CC = gcc')
+		self.build_targets.extend(['COMPILER=GNU'])
 
 	if self.compiler.name == 'mpicc':
                 # Use the Spack compiler wrappers
-		makefile.filter('CC =.*', 'CC = mpicc')
+		#makefile.filter('CC =.*', 'CC = mpicc')
+		self.build_targets.extend(['MPI=yes'])
 
 	if '+mpi' in spec:
-		makefile.filter('CC =.*', 'CC = mpicc')
+		#makefile.filter('CC =.*', 'CC = mpicc')
+		self.build_targets.extend(['MPI=yes'])
 		cflags += ' -DMPI'
 	if '+vecinfo' in spec:		
 		cflags += ' -ftree-vectorizer-verbose=6'

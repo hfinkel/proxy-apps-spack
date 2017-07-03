@@ -26,10 +26,12 @@ import os
 from spack import *
 
 class Minixyce(MakefilePackage):
-    """A portable proxy of some of the key capabilities in the electrical modeling Xyce."""
+    """Proxy Application. A portable proxy of some of the key capabilities in the electrical modeling Xyce."""
 
     homepage = "https://mantevo.org"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/MiniXyce/miniXyce_1.0.tar.gz"
+
+    tags = ['proxy-app']
 
     version('1.0', '6fc0e5a561af0b8ff581d9f704194133')
 

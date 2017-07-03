@@ -22,39 +22,43 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
+#
+# This is a template package file for Spack.  We've put "FIXME"
+# next to all the things you'll want to change. Once you've handled
+# them, you can save this file and test your package like this:
+#
+#     spack install ebms
+#
+# You can edit this file again by typing:
+#
+#     spack edit ebms
+#
+# See the Spack documentation for more information on packaging.
+# If you submit this package back to Spack as a pull request,
+# please first remove this boilerplate and all FIXME comments.
+#
 from spack import *
-from os import listdir
 
-class Pathfinder(MakefilePackage):
-    """Proxy Application. Signature search."""
 
-    homepage = "https://mantevo.org/packages/"
-    url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/PathFinder/PathFinder_1.0.0.tgz"
+class Ebms(Package):
+    """FIXME: Put a proper description of your package here."""
+
+    # FIXME: Add a proper url for your package's homepage here.
+    homepage = "http://www.example.com"
+    url      = "https://github.com/ANL-CESAR/EBMS/archive/master.tar.gz"
 
     tags = ['proxy-app']
 
-    version('1.0.0', '374269e8d42c305eda3e392444e22dde')
+    # FIXME: Add proper versions and checksums here.
+    version('master', git='https://github.com/ANL-CESAR/EBMS.git')
 
-    build_targets = ['--directory=PathFinder_ref']
-
-    def edit(self, spec, prefix):
-        makefile = FileFilter('PathFinder_ref/Makefile')
-        makefile.filter('CC=.*', 'CC=cc')
-        makefile.filter('CFLAGS += .*', 'CFLAGS += {}'.format(self.compiler.openmp_flag))
+    depends_on('mpi')
 
     def install(self, spec, prefix):
-        # Manual installation
-        mkdirp(prefix.bin)
-        mkdirp(prefix.doc.generatedData)
-        mkdirp(prefix.doc.scaleData)
-
-        install('PathFinder_ref/PathFinder.x', prefix.bin)
-        install('README', prefix.doc)
-        install('COPYING', prefix.doc)
-        install('COPYING.LESSER', prefix.doc)
-
-        # Install Sample Run Data
-        for f in listdir(join_path(self.build_directory, 'generatedData')):
-            install('generatedData/{}'.format(f), prefix.doc.generatedData)
-        for f in listdir(join_path(self.build_directory, 'scaleData')):
-            install('scaleData/{}'.format(f), prefix.doc.scaleData)
+        # FIXME: Unknown build system
+	mkdir(prefix.bin)
+        make()
+	install('ebmc-iallgather', prefix.bin)
+	install('ebmc-rget', prefix.bin)
+	#install('run', prefix.bin)
+	#install('inputs', prefix.bin)

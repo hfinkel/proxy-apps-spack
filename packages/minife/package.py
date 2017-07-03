@@ -32,6 +32,8 @@ class Minife(MakefilePackage):
     homepage = "https://mantevo.org/"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/MiniFE/miniFE-2.0.1.tgz"
 
+    tags = ['proxy-app']
+
     version('2.0.1', '3113d7c8fc01495d08552672b0dbd015')
 
     variant('build', default='ref', description='Type of Parallelism',
@@ -42,23 +44,27 @@ class Minife(MakefilePackage):
     depends_on('qthreads', when='build=qthreads')
 
     type_of_build = 'ref'
+    build_version = ''
+
 
     def edit(self, spec, prefix):
         build_search = re.search('build=([.\S]+)', str(spec))
         self.type_of_build = build_search.group(1)
 
-        inner_tar = tarfile.open(name='miniFE-2.0_{}.tgz'.format(self.type_of_build))
+        self.build_version = self.version.up_to(2)
+
+        inner_tar = tarfile.open(name='miniFE-{}_{}.tgz'.format(self.build_version, self.type_of_build))
         inner_tar.extractall()
 
-        makefile = FileFilter('miniFE-2.0_{}/src/Makefile'.format(self.type_of_build))
+        makefile = FileFilter('miniFE-{}_{}/src/Makefile'.format(self.build_version, self.type_of_build))
         makefile.filter('-fopenmp', self.compiler.openmp_flag, string=True)
 
-        self.build_targets.extend(['--directory=miniFE-2.0_{}/src'.format(self.type_of_build)])
+        self.build_targets.extend(['--directory=miniFE-{}_{}/src'.format(self.build_version, self.type_of_build)])
         self.build_targets.extend(['CXX={}'.format(spec['mpi'].mpicxx)])
         self.build_targets.extend(['CC={}'.format(spec['mpi'].mpicc)])
 
     def install(self, spec, prefix):
         mkdirp(prefix.bin)
-        install('miniFE-2.0_{}/src/miniFE.x'.format(self.type_of_build), prefix.bin)
+        install('miniFE-{}_{}/src/miniFE.x'.format(self.build_version, self.type_of_build), prefix.bin)
 
 

@@ -7,7 +7,7 @@
 # LLNL-CODE-647188
 #
 # For details, see https://github.com/llnl/spack
-# Please also see the LICENSE file for our notice and the LGPL.
+# Please also see the NOTICE and LICENSE files for our notice and the LGPL.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License (as
@@ -22,39 +22,39 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
+from shutil import copytree
+
 from spack import *
-from os import listdir
 
-class Pathfinder(MakefilePackage):
-    """Proxy Application. Signature search."""
 
-    homepage = "https://mantevo.org/packages/"
-    url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/PathFinder/PathFinder_1.0.0.tgz"
+class Miniaero(MakefilePackage):
+    """Proxy Application. MiniAero is a mini-application for the evaulation
+       of programming models and hardware for next generation platforms."""
+
+    homepage = "http://mantevo.org"
+    url      = "https://github.com/Mantevo/miniAero.git"
 
     tags = ['proxy-app']
 
-    version('1.0.0', '374269e8d42c305eda3e392444e22dde')
+    version('2016-11-11', git='https://github.com/Mantevo/miniAero.git',
+            commit='f46d135479a5be19ec5d146ccaf0e581aeff4596')
 
-    build_targets = ['--directory=PathFinder_ref']
+    depends_on('kokkos')
+
+    build_targets = ['--directory=kokkos']
 
     def edit(self, spec, prefix):
-        makefile = FileFilter('PathFinder_ref/Makefile')
-        makefile.filter('CC=.*', 'CC=cc')
-        makefile.filter('CFLAGS += .*', 'CFLAGS += {}'.format(self.compiler.openmp_flag))
-
+        makefile = FileFilter('kokkos/Makefile')
+        makefile.filter('CXX = .*', 'CXX = c++')
+        makefile.filter('KOKKOS_PATH = .*', 
+                        'KOKKOS_PATH = {}'.format(self.rpath[2][:-3]))
+        
     def install(self, spec, prefix):
-        # Manual installation
+        # Manual Installation
         mkdirp(prefix.bin)
-        mkdirp(prefix.doc.generatedData)
-        mkdirp(prefix.doc.scaleData)
+        mkdirp(prefix.doc)
 
-        install('PathFinder_ref/PathFinder.x', prefix.bin)
-        install('README', prefix.doc)
-        install('COPYING', prefix.doc)
-        install('COPYING.LESSER', prefix.doc)
-
-        # Install Sample Run Data
-        for f in listdir(join_path(self.build_directory, 'generatedData')):
-            install('generatedData/{}'.format(f), prefix.doc.generatedData)
-        for f in listdir(join_path(self.build_directory, 'scaleData')):
-            install('scaleData/{}'.format(f), prefix.doc.scaleData)
+        install('kokkos/miniAero.host', prefix.bin)
+        install('kokkos/README', prefix.doc)
+        install('kokkos/tests/3D_Sod_Serial/miniaero.inp', prefix.bin)
+        copytree('kokkos/tests', prefix.doc.tests)

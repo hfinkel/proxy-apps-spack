@@ -1,4 +1,4 @@
-#############################################################################
+##############################################################################
 # Copyright (c) 2013-2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
 #
@@ -7,7 +7,7 @@
 # LLNL-CODE-647188
 #
 # For details, see https://github.com/llnl/spack
-# Please also see the LICENSE file for our notice and the LGPL.
+# Please also see the NOTICE and LICENSE files for our notice and the LGPL.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License (as
@@ -27,11 +27,11 @@
 # next to all the things you'll want to change. Once you've handled
 # them, you can save this file and test your package like this:
 #
-#     spack install kripke-openmp
+#     spack install cosp2
 #
 # You can edit this file again by typing:
 #
-#     spack edit kripke-openmp
+#     spack edit cosp2
 #
 # See the Spack documentation for more information on packaging.
 # If you submit this package back to Spack as a pull request,
@@ -40,27 +40,34 @@
 from spack import *
 
 
-class KripkeOpenmp(CMakePackage):
-    """Kripke is a simple, scalable, 3D Sn deterministic particle transport
-    code. Its primary purpose is to research how data layout, programming 
-    paradigms and architectures effect the implementation and performance 
-    of Sn transport. A main goal of Kripke is investigating how different 
-    data-layouts effect instruction, thread and task level parallelism, 
-    and what the implications are on overall solver performance."""
+class Cosp2(MakefilePackage):
+    """Proxy Application. CoSP2 represents a sparse linear algebra 
+    parallel algorithm for calculating the density matrix in electronic 
+    tructure theory. The algorithm is based on a recursive second-order 
+    Fermi-Operator expansion method (SP2) and is tailored for density 
+    functional based tight-binding calculations of non-metallic systems 
+    
+    tags : proxy-add ecp-proxy-app """
 
-    # FIXME: Add a proper url for your package's homepage here.
-    homepage = "https://codesign.llnl.gov/kripke.php"
-    url      = "https://codesign.llnl.gov/downloads/kripke-openmp-1.1.tar.gz"
+    tags = ['proxy-app','ecp-proxy-app']
 
-    version('1.1', '7fe6f2b26ed983a6ce5495ab701f85bf')
+    homepage = "http://www.exmatex.org/cosp2.html"
+    url      = "https://github.com/exmatex/CoSP2/archive/master.tar.gz"
 
+    # FIXME: Add proper versions and checksums here.
+    # version('1.2.3', '0123456789abcdef0123456789abcdef')
+    version('master',git='https://github.com/exmatex/CoSP2.git',description='master')
+    variant('serial',default=True,description='Serial Build ')
+    variant('parallel',default=True,description='Serial Build ')
     # FIXME: Add dependencies if required.
-    depends_on('mpi')
+    # depends_on('foo')
 
-    #def cmake_args(self):
-        # FIXME: Add arguments other than
-        # FIXME: CMAKE_INSTALL_PREFIX and CMAKE_BUILD_TYPE
+    def edit(self, spec, prefix):
+        pass
+        # FIXME: Edit the Makefile if necessary
         # FIXME: If not needed delete this function
-        #args = []
-        #return args
-     #   pass
+        # makefile = FileFilter('Makefile')
+        # makefile.filter('CC = .*', 'CC = cc')
+
+    def install(self, spec, prefix):
+        pass

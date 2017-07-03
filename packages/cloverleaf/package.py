@@ -27,10 +27,12 @@ import re
 import glob
 
 class Cloverleaf(MakefilePackage):
-    """CloverLeaf is a miniapp that solves the compressible Euler equations on a Cartesian grid, using an explicit, second-order accurate method."""
+    """Proxy Application. CloverLeaf is a miniapp that solves the compressible Euler equations on a Cartesian grid, using an explicit, second-order accurate method."""
 
     homepage = "http://uk-mac.github.io/CloverLeaf"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/CloverLeaf/CloverLeaf-1.1.tar.gz"
+
+    tags = ['proxy-app']
 
     version('1.1', '65652b30a64eb237ec844a6fdd4cd518')
 
@@ -51,7 +53,7 @@ class Cloverleaf(MakefilePackage):
         # OpenMP build folder depends on openMP version
         if self.type_of_build:
             if self.type_of_build == 'OpenMP':
-                if int(self.compiler.version.up_to(1)) >= 5:
+                if '%gcc' in spec and int(self.compiler.version.up_to(1)) >= 5:
                     self.type_of_build = 'OpenMP4'
                 else:
                     self.type_of_build = 'OpenMP'
