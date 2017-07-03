@@ -42,12 +42,15 @@ class Minimd(MakefilePackage):
     depends_on('openmpi')
 
     type_of_build = 'ref'
+    build_version = ''
 
     def edit(self, spec, prefix):
         #build_search = re.search('build=([.\S]+)', str(spec))
         #self.type_of_build = build_search.group(1)
 
-        inner_tar = tarfile.open(name='miniMD_1.2_{}.tgz'.format(self.type_of_build))
+        self.build_version = self.version.up_to(2)
+
+        inner_tar = tarfile.open(name='miniMD_{}_{}.tgz'.format(self.build_version, self.type_of_build))
         inner_tar.extractall()
 
         self.build_targets.extend(['--directory=miniMD_{}'.format(self.type_of_build)])
