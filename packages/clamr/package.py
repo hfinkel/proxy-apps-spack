@@ -41,13 +41,11 @@ from spack import *
 import inspect
 
 class Clamr(CMakePackage):
-    """The CLAMR code is a cell-based adaptive mesh refinement (AMR) mini-app developed as a testbed for hybrid algorithm development using MPI and OpenCL GPU code.
-
-proxy-app
-ecp-proxy-app"""
+    """The CLAMR code is a cell-based adaptive mesh refinement (AMR) mini-app developed as a testbed for hybrid algorithm development using MPI and OpenCL GPU code."""
 
     homepage = "https://github.com/lanl/CLAMR"
     url      = ""
+    tags     = ['proxy-app']
 
     version('master', git='https://github.com/lanl/CLAMR.git')
 
