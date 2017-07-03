@@ -41,20 +41,33 @@ from spack import *
 
 
 class Cosp2(MakefilePackage):
-    """FIXME: Put a proper description of your package here."""
+    """Proxy Application. CoSP2 represents a sparse linear algebra 
+    parallel algorithm for calculating the density matrix in electronic 
+    tructure theory. The algorithm is based on a recursive second-order 
+    Fermi-Operator expansion method (SP2) and is tailored for density 
+    functional based tight-binding calculations of non-metallic systems 
+    
+    tags : proxy-add ecp-proxy-app """
 
-    # FIXME: Add a proper url for your package's homepage here.
-    homepage = "http://www.example.com"
+    tags = ['proxy-app','ecp-proxy-app']
+
+    homepage = "http://www.exmatex.org/cosp2.html"
     url      = "https://github.com/exmatex/CoSP2/archive/master.tar.gz"
 
     # FIXME: Add proper versions and checksums here.
     # version('1.2.3', '0123456789abcdef0123456789abcdef')
-
+    version('master',git='https://github.com/exmatex/CoSP2.git','master')
+    variant('serial',default=True,description='Serial Build ')
+    variant('parallel',default=True,description='Serial Build ')
     # FIXME: Add dependencies if required.
     # depends_on('foo')
 
     def edit(self, spec, prefix):
+        pass
         # FIXME: Edit the Makefile if necessary
         # FIXME: If not needed delete this function
         # makefile = FileFilter('Makefile')
         # makefile.filter('CC = .*', 'CC = cc')
+
+    def install(self, spec, prefix):
+        pass
