@@ -45,8 +45,11 @@ class Snap(MakefilePackage):
 
     homepage = "https://github.com/lanl/SNAP"
     url      = ""
+    tags     = ['proxy-app']
 
     version('master', git='https://github.com/lanl/SNAP.git')
+
+    variant('openmp', default=True, description='Build with OpenMP support')
 
     depends_on('mpi')
     # depends_on('fortran')

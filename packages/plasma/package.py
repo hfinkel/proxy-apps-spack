@@ -64,7 +64,7 @@ ecp-proxy-app"""
         makefile.filter('CC=.*', 'CC = cc')
         makefile.filter('CXX=.*', 'CXX = {}'.format(spec['mpi'].mpicxx))
 
-        makefile.filter('#.*Makefile.export.Teuchos.*' ,'\\\t\t\t\t\tMakefile.export.Teuchos')
+        makefile.filter('.*Makefile.export.NOX.*' ,'\t\t\t\t\tMakefile.export.NOX \\\n\t\t\t\t\tMakefile.export.Teuchos')
         
         if '+cuda' in spec:
             makefile.filter('CC=.*', 'CC = nvcc')
