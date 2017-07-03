@@ -45,6 +45,7 @@ class Nut(CMakePackage):
 
     homepage = "https://github.com/lanl/NuT"
     url      = ""
+    tags     = ['proxy-app']
 
     version('serial', git='https://github.com/lanl/NuT.git', branch='master')
     version('openmp', git='https://github.com/lanl/NuT.git', branch='openmp')
