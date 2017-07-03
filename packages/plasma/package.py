@@ -61,10 +61,13 @@ ecp-proxy-app"""
 
     def edit(self, spec, prefix):
         makefile = FileFilter('./PlasmaApp/Makefile')
-        makefile.filter('CC = .*', 'CC = {}'.format(spec['mpi'].mpicc))
-        makefile.filter('CXX=.*, CXX = {}'.format(spec['mpi'].mpicxx))        
+        makefile.filter('CC=.*', 'CC = cc')
+        makefile.filter('CXX=.*', 'CXX = {}'.format(spec['mpi'].mpicxx))
+
+        makefile.filter('#.*Makefile.export.Teuchos.*' ,'\\\t\t\t\t\tMakefile.export.Teuchos')
+        
         if '+cuda' in spec:
-            makefile.filter('CC = .*', 'CC = nvcc')
+            makefile.filter('CC=.*', 'CC = nvcc')
 
     def build(self, spec, prefix):
         opt = ''
