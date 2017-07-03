@@ -54,15 +54,35 @@ class Lcals(MakefilePackage):
     # FIXME: Add dependencies if required.
     # depends_on('foo')
 
-    #@when('arch=x86_sse_icc')
     def edit(self, spec, prefix):
         # FIXME: Edit the Makefile if necessary
         # FIXME: If not needed delete this function
         makefile = FileFilter('Makefile')
-	self.build_targets.extend(['LCALS_ARCH={}'.format('x86_sse_gnu')])
-	self.build_targets.extend(['CXX={}'.format('g++')])
+	
+
+        self.build_targets.extend(['LCALS_ARCH={}'.format('x86_sse_gnu')])
+        self.build_targets.extend(['CXX={}'.format('g++')])
+	
+	if self.compiler.name == 'icc':
+		self.build_targets.extend(['LCALS_ARCH={}'.format('MIC')])
+		self.build_targets.extend(['CXX={}'.format('icc')])
+	if self.compiler.name == 'icpc':
+                self.build_targets.extend(['LCALS_ARCH={}'.format('x86_sse_icc')])
+                self.build_targets.extend(['CXX={}'.format('icpc')])
+	if self.compiler.name == 'mpixlcxx':
+                self.build_targets.extend(['LCALS_ARCH={}'.format('bgp_xlc9')])
+                self.build_targets.extend(['CXX={}'.format('mpixlcxx')])
+	if self.compiler.name == 'mpixlcxx_r':
+                self.build_targets.extend(['LCALS_ARCH={}'.format('bgq_xlc12')])
+                self.build_targets.extend(['CXX={}'.format('mpixlcxx_r')])
+	if self.compiler.name == 'bgclang++11':
+                self.build_targets.extend(['LCALS_ARCH={}'.format('bgq_clang')])
+                self.build_targets.extend(['CXX={}'.format('bgclang++11')])
+        if self.compiler.name == 'mpicxx-4.7.2x':
+                self.build_targets.extend(['LCALS_ARCH={}'.format('bgq_gnu')])
+                self.build_targets.extend(['CXX={}'.format('mpicxx-4.7.2')])
 
     def install(self, spec, prefix):
         mkdir(prefix.bin)
         install('lcals.exe', prefix.bin)
-	
+
