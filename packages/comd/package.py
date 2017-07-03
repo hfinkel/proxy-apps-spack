@@ -38,6 +38,9 @@
 # please first remove this boilerplate and all FIXME comments.
 #
 from spack import *
+import shutil
+import os
+
 
 
 class Comd(MakefilePackage):
@@ -57,37 +60,35 @@ class Comd(MakefilePackage):
     variant('openmp', default=True, description='Build with OpenMP support')
    
     depends_on('mpi', when='+mpi')    
-
+    
     def edit(self, spec, prefix):
+        shutil.copy('src-openmp/Makefile.vanilla','src-openmp/Makefile')
+        shutil.copy('src-mpi/Makefile.vanilla','src-mpi/Makefile')
         if '+openmp' in spec: 
-            makefile = FileFilter('src-openmp/Makefile.vanilla')
+            makefile = FileFilter('src-openmp/Makefile')
         else:
-            makefile = FileFilter('src-mpi/Makefile.vanilla')
-            
+            makefile = FileFilter('src-mpi/Makefile')  
 
-        makefile.filter('CC   = .*', 'CC = {}'.format(spec['mpi'].mpicc))
+     
 
+        makefile.filter('CC   = .*', 'CXX={}'.format(spec['mpi'].mpicxx))
+        makefile.filter('CFLAGS = .*','CFLAGS = -std=c99')
+        makefile.filter('C_LIB = .*','C_LIB = -lm')
+        
+        if '+mpi' not in spec:
+            makefile.filter('CC   = .*', 'CC = gcc')
+            makefile.filter('DO_MPI = .*','DO_MPI = OFF')
+        
         if '+openmp' in spec:
-            self.build_targets.extend(['--directory=src-oprmmp', '--file=Makefile.vanilla'])
-            makefile = FileFilter('src-openmp/Makefile.vanilla')
-            if '+mpi' in spec:
-                ### mpi and opemmp variant 
-
-                pass
-            else:
-                ## openmp variant
-
-                pass
+            ### openmp and mpi variant
+            self.build_targets.extend(['--directory=src-openmp', '--file=Makefile'])
+           
+            makefile.filter('CFLAGS = .*', 'CFLAGS = -std=c99 -fopenmp')
         else:
             ### MPI variant
-            self.build_targets.extend(['--directory=src-oprmmp', '--file=Makefile.vanilla'])
-            makefile = FileFilter('src-mpi/Makefile.vanilla')
-            if '+mpi' not in spec:
-                ### serial variant
-                makefile.filter('CC   = .*', 'CC = gcc')
-                
-
-
+            self.build_targets.extend(['--directory=src-openmp', '--file=Makefile'])
+            makefile = FileFilter('src-mpi/Makefile')
+            
     def install(self, spec, prefix):
         mkdir(prefix.bin)
         mkdirp(prefix.examples)
@@ -95,7 +96,7 @@ class Comd(MakefilePackage):
         mkdirp(prefix.doc)
         install("examples/*",prefix.examples)
         install("pots/*",prefix.pots)
-        install('README', prefix.doc)
+        install('README', preficx.doc)
         install('LICENSE', prefix.doc)
 
         if '+openmp' in spec:
@@ -112,6 +113,7 @@ class Comd(MakefilePackage):
             else:
                 ### serial variant
                 install('CoMD-serial', prefix.bin)
+
 
 
 
