@@ -45,17 +45,21 @@ class Hpgmg(AutotoolsPackage):
 
     homepage = "https://bitbucket.org/hpgmg/hpgmg"
     url      = "https://bitbucket.org/hpgmg/hpgmg/get/master.tar.gz"
+    tags     = ['proxy-app']
 
     variant('fe', default=True, description='Build Finite Element FAS solver')
     variant('fv', default=True, description='Build Finite Volume solver')
     variant('mpi', default=False, description='Build with MPI support')
+    variant('cuda', default=False, description='Build with CUDA')
 
     depends_on('petsc', when='+fe')
-    depends_on('openmp', when='+fv')
+    # depends_on('openmp', when='+fv')
     depends_on('mpi', when='+mpi')
 
-    # def configure_args(self):
-        # FIXME: Add arguments other than --prefix
-        # FIXME: If not needed delete this function
-        # args = []
-        # return args
+    def configure_args(self):
+        args = []
+        if '-fe' in spec:
+            args.append('--no-fe')
+        if '-fv' in spec:
+            args.append('--no-fv') 
+        return args
