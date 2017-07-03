@@ -53,7 +53,7 @@ class Cloverleaf(MakefilePackage):
         # OpenMP build folder depends on openMP version
         if self.type_of_build:
             if self.type_of_build == 'OpenMP':
-                if int(self.compiler.version.up_to(1)) >= 5:
+                if '%gcc' in spec and int(self.compiler.version.up_to(1)) >= 5:
                     self.type_of_build = 'OpenMP4'
                 else:
                     self.type_of_build = 'OpenMP'
