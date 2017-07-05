@@ -41,10 +41,13 @@ from spack import *
 
 
 class Mcb(MakefilePackage):
-    """FIXME: Put a proper description of your package here."""
+    """The "Monte Carlo Benchmark" (MCB) is intended for use in exploring 
+    the computational performance of Monte Carlo algorithms on parallel architectures
 
-    # FIXME: Add a proper url for your package's homepage here.
-    homepage = "http://www.example.com"
+    tags : proxy-app ecp-proxy-app"""
+    
+    tags = ['exp-proxy-app','proxy-app']
+    homepage = "https://codesign.llnl.gov/mcb.php"
     url      = "https://codesign.llnl.gov/downloads/mcb-20130723.tar.gz"
 
     version('20130723', 'ed9c97edb45c8918184b4eba280bd884')
@@ -52,8 +55,11 @@ class Mcb(MakefilePackage):
     # FIXME: Add dependencies if required.
     # depends_on('foo')
 
-    #def edit(self, spec, prefix):
+    def edit(self, spec, prefix):
+        pass
         # FIXME: Edit the Makefile if necessary
         # FIXME: If not needed delete this function
         # makefile = FileFilter('Makefile')
         # makefile.filter('CC = .*', 'CC = cc')
+    def install(self,spec,prefix):
+        pass
