@@ -41,20 +41,27 @@ from spack import *
 
 
 class Cohmm(MakefilePackage):
-    """FIXME: Put a proper description of your package here."""
+    """An anticipated important use-case for next-generation supercomputing 
+    is multiscale modeling, in which continuum equations for large-scale 
+    material deformation are augmented with high-fidelity, fine-scale 
+    simulations that provide constitutive data on demand
 
-    # FIXME: Add a proper url for your package's homepage here.
-    homepage = "http://www.example.com"
+    tags: proxy-app exp-proxy-app"""
+
+    tags = ['exp-proxy-app','proxy-app']
+    homepage = "http://www.exmatex.org/cohmm.html"
     url      = "https://github.com/exmatex/CoHMM/archive/sad.tar.gz"
 
-    # FIXME: Add proper versions and checksums here.
-    # version('1.2.3', '0123456789abcdef0123456789abcdef')
+    version('sad', git='https://github.com/exmatex/CoHMM.git',description='Sad Branch')
 
     # FIXME: Add dependencies if required.
     # depends_on('foo')
 
     def edit(self, spec, prefix):
+        pass
         # FIXME: Edit the Makefile if necessary
         # FIXME: If not needed delete this function
         # makefile = FileFilter('Makefile')
         # makefile.filter('CC = .*', 'CC = cc')
+    def install(self, spec, prefix):
+        pass
