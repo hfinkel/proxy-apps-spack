@@ -48,8 +48,11 @@ class Comd(MakefilePackage):
     well-established and important tool for the study of the dynamical 
     properties of liquids, solids, and other systems of interest in 
     Materials Science and Engineering, Chemistry and Biology. 
-    A material is represented in terms of atoms and molecules."""
+    A material is represented in terms of atoms and molecules.
 
+    Tag : proxy-app, ecp-proxy-app"""
+
+    tag = ['proxy-app','ecp-proxy-app']
     homepage = "http://www.exmatex.org/comd.html"
     url      = "https://github.com/exmatex/CoMD/archive/master.tar.gz"
 
