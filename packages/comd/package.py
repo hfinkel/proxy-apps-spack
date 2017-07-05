@@ -50,7 +50,7 @@ class Comd(MakefilePackage):
     Materials Science and Engineering, Chemistry and Biology. 
     A material is represented in terms of atoms and molecules.
 
-    Tag : proxy-app, ecp-proxy-app"""
+    tags : proxy-app, ecp-proxy-app"""
 
     tag = ['proxy-app','ecp-proxy-app']
     homepage = "http://www.exmatex.org/comd.html"
