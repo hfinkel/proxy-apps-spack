@@ -55,15 +55,14 @@ class Vpfft(CMakePackage):
     homepage = "http://www.exmatex.org/vpfft.html"
     url      = "https://github.com/exmatex/VPFFT/archive/master.tar.gz"
 
-    # FIXME: Add proper versions and checksums here.
-    # version('1.2.3', '0123456789abcdef0123456789abcdef')
+    version('master', git='https://github.com/exmatex/VPFFT.git',description='git master')
 
     # FIXME: Add dependencies if required.
     # depends_on('foo')
 
-    def cmake_args(self):
+    #def cmake_args(self):
         # FIXME: Add arguments other than
         # FIXME: CMAKE_INSTALL_PREFIX and CMAKE_BUILD_TYPE
         # FIXME: If not needed delete this function
-        args = []
-        return args
+    #    args = []
+    #    return args
