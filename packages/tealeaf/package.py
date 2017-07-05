@@ -58,7 +58,7 @@ class Tealeaf(MakefilePackage):
             self.build_targets.extend(['COMPILER=INTEL'])
         elif '%pgi' in spec:
             self.build_targets.extend(['COMPILER=PGI'])
-        elif 'xl' in spec:
+        elif '%xl' in spec:
             self.build_targets.extend(['COMPILER=XL'])
 
     def install(self, spec, prefix):
