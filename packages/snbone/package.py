@@ -41,7 +41,7 @@ from spack import *
 import os
 
 class Snbone(MakefilePackage):
-    """FIXME: Put a proper description of your package here."""
+    """This application targets the primary computational solve burden of a SN, continuous finite element based transport equation solver."""
 
     # FIXME: Add a proper url for your package's homepage here.
     homepage = "https://github.com/ANL-CESAR/"
