@@ -42,7 +42,7 @@ import os
 
 
 class Openmc(MakefilePackage):
-    """FIXME: Put a proper description of your package here."""
+    """The OpenMC project aims to provide a fully-featured Monte Carlo particle transport code based on modern methods. It is a constructive solid geometry, continuous-energy transport code that uses ACE format cross sections. The project started under the Computational Reactor Physics Group at MIT."""
 
     # FIXME: Add a proper url for your package's homepage here.
     homepage = "https://github.com/ANL-CESAR/"
@@ -54,8 +54,9 @@ class Openmc(MakefilePackage):
     #version('1.2.3', '0123456789abcdef0123456789abcdef')
     version('master', git='https://github.com/ANL-CESAR/openmc.git')
 
+    variant('openmp', default=True, description='Build with OpenMP support.')
     # FIXME: Add dependencies if required.
-    # depends_on('foo')
+    depends_on('openmpi')
 
     build_targets = ['--directory=src']
 
