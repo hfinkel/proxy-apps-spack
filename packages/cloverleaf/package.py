@@ -22,12 +22,17 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-from spack import *
 import re
 import glob
 
+from spack import *
+
+
 class Cloverleaf(MakefilePackage):
-    """Proxy Application. CloverLeaf is a miniapp that solves the compressible Euler equations on a Cartesian grid, using an explicit, second-order accurate method."""
+    """Proxy Application. CloverLeaf is a miniapp that solves the 
+       compressible Euler equations on a Cartesian grid, 
+       using an explicit, second-order accurate method.  
+    """
 
     homepage = "http://uk-mac.github.io/CloverLeaf"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/CloverLeaf/CloverLeaf-1.1.tar.gz"
@@ -58,10 +63,12 @@ class Cloverleaf(MakefilePackage):
                 else:
                     self.type_of_build = 'OpenMP'
 
-            self.build_targets.extend(['--directory=CloverLeaf_{}'.format(self.type_of_build)])
+            self.build_targets.extend(
+                ['--directory=CloverLeaf_{}'.format(self.type_of_build)])
 
-        self.build_targets.extend(['MPI_COMPILER={}'.format(spec['mpi'].mpifc), 
-                                   'C_MPI_COMPILER={}'.format(spec['mpi'].mpicc)])
+        self.build_targets.extend(
+            ['MPI_COMPILER={}'.format(spec['mpi'].mpifc), 
+             'C_MPI_COMPILER={}'.format(spec['mpi'].mpicc)])
 
         # Use Makefile compiler specific flags
         if '%gcc' in spec:
@@ -87,7 +94,10 @@ class Cloverleaf(MakefilePackage):
         install('documentation.txt', prefix.doc)
 
         if self.type_of_build:
-            install('CloverLeaf_{}/clover_leaf'.format(self.type_of_build), prefix.bin)
-            install('CloverLeaf_{}/clover.in'.format(self.type_of_build), prefix.bin)
-            for f in glob.glob('CloverLeaf_{}/*.in'.format(self.type_of_build)):
+            install('CloverLeaf_{}/clover_leaf'.format(self.type_of_build),
+                     prefix.bin)
+            install('CloverLeaf_{}/clover.in'.format(self.type_of_build),  
+                     prefix.bin)
+            for f in glob.glob(
+                    'CloverLeaf_{}/*.in'.format(self.type_of_build)):
                 install(f, prefix.doc.tests)
