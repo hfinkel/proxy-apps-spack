@@ -22,8 +22,11 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-from spack import *
+
 from os import listdir
+
+from spack import *
+
 
 class Pathfinder(MakefilePackage):
     """Proxy Application. Signature search."""
@@ -40,7 +43,8 @@ class Pathfinder(MakefilePackage):
     def edit(self, spec, prefix):
         makefile = FileFilter('PathFinder_ref/Makefile')
         makefile.filter('CC=.*', 'CC=cc')
-        makefile.filter('CFLAGS += .*', 'CFLAGS += {}'.format(self.compiler.openmp_flag))
+        makefile.filter('CFLAGS += .*', 
+                        'CFLAGS += {}'.format(self.compiler.openmp_flag))
 
     def install(self, spec, prefix):
         # Manual installation

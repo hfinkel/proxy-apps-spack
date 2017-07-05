@@ -22,12 +22,17 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-from spack import *
+
 import re
 import glob
 
+from spack import *
+
+
 class Cloverleaf3d(MakefilePackage):
-    """Proxy Application. CloverLeaf3D is 3D version of the CloverLeaf mini-app. """
+    """Proxy Application. CloverLeaf3D is 3D version 
+       of the CloverLeaf mini-app. 
+    """
 
     homepage = "http://uk-mac.github.io/CloverLeaf3D/"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/CloverLeaf3D/CloverLeaf3D-1.0.tar.gz"
@@ -46,10 +51,12 @@ class Cloverleaf3d(MakefilePackage):
         if '+OpenACC' in spec:
             type_of_build = 'OpenACC'
         
-        self.build_targets.extend(['--directory=CloverLeaf3D_{}'.format(self.type_of_build)])
+        self.build_targets.extend(
+            ['--directory=CloverLeaf3D_{}'.format(self.type_of_build)])
 
-        self.build_targets.extend(['MPI_COMPILER={}'.format(spec['mpi'].mpifc), 
-                                   'C_MPI_COMPILER={}'.format(spec['mpi'].mpicc)])
+        self.build_targets.extend(
+            ['MPI_COMPILER={}'.format(spec['mpi'].mpifc),
+             'C_MPI_COMPILER={}'.format(spec['mpi'].mpicc)])
 
         # Use Makefile compiler specific flags
         if '%gcc' in spec:
@@ -74,7 +81,11 @@ class Cloverleaf3d(MakefilePackage):
         install('README.md', prefix.doc)
 
         if self.type_of_build:
-            install('CloverLeaf3D_{}/clover_leaf'.format(self.type_of_build), prefix.bin)
-            install('CloverLeaf3D_{}/clover.in'.format(self.type_of_build), prefix.bin)
-            for f in glob.glob('CloverLeaf3D_{}/*.in'.format(self.type_of_build)):
+            install('CloverLeaf3D_{}/clover_leaf'.format(self.type_of_build),
+                    prefix.bin)
+            install('CloverLeaf3D_{}/clover.in'.format(self.type_of_build),
+                    prefix.bin)
+
+            for f in glob.glob(
+                    'CloverLeaf3D_{}/*.in'.format(self.type_of_build)):
                 install(f, prefix.doc.tests)

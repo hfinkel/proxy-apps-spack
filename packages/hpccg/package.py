@@ -26,8 +26,10 @@ from spack import *
 
 
 class Hpccg(MakefilePackage):
-    """Proxy Application. Intended to be the 'best approximation to an unstructured implicit
-    finite element or finite volume application in 800 lines or fewer.'"""
+    """Proxy Application. Intended to be the 'best approximation
+       to an unstructured implicit finite element or finite volume 
+       application in 800 lines or fewer.'
+    """
 
     homepage = "https://mantevo.org/about/applications/"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/HPCCG/HPCCG-1.0.tar.gz"
@@ -48,21 +50,24 @@ class Hpccg(MakefilePackage):
         makefile.filter('LINKER=.*', 'LINKER=c++')
 
         if '%gcc' not in self.spec:
-            makefile.filter('CPP_OPT_FLAGS = -O3 -ftree-vectorize -ftree-vectorizer-verbose=2', '#')
+            makefile.filter('CPP_OPT_FLAGS = .*', '#')
 
         if '+mpi' in self.spec:
             makefile.filter('USE_MPI =', 'USE_MPI = -DUSING_MPI')
             makefile.filter('CXX=.*', 'CXX={}'.format(spec['mpi'].mpicxx))
-            makefile.filter('LINKER=.*', 'LINKER={}'.format(spec['mpi'].mpicxx))
+            makefile.filter('LINKER=.*', 
+                            'LINKER={}'.format(spec['mpi'].mpicxx))
 
         if '+openmp' in self.spec:
             makefile.filter('USE_OMP =', 'USE_OMP = -DUSING_OMP')
-            makefile.filter('#OMP_FLAGS = -fopenmp', 'OMP_FLAGS = {}'.format(self.compiler.openmp_flag))
+            makefile.filter('#OMP_FLAGS = .*', 'OMP_FLAGS = {}'.format(
+                             self.compiler.openmp_flag))
 
     def install(self, spec, prefix):
         # Manual installation
         mkdirp(prefix.bin)
         mkdirp(prefix.doc)
+
         install('test_HPCCG', prefix.bin)
         install('README', prefix.doc)
         install('weakScalingRunScript', prefix.doc)

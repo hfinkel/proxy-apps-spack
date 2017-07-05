@@ -27,7 +27,9 @@ import glob
 import tarfile
 
 class Minimd(MakefilePackage):
-    """Proxy Application. A simple proxy for the force computations in a typical molecular dynamics applications."""
+    """Proxy Application. A simple proxy for the force computations
+       in a typical molecular dynamics applications.
+    """
 
     homepage = "http://mantevo.org"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/MiniMD/miniMD_1.2.tgz"
@@ -43,13 +45,16 @@ class Minimd(MakefilePackage):
     def edit(self, spec, prefix):
         self.build_version = self.version.up_to(2)
 
-        inner_tar = tarfile.open(name='miniMD_{}_ref.tgz'.format(self.build_version))
+        inner_tar = tarfile.open(name='miniMD_{}_ref.tgz'.format(
+                                 self.build_version))
         inner_tar.extractall()
 
         self.build_targets.extend(['--directory=miniMD_ref'])
         self.build_targets.extend(['LINK={}'.format(spec['mpi'].mpicxx)])
         self.build_targets.extend(['CC={}'.format(spec['mpi'].mpicxx)])
-        self.build_targets.extend(['CCFLAGS={} -DMPICH_IGNORE_CXX_SEEK -DNOCHUNK'.format(self.compiler.openmp_flag)])
+        self.build_targets.extend(
+            ['CCFLAGS={} -DMPICH_IGNORE_CXX_SEEK -DNOCHUNK'.format(
+                self.compiler.openmp_flag)])
 
         self.build_targets.extend(['openmpi'])
 

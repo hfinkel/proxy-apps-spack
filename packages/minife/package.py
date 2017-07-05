@@ -22,12 +22,17 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-from spack import *
+
 import tarfile
 import re
 
+from spack import *
+
+
 class Minife(MakefilePackage):
-    """Proxy Application. MiniFE is an proxy application for unstructured implicit finite element codes."""
+    """Proxy Application. MiniFE is an proxy application 
+       for unstructured implicit finite element codes.
+    """
 
     homepage = "https://mantevo.org/"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/MiniFE/miniFE-2.0.1.tgz"
@@ -53,18 +58,24 @@ class Minife(MakefilePackage):
 
         self.build_version = self.version.up_to(2)
 
-        inner_tar = tarfile.open(name='miniFE-{}_{}.tgz'.format(self.build_version, self.type_of_build))
+        inner_tar = tarfile.open(name='miniFE-{}_{}.tgz'.format(
+                                 self.build_version, self.type_of_build))
         inner_tar.extractall()
 
-        makefile = FileFilter('miniFE-{}_{}/src/Makefile'.format(self.build_version, self.type_of_build))
+        makefile = FileFilter('miniFE-{}_{}/src/Makefile'.format(
+                              self.build_version, self.type_of_build))
+
         makefile.filter('-fopenmp', self.compiler.openmp_flag, string=True)
 
-        self.build_targets.extend(['--directory=miniFE-{}_{}/src'.format(self.build_version, self.type_of_build)])
+        self.build_targets.extend(['--directory=miniFE-{}_{}/src'.format(
+                                   self.build_version, self.type_of_build)])
         self.build_targets.extend(['CXX={}'.format(spec['mpi'].mpicxx)])
         self.build_targets.extend(['CC={}'.format(spec['mpi'].mpicc)])
 
     def install(self, spec, prefix):
         mkdirp(prefix.bin)
-        install('miniFE-{}_{}/src/miniFE.x'.format(self.build_version, self.type_of_build), prefix.bin)
+        install('miniFE-{}_{}/src/miniFE.x'.format(
+                    self.build_version, self.type_of_build), 
+                prefix.bin)
 
 

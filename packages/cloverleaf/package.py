@@ -22,6 +22,7 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
+
 import re
 import glob
 
@@ -98,6 +99,7 @@ class Cloverleaf(MakefilePackage):
                      prefix.bin)
             install('CloverLeaf_{}/clover.in'.format(self.type_of_build),  
                      prefix.bin)
+
             for f in glob.glob(
                     'CloverLeaf_{}/*.in'.format(self.type_of_build)):
                 install(f, prefix.doc.tests)

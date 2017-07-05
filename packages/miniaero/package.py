@@ -22,6 +22,7 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
+
 from shutil import copytree
 
 from spack import *
@@ -29,7 +30,8 @@ from spack import *
 
 class Miniaero(MakefilePackage):
     """Proxy Application. MiniAero is a mini-application for the evaulation
-       of programming models and hardware for next generation platforms."""
+       of programming models and hardware for next generation platforms.
+    """
 
     homepage = "http://mantevo.org"
     url      = "https://github.com/Mantevo/miniAero.git"

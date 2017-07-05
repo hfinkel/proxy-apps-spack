@@ -22,11 +22,17 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-from spack import *
+
 import glob
 
+from spack import *
+
+
 class Tealeaf(MakefilePackage):
-    """Proxy Application. TeaLeaf is a mini-app that solves the linear heat conduction equation on a spatially decomposed regularly grid using a 5 point stencil with implicit solvers. """
+    """Proxy Application. TeaLeaf is a mini-app that solves
+       the linear heat conduction equation on a spatially decomposed
+       regularly grid using a 5 point stencil with implicit solvers.
+    """
 
     homepage = "http://uk-mac.github.io/TeaLeaf/"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/TeaLeaf/TeaLeaf-1.0.tar.gz"
@@ -39,8 +45,10 @@ class Tealeaf(MakefilePackage):
 
     def edit(self, spec, prefix):
         self.build_targets.extend(['--directory=TeaLeaf_ref'])
-        self.build_targets.extend(['MPI_COMPILER={}'.format(spec['mpi'].mpifc)])
-        self.build_targets.extend(['C_MPI_COMPILER={}'.format(spec['mpi'].mpicc)])
+        self.build_targets.extend(['MPI_COMPILER={}'.format(
+                                   spec['mpi'].mpifc)])
+        self.build_targets.extend(['C_MPI_COMPILER={}'.format(
+                                   spec['mpi'].mpicc)])
 
         if '%gcc' in spec:
             self.build_targets.extend(['COMPILER=GNU'])
@@ -64,5 +72,6 @@ class Tealeaf(MakefilePackage):
 
         install('TeaLeaf_ref/tea_leaf', prefix.bin)
         install('TeaLeaf_ref/tea.in', prefix.bin)
+
         for f in glob.glob('TeaLeaf_ref/*.in'):
             install(f, prefix.doc.tests)

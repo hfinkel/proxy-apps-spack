@@ -22,10 +22,13 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
+
 from spack import *
 
 class Miniamr(MakefilePackage):
-    """Proxy Application. 3D stencil calculation with Adaptive Mesh Refinement (AMR)"""
+    """Proxy Application. 3D stencil calculation with 
+       Adaptive Mesh Refinement (AMR)
+    """
 
     homepage = "https://mantevo.org"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/MiniAMR/miniAMR_1.0_all.tgz"
@@ -42,9 +45,12 @@ class Miniamr(MakefilePackage):
         if '+mpi' in spec:
             makefile = FileFilter('miniAMR_ref/Makefile.mpi')
             makefile.filter('CC   = .*', 'CC = {}'.format(spec['mpi'].mpicc))
-            self.build_targets.extend(['--directory=miniAMR_ref', '--file=Makefile.mpi', 'LDLIBS=-lm'])
+            self.build_targets.extend(['--directory=miniAMR_ref', 
+                                       '--file=Makefile.mpi', 
+                                       'LDLIBS=-lm'])
         else:
-            self.build_targets.extend(['--directory=miniAMR_serial', '--file=Makefile.serial'])
+            self.build_targets.extend(['--directory=miniAMR_serial', 
+                                       '--file=Makefile.serial'])
 
     def install(self, spec, prefix):
         # Manual installation
