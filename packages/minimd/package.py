@@ -23,7 +23,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
 from spack import *
-import re
+import glob
 import tarfile
 
 class Minimd(MakefilePackage):
@@ -36,30 +36,31 @@ class Minimd(MakefilePackage):
 
     version('1.2', '893ef1ca5062e32b43a8d11bcfe1a056')
 
-    #variant('build', default='openmpi', description='Type of Build',
-            #values=('intel', 'cray', 'openmpi', 'cray_intel'))
-
     depends_on('openmpi')
 
-    type_of_build = 'ref'
     build_version = ''
 
     def edit(self, spec, prefix):
-        #build_search = re.search('build=([.\S]+)', str(spec))
-        #self.type_of_build = build_search.group(1)
-
         self.build_version = self.version.up_to(2)
 
-        inner_tar = tarfile.open(name='miniMD_{}_{}.tgz'.format(self.build_version, self.type_of_build))
+        inner_tar = tarfile.open(name='miniMD_{}_ref.tgz'.format(self.build_version))
         inner_tar.extractall()
 
-        self.build_targets.extend(['--directory=miniMD_{}'.format(self.type_of_build)])
+        self.build_targets.extend(['--directory=miniMD_ref'])
         self.build_targets.extend(['LINK={}'.format(spec['mpi'].mpicxx)])
         self.build_targets.extend(['CC={}'.format(spec['mpi'].mpicxx)])
+        self.build_targets.extend(['CCFLAGS={} -DMPICH_IGNORE_CXX_SEEK -DNOCHUNK'.format(self.compiler.openmp_flag)])
 
         self.build_targets.extend(['openmpi'])
 
     def install(self, spec, prefix):
+        # Manual Installation
         mkdirp(prefix.bin)
+        mkdirp(prefix.doc)
+
         install('miniMD_ref/miniMD_openmpi', prefix.bin)
         install('miniMD_ref/in.lj.miniMD', prefix.bin)
+        install('miniMD_ref/README', prefix.doc)
+
+        for f in glob.glob('miniMD_ref/in.*'):
+            install(f, prefix.doc)
