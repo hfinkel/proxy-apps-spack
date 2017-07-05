@@ -64,55 +64,47 @@ class Comd(MakefilePackage):
     def edit(self, spec, prefix):
         shutil.copy('src-openmp/Makefile.vanilla','src-openmp/Makefile')
         shutil.copy('src-mpi/Makefile.vanilla','src-mpi/Makefile')
-        if '+openmp' in spec: 
-            makefile = FileFilter('src-openmp/Makefile')
-        else:
-            makefile = FileFilter('src-mpi/Makefile')  
-
-     
-
-        makefile.filter('CC   = .*', 'CXX={}'.format(spec['mpi'].mpicxx))
-        makefile.filter('CFLAGS = .*','CFLAGS = -std=c99')
-        makefile.filter('C_LIB = .*','C_LIB = -lm')
-        
-        if '+mpi' not in spec:
-            makefile.filter('CC   = .*', 'CC = gcc')
-            makefile.filter('DO_MPI = .*','DO_MPI = OFF')
-        
+               
         if '+openmp' in spec:
             ### openmp and mpi variant
             self.build_targets.extend(['--directory=src-openmp', '--file=Makefile'])
-           
+            makefile = FileFilter('src-openmp/Makefile')
             makefile.filter('CFLAGS = .*', 'CFLAGS = -std=c99 -fopenmp')
         else:
             ### MPI variant
-            self.build_targets.extend(['--directory=src-openmp', '--file=Makefile'])
+            self.build_targets.extend(['--directory=src-mpi', '--file=Makefile'])
             makefile = FileFilter('src-mpi/Makefile')
+            makefile.filter('CFLAGS = .*','CFLAGS = -std=c99')
+        
+        makefile.filter('CC   = .*', 'CXX={}'.format(spec['mpi'].mpicxx))
+        makefile.filter('C_LIB = .*','C_LIB = -lm')
+        if '+mpi' not in spec:
+            makefile.filter('CC   = .*', 'CC = gcc')
+            makefile.filter('DO_MPI = .*','DO_MPI = OFF')
+
             
     def install(self, spec, prefix):
-        mkdir(prefix.bin)
+        mkdirp(prefix.bin)
         mkdirp(prefix.examples)
         mkdirp(prefix.pots)
         mkdirp(prefix.doc)
-        install("examples/*",prefix.examples)
-        install("pots/*",prefix.pots)
-        install('README', preficx.doc)
-        install('LICENSE', prefix.doc)
+        install('README.md', prefix.doc)
+        install('LICENSE.md', prefix.doc)
 
         if '+openmp' in spec:
             if '+mpi' in spec:
                 ### mpi and opemmp variant 
-                install('CoMD-openmp', prefix.bin)
+                install('bin/CoMD-openmp-mpi', prefix.bin)
             else:
                 ## openmp variant
-                install('CoMD-openmp-mpi', prefix.bin)
+                install('bin/CoMD-openmp', prefix.bin)
         else:
             if '+mpi' in spec:
                 ### mpi variant
-                install('CoMD-mpi', prefix.bin)
+                install('bin/CoMD-mpi', prefix.bin)
             else:
                 ### serial variant
-                install('CoMD-serial', prefix.bin)
+                install('bin/CoMD-serial', prefix.bin)
 
 
 
