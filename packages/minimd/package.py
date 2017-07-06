@@ -43,13 +43,9 @@ class Minimd(MakefilePackage):
 
     depends_on('openmpi')
 
-    build_version = ''
-
     def edit(self, spec, prefix):
-        self.build_version = self.version.up_to(2)
-
         inner_tar = tarfile.open(name='miniMD_{}_ref.tgz'.format(
-                                 self.build_version))
+                                 self.version.up_to(2)))
         inner_tar.extractall()
 
         self.build_targets.extend(['--directory=miniMD_ref'])
