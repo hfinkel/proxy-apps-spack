@@ -52,9 +52,6 @@ class Pennant(MakefilePackage):
     url      = "https://github.com/lanl/PENNANT/archive/pennant_v0.9.tar.gz"
     tags     = ['proxy-app']
 
-    license_required = True
-    license_files    = ['LICENSE']
-
     version('0.9', '4f21ba3836b2721436277308c2e33f45')
     version('0.8', 'a1afff4914fef8140c3024a02d7c993c')
     version('0.7', 'd642a030d5388f65f799504803794a4e')
