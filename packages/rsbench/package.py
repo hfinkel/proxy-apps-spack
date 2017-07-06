@@ -59,7 +59,7 @@ class Rsbench(MakefilePackage):
     variant('openmp', default=True, description='Built with OpenMP support.')
 
     # FIXME: Add dependencies if required.
-    depends_on('openmpi', when='+openmp')
+    #depends_on('openmpi', when='+openmp')
 
     build_targets = ['--directory=src']
 
