@@ -41,17 +41,19 @@ from spack import *
 import os
 
 class Nekbone(Package):
-    """FIXME: Put a proper description of your package here."""
+    """NEK5000 emulation software called NEKbone. Nekbone captures the basic structure and user interface of the ex- tensive Nek5000 software. Nek5000 is a high order, incompressible Navier-Stokes solver based on the spectral element method."""
 
     # FIXME: Add a proper url for your package's homepage here.
     homepage = "https://github.com/ANL-CESAR/"
     url      = "https://github.com/ANL-CESAR/nekbone.git"
 
+    tags = ['proxy-app']
+
     # FIXME: Add proper versions and checksums here.
     # version('1.2.3', '0123456789abcdef0123456789abcdef')
     version('master', git = 'https://github.com/ANL-CESAR/nekbone.git')
     # FIXME: Add dependencies if required.
-    # depends_on('foo')
+    depends_on('openmpi')
 
     def install(self, spec, prefix):
 
@@ -111,3 +113,4 @@ class Nekbone(Package):
 
         install('nekbone', prefix.bin + '/nek_mgrid/')
         install('nekpmpi', prefix.bin + '/nek_mgrid/')
+
