@@ -41,21 +41,24 @@ from spack import *
 
 
 class Cogl(CMakePackage):
-    """FIXME: Put a proper description of your package here."""
+    """CoGL is a meso-scale simulation proxy app used to analyze
+     pattern formation in ferroelastic materials using the Ginzburg–Landau
+      approach. It has been publicly released on the ExMatEx project 
+      Github repository. 
 
-    # FIXME: Add a proper url for your package's homepage here.
-    homepage = "http://www.example.com"
+      tags = proxy-app, ecp-proxy-app"""
+
+    homepage = "http://www.exmatex.org/cogl.html"
     url      = "https://github.com/exmatex/CoGL/archive/master.tar.gz"
 
-    # FIXME: Add proper versions and checksums here.
-    # version('1.2.3', '0123456789abcdef0123456789abcdef')
+    version('master',git='https://github.com/exmatex/CoGL.git',description='master')
 
-    # FIXME: Add dependencies if required.
     # depends_on('foo')
 
     def cmake_args(self):
+        pass
         # FIXME: Add arguments other than
         # FIXME: CMAKE_INSTALL_PREFIX and CMAKE_BUILD_TYPE
         # FIXME: If not needed delete this function
-        args = []
-        return args
+        #args = []
+        #return args
