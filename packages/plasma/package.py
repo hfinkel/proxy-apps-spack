@@ -41,13 +41,11 @@ from spack import *
 
 
 class Plasma(MakefilePackage):
-    """PlasmaApp is a flexible implicit charge and energy conserving implicit PIC framework. This codes aims to demonstrate the potential of using a fluid plasma model to accelerate a kinetic model through a High-Low order system coupling. The multi-granularity of this problem gives it the ability to map well to emerging heterogeneous architectures with multiple levels of parallelism.
-
-proxy-app
-ecp-proxy-app"""
+    """PlasmaApp is a flexible implicit charge and energy conserving implicit PIC framework. This codes aims to demonstrate the potential of using a fluid plasma model to accelerate a kinetic model through a High-Low order system coupling. The multi-granularity of this problem gives it the ability to map well to emerging heterogeneous architectures with multiple levels of parallelism."""
 
     homepage = "https://github.com/cocomans/plasma/"
     url      = ""
+    tags     = ['proxy-app', 'ecp-proxy-app']
 
     version('master', git='https://github.com/cocomans/plasma.git')
 
@@ -78,7 +76,7 @@ ecp-proxy-app"""
 
         with working_dir(join_path(self.build_directory, 'PlasmaApp')):
             gmake('{0}packages'.format(opt))
-            gmake('{0}tests'.format(opt))
+            # gmake('{0}tests'.format(opt))
 
     def install(self, spec, prefix):       
         mkdirp(prefix.bin)

@@ -45,7 +45,7 @@ class Clamr(CMakePackage):
 
     homepage = "https://github.com/lanl/CLAMR"
     url      = ""
-    tags     = ['proxy-app']
+    tags     = ['proxy-app', 'ecp-proxy-app']
 
     version('master', git='https://github.com/lanl/CLAMR.git')
 
@@ -58,7 +58,6 @@ class Clamr(CMakePackage):
     variant('single', default=False, description='single precision')
 
     depends_on('mpi')
-    depends_on('opencl')
     depends_on('mpe', when='-opengl')
 
     def build_type(self):
@@ -88,6 +87,7 @@ class Clamr(CMakePackage):
        return cmake_args
 
     def build(self, spec, prefix):
+        print(self.rpath)
         build_targets = ['', 'check', 'clamr_tests', 'doc']
         with working_dir(self.build_directory):
             inspect.getmodule(self).make(*self.build_targets)
@@ -97,5 +97,6 @@ class Clamr(CMakePackage):
         install('LICENSE', prefix)
         install_tree('docs', join_path(prefix, 'docs'))
         install_tree('tests', join_path(prefix, 'tests'))
+        install_tree('graphics', join_path(prefix, 'graphics'))
         with working_dir(self.build_directory):
-            inspect.getmodule(self).make(*self.install_targets)
+            inspect.getmodule(self).make(*self.install_targets) 

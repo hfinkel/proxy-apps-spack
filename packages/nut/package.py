@@ -45,7 +45,7 @@ class Nut(CMakePackage):
 
     homepage = "https://github.com/lanl/NuT"
     url      = ""
-    tags     = ['proxy-app']
+    tags     = ['proxy-app', 'ecp-proxy-app']
 
     version('serial', git='https://github.com/lanl/NuT.git', branch='master')
     version('openmp', git='https://github.com/lanl/NuT.git', branch='openmp')
@@ -55,7 +55,7 @@ class Nut(CMakePackage):
 
     def cmake_args(self):
         cmakefile = FileFilter('CMakeLists.txt')
-        cmakefile.filter('# create variable.*', 'set(ENV{RANDOM123_DIR} prefix/../random123*)')
+        cmakefile.filter('# create variable.*', 'set(ENV{RANDOM123_DIR} {})'.format(spec['random123'].prefix))
         cmakefile.filter('# set compiler .*', 'set(ENV{CC} cc)')
         cmakefile.filter('# GNU .*', 'set(ENV{CXX} c++)')
 
