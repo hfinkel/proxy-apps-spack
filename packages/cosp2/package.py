@@ -58,7 +58,7 @@ class Cosp2(MakefilePackage):
     variant('serial',default=True,description='Serial Build ')
     variant('parallel',default=True,description='Serial Build ')
 
-    depends_on('')
+#    depends_on('')
     def edit(self, spec, prefix):
         pass
 
