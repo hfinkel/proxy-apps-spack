@@ -41,7 +41,12 @@ from spack import *
 
 
 class Pennant(MakefilePackage):
-    """PENNANT is an unstructured mesh physics mini-app designed for advanced architecture research. It contains mesh data structures and a few physics algorithms adapted from the LANL rad-hydro code FLAG, and gives a sample of the typical memory access patterns of FLAG."""
+    """PENNANT is an unstructured mesh physics mini-app designed
+       for advanced architecture research. It contains mesh data
+       structures and a few physics algorithms adapted
+       from the LANL rad-hydro code FLAG, and gives a sample of
+       the typical memory access patterns of FLAG.
+    """
 
     homepage = "https://github.com/lanl/PENNANT"
     url      = "https://github.com/lanl/PENNANT/archive/pennant_v0.9.tar.gz"
@@ -68,16 +73,23 @@ class Pennant(MakefilePackage):
         if self.compiler.name == 'icpc':
             opt += ' -fast -fno-alias'
         if self.compiler.name == 'pgCC':
-            compiler = 'pgCC'
             opt += ' -fastsse'
 
         makefile.filter('CXX .*', 'CXX := c++')
-        makefile.filter('CXXFLAGS_DEBUG .*', 'CXXFLAGS_DEBUG := {0}'.format(debug))
-        makefile.filter('CXXFLAGS_OPT .*', 'CXXFLAGS_OPT := {0}'.format(opt))
-        makefile.filter('CXXFLAGS_OPENMP .*', 'CXXFLAGS_OPENMP := {0}'.format(self.compiler.openmp_flag))
-        
+        makefile.filter(
+            'CXXFLAGS_DEBUG .*',
+            'CXXFLAGS_DEBUG := {0}'.format(debug))
+        makefile.filter(
+            'CXXFLAGS_OPT .*',
+            'CXXFLAGS_OPT := {0}'.format(opt))
+        makefile.filter(
+            'CXXFLAGS_OPENMP .*',
+            'CXXFLAGS_OPENMP := {0}'.format(self.compiler.openmp_flag))
+
         if '+mpi' in spec:
-            makefile.filter('CXX .*', 'CXX := {0}'.format(spec['mpi'].mpicxx))
+            makefile.filter(
+                'CXX .*',
+                'CXX := {0}'.format(spec['mpi'].mpicxx))
 
         if '+mpi' not in spec:
             makefile.filter('CXX := mpicxx', '#')
@@ -86,12 +98,14 @@ class Pennant(MakefilePackage):
 
         if '+openmp' not in spec:
             makefile.filter('.*CXXFLAGS_OPENMP.*', '#')
-        
+
         if '+debug' in spec:
-            makefile.filter('.*(CXXFLAGS_OPT).*', 'CXXFLAGS := $(CXXFLAGS_DEBUG)')
+            makefile.filter(
+                '.*(CXXFLAGS_OPT).*',
+                'CXXFLAGS := $(CXXFLAGS_DEBUG)')
 
     def install(self, spec, prefix):
-        
+
         def install_dir(dirname):
             install_tree(dirname, join_path(prefix, dirname))
 
