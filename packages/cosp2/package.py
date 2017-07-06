@@ -54,20 +54,14 @@ class Cosp2(MakefilePackage):
     homepage = "http://www.exmatex.org/cosp2.html"
     url      = "https://github.com/exmatex/CoSP2/archive/master.tar.gz"
 
-    # FIXME: Add proper versions and checksums here.
-    # version('1.2.3', '0123456789abcdef0123456789abcdef')
     version('master',git='https://github.com/exmatex/CoSP2.git',description='master')
     variant('serial',default=True,description='Serial Build ')
     variant('parallel',default=True,description='Serial Build ')
-    # FIXME: Add dependencies if required.
-    # depends_on('foo')
 
+    depends_on('')
     def edit(self, spec, prefix):
         pass
-        # FIXME: Edit the Makefile if necessary
-        # FIXME: If not needed delete this function
-        # makefile = FileFilter('Makefile')
-        # makefile.filter('CC = .*', 'CC = cc')
+
 
     def install(self, spec, prefix):
         pass

@@ -41,12 +41,11 @@ from spack import *
 
 
 class Cogl(CMakePackage):
-    """CoGL is a meso-scale simulation proxy app used to analyze
-     pattern formation in ferroelastic materials using the Ginzburg–Landau
-      approach. It has been publicly released on the ExMatEx project 
-      Github repository. 
+    """CoGL is a meso-scale simulation proxy app used to analyze CoGL
+    pattern formation in ferroelastic materials using the ginzburg-landau 
+    approach. It has been publicly released on the ExMatEx Project Github Repo.
 
-      tags = proxy-app, ecp-proxy-app"""
+    tags = proxy-app, ecp-proxy-app"""
 
     homepage = "http://www.exmatex.org/cogl.html"
     url      = "https://github.com/exmatex/CoGL/archive/master.tar.gz"
