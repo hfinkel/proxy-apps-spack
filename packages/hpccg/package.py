@@ -60,8 +60,8 @@ class Hpccg(MakefilePackage):
 
         if '+openmp' in self.spec:
             makefile.filter('USE_OMP =', 'USE_OMP = -DUSING_OMP')
-            makefile.filter('#OMP_FLAGS = .*', 'OMP_FLAGS = {}'.format(
-                self.compiler.openmp_flag))
+            makefile.filter('#OMP_FLAGS = .*',
+                            'OMP_FLAGS = {}'.format(self.compiler.openmp_flag))
 
     def install(self, spec, prefix):
         # Manual installation
