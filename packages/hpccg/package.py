@@ -27,7 +27,7 @@ from spack import *
 
 class Hpccg(MakefilePackage):
     """Proxy Application. Intended to be the 'best approximation
-       to an unstructured implicit finite element or finite volume 
+       to an unstructured implicit finite element or finite volume
        application in 800 lines or fewer.'
     """
 
@@ -42,7 +42,7 @@ class Hpccg(MakefilePackage):
     variant('openmp', default=True, description='Build with OpenMP support')
 
     # Optional dependencies
-    depends_on('mpi', when= '+mpi')
+    depends_on('mpi', when='+mpi')
 
     def edit(self, spec, prefix):
         makefile = FileFilter('Makefile')
@@ -55,13 +55,13 @@ class Hpccg(MakefilePackage):
         if '+mpi' in self.spec:
             makefile.filter('USE_MPI =', 'USE_MPI = -DUSING_MPI')
             makefile.filter('CXX=.*', 'CXX={}'.format(spec['mpi'].mpicxx))
-            makefile.filter('LINKER=.*', 
+            makefile.filter('LINKER=.*',
                             'LINKER={}'.format(spec['mpi'].mpicxx))
 
         if '+openmp' in self.spec:
             makefile.filter('USE_OMP =', 'USE_OMP = -DUSING_OMP')
             makefile.filter('#OMP_FLAGS = .*', 'OMP_FLAGS = {}'.format(
-                             self.compiler.openmp_flag))
+                self.compiler.openmp_flag))
 
     def install(self, spec, prefix):
         # Manual installation

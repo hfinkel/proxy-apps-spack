@@ -25,8 +25,9 @@
 
 from spack import *
 
+
 class Miniamr(MakefilePackage):
-    """Proxy Application. 3D stencil calculation with 
+    """Proxy Application. 3D stencil calculation with
        Adaptive Mesh Refinement (AMR)
     """
 
@@ -45,11 +46,11 @@ class Miniamr(MakefilePackage):
         if '+mpi' in spec:
             makefile = FileFilter('miniAMR_ref/Makefile.mpi')
             makefile.filter('CC   = .*', 'CC = {}'.format(spec['mpi'].mpicc))
-            self.build_targets.extend(['--directory=miniAMR_ref', 
-                                       '--file=Makefile.mpi', 
+            self.build_targets.extend(['--directory=miniAMR_ref',
+                                       '--file=Makefile.mpi',
                                        'LDLIBS=-lm'])
         else:
-            self.build_targets.extend(['--directory=miniAMR_serial', 
+            self.build_targets.extend(['--directory=miniAMR_serial',
                                        '--file=Makefile.serial'])
 
     def install(self, spec, prefix):

@@ -43,7 +43,7 @@ class Pathfinder(MakefilePackage):
     def edit(self, spec, prefix):
         makefile = FileFilter('PathFinder_ref/Makefile')
         makefile.filter('CC=.*', 'CC=cc')
-        makefile.filter('CFLAGS += .*', 
+        makefile.filter('CFLAGS += .*',
                         'CFLAGS += {}'.format(self.compiler.openmp_flag))
 
     def install(self, spec, prefix):

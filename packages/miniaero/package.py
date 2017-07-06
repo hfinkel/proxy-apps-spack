@@ -48,9 +48,9 @@ class Miniaero(MakefilePackage):
     def edit(self, spec, prefix):
         makefile = FileFilter('kokkos/Makefile')
         makefile.filter('CXX = .*', 'CXX = c++')
-        makefile.filter('KOKKOS_PATH = .*', 
+        makefile.filter('KOKKOS_PATH = .*',
                         'KOKKOS_PATH = {}'.format(spec['kokkos'].prefix))
-        
+
     def install(self, spec, prefix):
         # Manual Installation
         mkdirp(prefix.bin)

@@ -30,9 +30,9 @@ from spack import *
 
 
 class Cloverleaf(MakefilePackage):
-    """Proxy Application. CloverLeaf is a miniapp that solves the 
-       compressible Euler equations on a Cartesian grid, 
-       using an explicit, second-order accurate method.  
+    """Proxy Application. CloverLeaf is a miniapp that solves the
+       compressible Euler equations on a Cartesian grid,
+       using an explicit, second-order accurate method.
     """
 
     homepage = "http://uk-mac.github.io/CloverLeaf"
@@ -42,10 +42,10 @@ class Cloverleaf(MakefilePackage):
 
     version('1.1', '65652b30a64eb237ec844a6fdd4cd518')
 
-    variant('build', default='ref', description='Type of Parallelism Build', 
+    variant('build', default='ref', description='Type of Parallelism Build',
             values=('CUDA', 'MPI', 'OpenACC_CRAY', 'OpenMP', 'ref', 'Serial'))
 
-    depends_on('mpi') 
+    depends_on('mpi')
     depends_on('cuda', when='build=CUDA')
 
     # Holds build variant value
@@ -68,7 +68,7 @@ class Cloverleaf(MakefilePackage):
                 ['--directory=CloverLeaf_{}'.format(self.type_of_build)])
 
         self.build_targets.extend(
-            ['MPI_COMPILER={}'.format(spec['mpi'].mpifc), 
+            ['MPI_COMPILER={}'.format(spec['mpi'].mpifc),
              'C_MPI_COMPILER={}'.format(spec['mpi'].mpicc)])
 
         # Use Makefile compiler specific flags
@@ -83,7 +83,6 @@ class Cloverleaf(MakefilePackage):
         elif 'xl' in spec:
             self.build_targets.extend(['COMPILER=XLF'])
 
-
     def install(self, spec, prefix):
         # Manual Installation
         mkdirp(prefix.bin)
@@ -96,9 +95,9 @@ class Cloverleaf(MakefilePackage):
 
         if self.type_of_build:
             install('CloverLeaf_{}/clover_leaf'.format(self.type_of_build),
-                     prefix.bin)
-            install('CloverLeaf_{}/clover.in'.format(self.type_of_build),  
-                     prefix.bin)
+                    prefix.bin)
+            install('CloverLeaf_{}/clover.in'.format(self.type_of_build),
+                    prefix.bin)
 
             for f in glob.glob(
                     'CloverLeaf_{}/*.in'.format(self.type_of_build)):

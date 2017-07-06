@@ -30,7 +30,7 @@ from spack import *
 
 
 class Minife(MakefilePackage):
-    """Proxy Application. MiniFE is an proxy application 
+    """Proxy Application. MiniFE is an proxy application
        for unstructured implicit finite element codes.
     """
 
@@ -42,15 +42,13 @@ class Minife(MakefilePackage):
     version('2.0.1', '3113d7c8fc01495d08552672b0dbd015')
 
     variant('build', default='ref', description='Type of Parallelism',
-            values=('ref', 'openmp_ref', 'qthreads')) 
-
+            values=('ref', 'openmp_ref', 'qthreads'))
 
     depends_on('mpi')
     depends_on('qthreads', when='build=qthreads')
 
     type_of_build = 'ref'
     build_version = ''
-
 
     def edit(self, spec, prefix):
         build_search = re.search('build=([.\S]+)', str(spec))
@@ -75,7 +73,5 @@ class Minife(MakefilePackage):
     def install(self, spec, prefix):
         mkdirp(prefix.bin)
         install('miniFE-{}_{}/src/miniFE.x'.format(
-                    self.build_version, self.type_of_build), 
+                self.build_version, self.type_of_build),
                 prefix.bin)
-
-

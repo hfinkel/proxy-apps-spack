@@ -1,4 +1,4 @@
-##############################################################################
+#############################################################################
 # Copyright (c) 2013-2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
 #
@@ -23,15 +23,14 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
 
-import re
 import glob
 
 from spack import *
 
 
 class Cloverleaf3d(MakefilePackage):
-    """Proxy Application. CloverLeaf3D is 3D version 
-       of the CloverLeaf mini-app. 
+    """Proxy Application. CloverLeaf3D is 3D version
+       of the CloverLeaf mini-app.
     """
 
     homepage = "http://uk-mac.github.io/CloverLeaf3D/"
@@ -49,8 +48,8 @@ class Cloverleaf3d(MakefilePackage):
 
     def edit(self, spec, prefix):
         if '+OpenACC' in spec:
-            type_of_build = 'OpenACC'
-        
+            self.type_of_build = 'OpenACC'
+
         self.build_targets.extend(
             ['--directory=CloverLeaf3D_{}'.format(self.type_of_build)])
 
@@ -69,7 +68,6 @@ class Cloverleaf3d(MakefilePackage):
             self.build_targets.extend(['COMPILER=PGI'])
         elif 'xl' in spec:
             self.build_targets.extend(['COMPILER=XLF'])
-
 
     def install(self, spec, prefix):
         # Manual Installation
