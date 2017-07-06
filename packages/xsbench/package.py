@@ -64,7 +64,6 @@ class Xsbench(MakefilePackage):
 
     # FIXME: Add dependencies if required.
     depends_on('mpi', when='+mpi')
-    depends_on('openmpi')
 
     build_targets = ['--directory=src']
 

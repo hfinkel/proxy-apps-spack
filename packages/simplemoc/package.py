@@ -64,7 +64,6 @@ class Simplemoc(MakefilePackage):
 
     # FIXME: Add dependencies if required.
     depends_on('mpi', when='+mpi')
-    depends_on('openmpi', when='+openmp')
 
     build_targets = ['--directory=src']
 

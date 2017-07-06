@@ -53,8 +53,7 @@ class Snbone(MakefilePackage):
     # FIXME: Add dependencies if required.
     # depends_on('foo')
 
-    src_dirs = ['src_c', 'src_fortran']
-
+    tags = ['proxy-app']
 
     def edit(self, spec, prefix):
 	ldflags = '-lm'

@@ -56,7 +56,6 @@ class Openmc(MakefilePackage):
 
     variant('openmp', default=True, description='Build with OpenMP support.')
     # FIXME: Add dependencies if required.
-    depends_on('openmpi')
 
     build_targets = ['--directory=src']
 

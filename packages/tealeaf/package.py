@@ -66,10 +66,7 @@ class Tealeaf(MakefilePackage):
         mkdirp(prefix.bin)
         mkdirp(prefix.doc.tests)
 
-        install('COPYING', prefix.doc)
-        install('COPYING.LESSER', prefix.doc)
         install('README.md', prefix.doc)
-
         install('TeaLeaf_ref/tea_leaf', prefix.bin)
         install('TeaLeaf_ref/tea.in', prefix.bin)
 
