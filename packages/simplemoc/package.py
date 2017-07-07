@@ -105,16 +105,16 @@ class Simplemoc(MakefilePackage):
 		ldflags += ' ' + '-lpapi'
 
 	if '+papi' in spec and self.compiler.name == 'gcc':
-		cflags += ' ' + '-fopenmp'
+		cflags += ' ' + self.compiler.openmp_flag
 
 	if '+papi' in spec and self.compiler.name == 'icc':
-                cflags += ' ' + '-openmp'
+                cflags += ' ' + self.compiler.openmp_flag
 
 	if '+papi' in spec and self.compiler.name == 'mpicc':
                 cflags += ' ' + '-qsmp'
 
 	if '+papi' in spec and self.compiler.name == 'icc':
-                cflags += ' ' + '-openmp'
+                cflags += ' ' + self.compiler.openmp_flag
 
 	makefile.filter('CFLAGS .*', 'CFLAGS = {0}'.format(cflags))
 

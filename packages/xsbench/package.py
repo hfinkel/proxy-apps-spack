@@ -72,7 +72,7 @@ class Xsbench(MakefilePackage):
 	
 	makefile = FileFilter('src/Makefile')
 
-	cflags = '-std=gnu99 -fopenmp'
+	cflags = '-std=gnu99' + ' ' + self.compiler.openmp_flag
 	LDFLAGS = '-lm'
 
 	#makefile.filter('CC =.*', 'CC = gcc')
