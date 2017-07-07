@@ -38,6 +38,7 @@
 # please first remove this boilerplate and all FIXME comments.
 #
 from spack import *
+import shutil
 
 
 class Cosp2(MakefilePackage):
@@ -55,13 +56,36 @@ class Cosp2(MakefilePackage):
     url      = "https://github.com/exmatex/CoSP2/archive/master.tar.gz"
 
     version('master',git='https://github.com/exmatex/CoSP2.git',description='master')
+
+    variant('precision', default=False, description='for Precision options')
     variant('serial',default=True,description='Serial Build ')
-    variant('parallel',default=True,description='Serial Build ')
+    variant('parallel',default=True,description=' Build with MPI Support ')
 
-#    depends_on('')
+    depends_on('mpi', when='+mpi')
     def edit(self, spec, prefix):
-        pass
-
+        shutil.copy('src-mpi/Makefile.vanilla','src-mpi/Makefile')
+        self.build_targets.extend(['--directory=src-mpi', '--file=Makefile'])
+        makefile = FileFilter('src-mpi/Makefile')
+        makefile.filter('CFLAGS = .*','CFLAGS = -std=c99')
+        
+        if '+precision' in spec:
+            makefile.filter('DOUBLE_PRECISION = O.*', 'DOUBLE_PRECISION = OFF')
+           
 
     def install(self, spec, prefix):
-        pass
+        mkdirp(prefix.bin)
+        mkdirp(prefix.examples)
+        mkdirp(prefix.pots)
+        mkdirp(prefix.doc)
+        install('README.md', prefix.doc)
+        install('LICENSE.md', prefix.doc)
+
+
+
+
+
+
+
+
+
+
