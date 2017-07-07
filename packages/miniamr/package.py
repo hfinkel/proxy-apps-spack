@@ -65,4 +65,3 @@ class Miniamr(MakefilePackage):
 
         # Install Support Documents
         install('miniAMR_ref/README', prefix.doc)
-        install('miniAMR_ref/LICENSE', prefix.doc)
