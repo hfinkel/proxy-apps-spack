@@ -58,16 +58,17 @@ class Comd(MakefilePackage):
 
     version('master',git='https://github.com/exmatex/CoMD.git',branch='master')    
     
-    variant('precision', default=True, description='for Precision options')
-    variant('mpi', default=True, description='Build with MPI support')
-    variant('openmp', default=True, description='Build with OpenMP support')
+    variant('precision', default=False, description='for Precision options')
+    variant('serial', default=True, description='Build without MPI support')
+    variant('mpi', default=False, description='Build with MPI support')
+    variant('openmp', default=False, description='Build with OpenMP support')
    
     depends_on('mpi', when='+mpi')    
     
     def edit(self, spec, prefix):
         shutil.copy('src-openmp/Makefile.vanilla','src-openmp/Makefile')
         shutil.copy('src-mpi/Makefile.vanilla','src-mpi/Makefile')
-               
+        
         if '+openmp' in spec:
             ### openmp and mpi variant
             self.build_targets.extend(['--directory=src-openmp', '--file=Makefile'])
@@ -84,8 +85,9 @@ class Comd(MakefilePackage):
         if '+mpi' not in spec:
             makefile.filter('CC   = .*', 'CC = gcc')
             makefile.filter('DO_MPI = .*','DO_MPI = OFF')
+        if '+precision' in spec:
+            makefile.filter('DOUBLE_PRECISION = O.*', 'DOUBLE_PRECISION = OFF')
 
-            
     def install(self, spec, prefix):
         mkdirp(prefix.bin)
         mkdirp(prefix.examples)
