@@ -60,7 +60,7 @@ class Comd(MakefilePackage):
     
     variant('precision', default=False, description='for Precision options')
     variant('serial', default=True, description='Build without MPI support')
-    variant('mpi', default=False, description='Build with MPI support')
+    variant('mpi', default=True, description='Build with MPI support')
     variant('openmp', default=False, description='Build with OpenMP support')
    
     depends_on('mpi', when='+mpi')    
@@ -85,6 +85,7 @@ class Comd(MakefilePackage):
         if '+mpi' not in spec:
             makefile.filter('CC   = .*', 'CC = gcc')
             makefile.filter('DO_MPI = .*','DO_MPI = OFF')
+
         if '+precision' in spec:
             makefile.filter('DOUBLE_PRECISION = O.*', 'DOUBLE_PRECISION = OFF')
 
