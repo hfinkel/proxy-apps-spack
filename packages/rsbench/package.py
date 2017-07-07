@@ -73,11 +73,11 @@ class Rsbench(MakefilePackage):
 	if len(self.compiler.name) <= 0 or self.compiler.name == 'gcc':
                 #makefile.filter('CC =.*', 'CC = gcc')
 		self.build_targets.extend(['COMPILER=gnu'])
-		cflags += ' ' + '-fopenmp -ffast-math'
+		cflags += ' ' + '-ffast-math' + ' ' + self.compiler.openmp_flag
 	
 	if self.compiler.name == 'icc':
 		self.build_targets.extend(['COMPILER=intel'])
-                cflags += ' ' + '-openmp -xhost -ansi-alias -no-prec-div'
+                cflags += ' ' + '-xhost -ansi-alias -no-prec-div' + ' ' + self.compiler.openmp_flag
 
 	if self.compiler.name == 'pgcc':
 		self.build_targets.extend(['COMPILER=pgi'])
