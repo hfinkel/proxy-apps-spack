@@ -45,7 +45,7 @@ class Rsbench(MakefilePackage):
 
     # FIXME: Add a proper url for your package's homepage here.
     homepage = "https://github.com/ANL-CESAR/RSBench"
-    url      = "https://github.com/ANL-CESAR/RSBench/archive/v2.tar.gz"
+    url = "https://github.com/ANL-CESAR/RSBench/archive/v2.tar.gz"
 
     tags = ['proxy-app']
 
@@ -59,53 +59,50 @@ class Rsbench(MakefilePackage):
     variant('openmp', default=True, description='Built with OpenMP support.')
 
     # FIXME: Add dependencies if required.
-    #depends_on('openmpi', when='+openmp')
 
     build_targets = ['--directory=src']
 
     def edit(self, spec, prefix):
 
-	makefile = FileFilter('src/makefile')
+        makefile = FileFilter('src/makefile')
 
         cflags = '-std=gnu99'
         ldflags = '-lm'
 
-	if len(self.compiler.name) <= 0 or self.compiler.name == 'gcc':
-                #makefile.filter('CC =.*', 'CC = gcc')
-		self.build_targets.extend(['COMPILER=gnu'])
-		cflags += ' ' + '-ffast-math' + ' ' + self.compiler.openmp_flag
-	
-	if self.compiler.name == 'icc':
-		self.build_targets.extend(['COMPILER=intel'])
-                cflags += ' ' + '-xhost -ansi-alias -no-prec-div' + ' ' + self.compiler.openmp_flag
+        if len(self.compiler.name) <= 0 or self.compiler.name == 'gcc':
+            self.build_targets.extend(['COMPILER=gnu'])
+            cflags += ' ' + '-ffast-math' + ' ' + self.compiler.openmp_flag
 
-	if self.compiler.name == 'pgcc':
-		self.build_targets.extend(['COMPILER=pgi'])
-		cflags += ' ' + '-mp -fastsse'
+        if self.compiler.name == 'icc':
+            self.build_targets.extend(['COMPILER=intel'])
+            cflags += ' ' + '-xhost -ansi-alias -no-prec-div'
+            + ' ' + self.compiler.openmp_flag
 
-	if '+debug' in spec: 
-                cflags += ' ' + '-g'
-        
+        if self.compiler.name == 'pgcc':
+            self.build_targets.extend(['COMPILER=pgi'])
+            cflags += ' ' + '-mp -fastsse'
+
+        if '+debug' in spec:
+            cflags += ' ' + '-g'
+
         if '+profile' in spec:
-                cflags += ' ' + '-pg'
+            cflags += ' ' + '-pg'
 
-	if '+optimize' in spec and self.compiler.name == 'icc':
-                cflags += ' ' + '-O3'
+        if '+optimize' in spec and self.compiler.name == 'icc':
+            cflags += ' ' + '-O3'
 
-	if '+status' in spec:
-		cflags += ' ' + '-DSTATUS'
+        if '+status' in spec:
+            cflags += ' ' + '-DSTATUS'
 
-	if '+papi' in spec:
-                cflags += ' ' + '-DPAPI'
-		ldflags += ' ' + '-lpapi'
-		makefile.filter('source =.*', 'source = {0}'.format('papi.c \\'))
+        if '+papi' in spec:
+            cflags += ' ' + '-DPAPI'
+            ldflags += ' ' + '-lpapi'
+            makefile.filter('source =.*', 'source = {0}'.format('papi.c \\'))
 
+        self.build_targets.extend(['CFLAGS={}'.format(cflags)])
 
-	#makefile.filter('CFLAGS .*', 'CFLAGS = {0}'.format(cflags))
-
-	self.build_targets.extend(['CFLAGS={}'.format(cflags)])
-	
     def install(self, spec, prefix):
         # FIXME: Unknown build system
-	mkdir(prefix.bin)
+        mkdir(prefix.bin)
         make('src/rsbench', prefix.bin)
+
