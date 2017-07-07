@@ -40,12 +40,14 @@
 from spack import *
 import os
 
+
 class Snbone(MakefilePackage):
-    """This application targets the primary computational solve burden of a SN, continuous finite element based transport equation solver."""
+    """This application targets the primary computational solve burden of a SN,
+       continuous finite element based transport equation solver."""
 
     # FIXME: Add a proper url for your package's homepage here.
     homepage = "https://github.com/ANL-CESAR/"
-    url      = "https://github.com/ANL-CESAR/SNbone.git"
+    url = "https://github.com/ANL-CESAR/SNbone.git"
 
     # FIXME: Add proper versions and checksums here.
     version('master', git='https://github.com/ANL-CESAR/SNbone.git')
@@ -56,29 +58,29 @@ class Snbone(MakefilePackage):
     tags = ['proxy-app']
 
     def edit(self, spec, prefix):
-	ldflags = '-lm'
+        ldflags = '-lm'
         self.build_targets.extend(['--directory=src_c'])
-	self.build_targets.extend(['COMPILER=gfortran'])
-	if self.compiler.name == 'mpixlf90_r':
+        self.build_targets.extend(['COMPILER=gfortran'])
+        if self.compiler.name == 'mpixlf90_r':
             self.build_targets.extend(['COMPILER=bgq'])
         if self.compiler.name == 'intel':
             self.build_targets.extend(['COMPILER=intel'])
-	self.build_targets.extend(['LDFLAGS={}'.format(ldflags)])
+            self.build_targets.extend(['LDFLAGS={}'.format(ldflags)])
 
-	self.build_targets.extend(['--directory=../src_fortran'])
-	self.build_targets.extend(['--directory=../src_makemesh'])	
+        self.build_targets.extend(['--directory=../src_fortran'])
+        self.build_targets.extend(['--directory=../src_makemesh'])
 
     def install(self, spec, prefix):
         # FIXME: Unknown build system
         with working_dir('src_c', create=False):
-	    mkdir(prefix.bin)
-	    if not os.path.exists(prefix.bin + '/C'):
-	    	mkdir(prefix.bin + '/C')
-	    if not os.path.exists(prefix.bin + '/Fortran'):
-	    	mkdir(prefix.bin + '/Fortran')
-	    if not os.path.exists(prefix.bin + '/MakeMesh'):
-	        mkdir(prefix.bin + '/MakeMesh')
-	    install('SNaCFE.x', prefix.bin + '/C')
-	    install('../src_fortran/SNaCFE.x', prefix.bin + '/Fortran')
-	    install('../src_makemesh/makemesh.x', prefix.bin + '/MakeMesh')
-	#make()
+            mkdir(prefix.bin)
+            if not os.path.exists(prefix.bin + '/C'):
+                mkdir(prefix.bin + '/C')
+            if not os.path.exists(prefix.bin + '/Fortran'):
+                mkdir(prefix.bin + '/Fortran')
+            if not os.path.exists(prefix.bin + '/MakeMesh'):
+                mkdir(prefix.bin + '/MakeMesh')
+        install('SNaCFE.x', prefix.bin + '/C')
+        install('../src_fortran/SNaCFE.x', prefix.bin + '/Fortran')
+        install('../src_makemesh/makemesh.x', prefix.bin + '/MakeMesh')
+
