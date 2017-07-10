@@ -39,46 +39,48 @@
 #
 from spack import *
 import shutil
+import glob
 
 
 class Cosp2(MakefilePackage):
-    """Proxy Application. CoSP2 represents a sparse linear algebra 
-    parallel algorithm for calculating the density matrix in electronic 
-    tructure theory. The algorithm is based on a recursive second-order 
-    Fermi-Operator expansion method (SP2) and is tailored for density 
-    functional based tight-binding calculations of non-metallic systems 
-    
-    tags : proxy-add ecp-proxy-app """
+    """ Proxy Application. CoSP2 represents a sparse linear algebra 
+        parallel algorithm for calculating the density matrix in electronic 
+        tructure theory. The algorithm is based on a recursive second-order 
+        Fermi-Operator expansion method (SP2) and is tailored for density 
+        functional based tight-binding calculations of non-metallic systems 
+        tags : proxy-app 
+    """
 
-    tags = ['proxy-app','ecp-proxy-app']
+    tags = ['proxy-app']
 
     homepage = "http://www.exmatex.org/cosp2.html"
     url      = "https://github.com/exmatex/CoSP2/archive/master.tar.gz"
 
     version('master',git='https://github.com/exmatex/CoSP2.git',description='master')
 
-    variant('precision', default=False, description='for Precision options')
     variant('serial',default=True,description='Serial Build ')
     variant('parallel',default=True,description=' Build with MPI Support ')
 
-    depends_on('mpi', when='+mpi')
+    depends_on('mpi')
+    build_directory = 'src-mpi'
     def edit(self, spec, prefix):
-        shutil.copy('src-mpi/Makefile.vanilla','src-mpi/Makefile')
-        self.build_targets.extend(['--directory=src-mpi', '--file=Makefile'])
-        makefile = FileFilter('src-mpi/Makefile')
-        makefile.filter('CFLAGS = .*','CFLAGS = -std=c99')
-        
+       with working_dir('src-mpi'):
+        filter_file(r'^CC\s*=.*', 'CC = %s' % self.spec['mpi'].mpicc,'Makefile.vanilla')
         if '+precision' in spec:
             makefile.filter('DOUBLE_PRECISION = O.*', 'DOUBLE_PRECISION = OFF')
-           
+        shutil.copy('Makefile.vanilla', 'Makefile')   
 
     def install(self, spec, prefix):
-        mkdirp(prefix.bin)
+        shutil.move('bin', prefix)
         mkdirp(prefix.examples)
         mkdirp(prefix.pots)
         mkdirp(prefix.doc)
         install('README.md', prefix.doc)
         install('LICENSE.md', prefix.doc)
+        for files in glob.glob('examples/*.*'):
+            install(files,prefix.examples)
+        for files in glob.glob('pots/*.*'):
+            install(files,prefix.examples)
 
 
 
