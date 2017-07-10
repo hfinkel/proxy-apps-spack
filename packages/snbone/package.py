@@ -48,7 +48,6 @@ class Snbone(MakefilePackage):
     # FIXME: Add a proper url for your package's homepage here.
     homepage = "https://github.com/ANL-CESAR/"
     url = "https://github.com/ANL-CESAR/SNbone.git"
-
     # FIXME: Add proper versions and checksums here.
     version('master', git='https://github.com/ANL-CESAR/SNbone.git')
 
@@ -58,22 +57,14 @@ class Snbone(MakefilePackage):
     tags = ['proxy-app']
 
     def edit(self, spec, prefix):
-	with working_dir('src_c', create=False):
-	    if self.compiler.name == 'gcc':
-		make('COMPILER=gfortran', 'LDFLAGS={0}'.format('-lm'))
-            if self.compiler.name == 'mpixlf90_r':
-	        make('COMPILER=bgq', 'LDFLAGS={0}'.format('-lm'))
-            if self.compiler.name == 'icc':
-		make('COMPILER=intel', 'LDFLAGS={0}'.format('-lm'))
-   	with working_dir('src_fortran', create=False):
+        with working_dir('src_c', create=False):
             if self.compiler.name == 'gcc':
                 make('COMPILER=gfortran', 'LDFLAGS={0}'.format('-lm'))
             if self.compiler.name == 'mpixlf90_r':
                 make('COMPILER=bgq', 'LDFLAGS={0}'.format('-lm'))
             if self.compiler.name == 'icc':
                 make('COMPILER=intel', 'LDFLAGS={0}'.format('-lm'))
- 
-	with working_dir('src_makemesh', create=False):
+        with working_dir('src_fortran', create=False):
             if self.compiler.name == 'gcc':
                 make('COMPILER=gfortran', 'LDFLAGS={0}'.format('-lm'))
             if self.compiler.name == 'mpixlf90_r':
@@ -81,16 +72,25 @@ class Snbone(MakefilePackage):
             if self.compiler.name == 'icc':
                 make('COMPILER=intel', 'LDFLAGS={0}'.format('-lm'))
 
-	with working_dir('src_processmesh', create=False):
+        with working_dir('src_makemesh', create=False):
             if self.compiler.name == 'gcc':
-                make('COMPILER=gfortran', 'METISLIB={0}'.format(spec['metis'].prefix + '/lib/libmetis.so'))
+                make('COMPILER=gfortran', 'LDFLAGS={0}'.format('-lm'))
+            if self.compiler.name == 'mpixlf90_r':
+                make('COMPILER=bgq', 'LDFLAGS={0}'.format('-lm'))
+            if self.compiler.name == 'icc':
+                make('COMPILER=intel', 'LDFLAGS={0}'.format('-lm'))
+
+        with working_dir('src_processmesh', create=False):
+            if self.compiler.name == 'gcc':
+                make('COMPILER=gfortran', 'METISLIB={0}'
+                     .format(spec['metis'].prefix + '/lib/libmetis.so'))
             if self.compiler.name == 'mpixlf90_r':
                 make('COMPILER=bgq', 'LDFLAGS={0}'.format('-lm'))
             if self.compiler.name == 'icc':
                 make('COMPILER=intel', 'LDFLAGS={0}'.format('-lm'))
 
     def build(self, spec, prefix):
-    	pass
+        pass
 
     def install(self, spec, prefix):
         # FIXME: Unknown build system
@@ -104,8 +104,9 @@ class Snbone(MakefilePackage):
                 mkdir(prefix.bin + '/MakeMesh')
             if not os.path.exists(prefix.bin + '/ProcessMesh'):
                 mkdir(prefix.bin + '/ProcessMesh')
-	    install('SNaCFE.x', prefix.bin + '/C')
+            install('SNaCFE.x', prefix.bin + '/C')
             install('../src_fortran/SNaCFE.x', prefix.bin + '/Fortran')
             install('../src_makemesh/makemesh.x', prefix.bin + '/MakeMesh')
-	    install('../src_processmesh/processmesh.x', prefix.bin + '/ProcessMesh')
+            install('../src_processmesh/processmesh.x',
+                    prefix.bin + '/ProcessMesh')
 

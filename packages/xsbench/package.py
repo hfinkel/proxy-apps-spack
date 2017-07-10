@@ -54,27 +54,7 @@ class Xsbench(MakefilePackage):
 
     version('13', '72a92232d2f5777fb52f5ea4082aff37')
 
-    variant('vecinfo',
-            default=False,
-            description='Compiler Vectorization (needs -O3 flag) information.')
-    variant('verify',
-            default=False,
-            description='Enable verification.')
-    variant('benchmark',
-            default=False,
-            description='Adds outer benchmarking loop to do multiple trials ' +
-            'for 1 < threads <= max_threads.')
-    variant('binarydump',
-            default=False,
-            description='Binary dump for file I/O based initialization.')
-    variant('binaryread',
-            default=False,
-            description='Binary read for file I/O based initialization.')
     variant('mpi', default=False,  description='Build with MPI support.')
-    variant('optimize',
-            default=False,
-            description='Enable optimization flag.')
-    variant('openmp', default=True, description='Build with OpenMP support.')
 
     # FIXME: Add dependencies if required.
     depends_on('mpi', when='+mpi')
@@ -86,37 +66,11 @@ class Xsbench(MakefilePackage):
 
         makefile = FileFilter('src/Makefile')
 
-        cflags = '-std=gnu99' + ' ' + self.compiler.openmp_flag
-        LDFLAGS = '-lm'
-
-        if len(self.compiler.name) <= 0 or self.compiler.name == 'gcc':
+        if self.compiler.name == 'gcc':
             self.build_targets.extend(['COMPILER=GNU'])
 
         if self.compiler.name == 'mpicc':
             self.build_targets.extend(['MPI=yes'])
-
-        if '+mpi' in spec:
-            self.build_targets.extend(['MPI=yes'])
-            cflags += ' -DMPI'
-        if '+vecinfo' in spec:
-            cflags += ' -ftree-vectorizer-verbose=6'
-            cflags += ' -03'
-        if '+verify' in spec:
-            cflags += ' -DVERIFICATION'
-
-        if '+benchmark' in spec:
-            cflags += ' -DBENCHMARK'
-
-        if '+binarydump' in spec:
-            cflags += ' -DBINARY_DUMP'
-
-        if '+binaryread' in spec:
-            cflags += ' -DBINARY_READ'
-
-        if '+optimize' in spec:
-            cflags += ' -03'
-
-        makefile.filter('CFLAGS .*', 'CFLAGS = {0}'.format(cflags))
 
     def install(self, spec, prefix):
         # Manual installation

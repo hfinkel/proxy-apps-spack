@@ -41,11 +41,16 @@ from spack import *
 
 
 class Lcals(MakefilePackage):
-    """LCALS ("Livermore Compiler Analysis Loop Suite") is a collection of loop kernels based, in part, on historical "Livermore Loops" benchmarks (See the 1986 technical report: "The Livermore Fortran Kernels: A Computer Test of the Numerical Performance Range", by Frank H. McMahon, UCRL-53745.). The suite contains facilities to generate timing statistics and reports."""
+    """LCALS ("Livermore Compiler Analysis Loop Suite") is a collection of loop
+       kernels based, in part, on historical "Livermore Loops" benchmarks
+       (See the 1986 technical report: "The Livermore Fortran Kernels:
+        A Computer Test of the Numerical Performance Range",
+        by Frank H. McMahon, UCRL-53745.). The suite contains facilities to
+        generate timing statistics and reports."""
 
     # FIXME: Add a proper url for your package's homepage here.
     homepage = "https://codesign.llnl.gov/LCALS-downloads/"
-    url      = "https://codesign.llnl.gov/LCALS-downloads/lcals-v1.0.2.tgz"
+    url = "https://codesign.llnl.gov/LCALS-downloads/lcals-v1.0.2.tgz"
 
     tags = ['proxy-app']
 
@@ -58,29 +63,28 @@ class Lcals(MakefilePackage):
         # FIXME: Edit the Makefile if necessary
         # FIXME: If not needed delete this function
         makefile = FileFilter('Makefile')
-	
 
         self.build_targets.extend(['LCALS_ARCH={}'.format('x86_sse_gnu')])
         self.build_targets.extend(['CXX={}'.format('g++')])
-	
-	if self.compiler.name == 'icc':
-		self.build_targets.extend(['LCALS_ARCH={}'.format('MIC')])
-		self.build_targets.extend(['CXX={}'.format('icc')])
-	if self.compiler.name == 'icpc':
-                self.build_targets.extend(['LCALS_ARCH={}'.format('x86_sse_icc')])
-                self.build_targets.extend(['CXX={}'.format('icpc')])
-	if self.compiler.name == 'mpixlcxx':
-                self.build_targets.extend(['LCALS_ARCH={}'.format('bgp_xlc9')])
-                self.build_targets.extend(['CXX={}'.format('mpixlcxx')])
-	if self.compiler.name == 'mpixlcxx_r':
-                self.build_targets.extend(['LCALS_ARCH={}'.format('bgq_xlc12')])
-                self.build_targets.extend(['CXX={}'.format('mpixlcxx_r')])
-	if self.compiler.name == 'bgclang++11':
-                self.build_targets.extend(['LCALS_ARCH={}'.format('bgq_clang')])
-                self.build_targets.extend(['CXX={}'.format('bgclang++11')])
+
+        if self.compiler.name == 'icc':
+            self.build_targets.extend(['LCALS_ARCH={}'.format('MIC')])
+            self.build_targets.extend(['CXX={}'.format('icc')])
+        if self.compiler.name == 'icpc':
+            self.build_targets.extend(['LCALS_ARCH={}'.format('x86_sse_icc')])
+            self.build_targets.extend(['CXX={}'.format('icpc')])
+        if self.compiler.name == 'mpixlcxx':
+            self.build_targets.extend(['LCALS_ARCH={}'.format('bgp_xlc9')])
+            self.build_targets.extend(['CXX={}'.format('mpixlcxx')])
+        if self.compiler.name == 'mpixlcxx_r':
+            self.build_targets.extend(['LCALS_ARCH={}'.format('bgq_xlc12')])
+            self.build_targets.extend(['CXX={}'.format('mpixlcxx_r')])
+        if self.compiler.name == 'bgclang++11':
+            self.build_targets.extend(['LCALS_ARCH={}'.format('bgq_clang')])
+            self.build_targets.extend(['CXX={}'.format('bgclang++11')])
         if self.compiler.name == 'mpicxx-4.7.2x':
-                self.build_targets.extend(['LCALS_ARCH={}'.format('bgq_gnu')])
-                self.build_targets.extend(['CXX={}'.format('mpicxx-4.7.2')])
+            self.build_targets.extend(['LCALS_ARCH={}'.format('bgq_gnu')])
+            self.build_targets.extend(['CXX={}'.format('mpicxx-4.7.2')])
 
     def install(self, spec, prefix):
         mkdir(prefix.bin)

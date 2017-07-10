@@ -52,12 +52,6 @@ class Rsbench(MakefilePackage):
     version('2', '15a3ac5ea72529ac1ed9ed016ee68b4f')
     version('0', '3427634dc5e7cd904d88f9955b371757')
 
-    variant('debug',     default=False,  description='Enable debugging.')
-    variant('optimize',     default=False,  description='Do Optimizations.')
-    variant('papi',     default=False,  description='Enable PAPI support.')
-    variant('status', default=False, description='Enable status flag.')
-    variant('openmp', default=True, description='Built with OpenMP support.')
-
     # FIXME: Add dependencies if required.
 
     build_targets = ['--directory=src']
@@ -66,40 +60,11 @@ class Rsbench(MakefilePackage):
 
         makefile = FileFilter('src/makefile')
 
-        cflags = '-std=gnu99'
-        ldflags = '-lm'
-
-        if len(self.compiler.name) <= 0 or self.compiler.name == 'gcc':
+        if self.compiler.name == 'gcc':
             self.build_targets.extend(['COMPILER=gnu'])
-            cflags += ' ' + '-ffast-math' + ' ' + self.compiler.openmp_flag
 
         if self.compiler.name == 'icc':
             self.build_targets.extend(['COMPILER=intel'])
-            cflags += ' ' + '-xhost -ansi-alias -no-prec-div'
-            + ' ' + self.compiler.openmp_flag
-
-        if self.compiler.name == 'pgcc':
-            self.build_targets.extend(['COMPILER=pgi'])
-            cflags += ' ' + '-mp -fastsse'
-
-        if '+debug' in spec:
-            cflags += ' ' + '-g'
-
-        if '+profile' in spec:
-            cflags += ' ' + '-pg'
-
-        if '+optimize' in spec and self.compiler.name == 'icc':
-            cflags += ' ' + '-O3'
-
-        if '+status' in spec:
-            cflags += ' ' + '-DSTATUS'
-
-        if '+papi' in spec:
-            cflags += ' ' + '-DPAPI'
-            ldflags += ' ' + '-lpapi'
-            makefile.filter('source =.*', 'source = {0}'.format('papi.c \\'))
-
-        self.build_targets.extend(['CFLAGS={}'.format(cflags)])
 
     def install(self, spec, prefix):
         # FIXME: Unknown build system
