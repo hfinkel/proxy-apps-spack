@@ -38,14 +38,14 @@
 # please first remove this boilerplate and all FIXME comments.
 #
 from spack import *
+import os
 
-
-class Mcb(MakefilePackage):
+class Mcb(Package):
     """The "Monte Carlo Benchmark" (MCB) is intended for use in exploring 
     the computational performance of Monte Carlo algorithms on parallel architectures
 
     tags : proxy-app ecp-proxy-app"""
-    
+
     tags = ['exp-proxy-app','proxy-app']
     homepage = "https://codesign.llnl.gov/mcb.php"
     url      = "https://codesign.llnl.gov/downloads/mcb-20130723.tar.gz"
@@ -53,13 +53,22 @@ class Mcb(MakefilePackage):
     version('20130723', 'ed9c97edb45c8918184b4eba280bd884')
 
     # FIXME: Add dependencies if required.
-    # depends_on('foo')
+    depends_on('openmpi')
 
-    def edit(self, spec, prefix):
-        pass
-        # FIXME: Edit the Makefile if necessary
-        # FIXME: If not needed delete this function
-        # makefile = FileFilter('Makefile')
-        # makefile.filter('CC = .*', 'CC = cc')
     def install(self,spec,prefix):
-        pass
+        os.system('./build-linux-x86_64')
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
