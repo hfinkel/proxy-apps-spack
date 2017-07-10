@@ -38,33 +38,44 @@
 # please first remove this boilerplate and all FIXME comments.
 #
 from spack import *
-import glob
+
 
 class Nut(CMakePackage):
-    """NuT is Monte Carlo code for neutrino transport and is a C++ analog to the Haskell McPhD code. NuT is principally aimed at exploring on-node parallelism and performance issues."""
+    """NuT is Monte Carlo code for neutrino transport and
+       is a C++ analog to the Haskell McPhD code.
+       NuT is principally aimed at exploring on-node parallelism
+       and performance issues."""
 
     homepage = "https://github.com/lanl/NuT"
     url      = ""
-    tags     = ['proxy-app', 'ecp-proxy-app']
+    tags     = ['proxy-app']
 
-    version('serial', git='https://github.com/lanl/NuT.git', branch='master')
-    version('openmp', git='https://github.com/lanl/NuT.git', branch='openmp')
+    version(
+        'serial', git='https://github.com/lanl/NuT.git',
+        branch='master')
+    version(
+        'omp', git='https://github.com/lanl/NuT.git',
+        branch='openmp')
 
     depends_on('random123')
-    depends_on('openmp', when='@openmp')
+    depends_on('openmp', when='@omp')
 
     def cmake_args(self):
         cmakefile = FileFilter('CMakeLists.txt')
-        cmakefile.filter('# create variable.*', 'set(ENV{RANDOM123_DIR} {})'.format(spec['random123'].prefix))
+        cmakefile.filter(
+            '# create variable.*',
+            'set(ENV{RANDOM123_DIR} prefix/../random123*)')
         cmakefile.filter('# set compiler .*', 'set(ENV{CC} cc)')
         cmakefile.filter('# GNU .*', 'set(ENV{CXX} c++)')
 
-        self.build_targets.extend(['VERBOSE=on -j 4 2>&1 | tee -a make.out'])
+        self.build_targets.extend(
+            ['VERBOSE=on -j 4 2>&1 | tee -a make.out'])
 
-        args = []
+        args = ['..']
         return args
 
     def install(self, spec, prefix):
         install('README.md', prefix)
-        mkdirp('test', prefix)
-        install_tree(join_path(self.build_directory, 'test'), join_path(prefix, 'test'))
+        install_tree(
+            join_path(self.build_directory, 'test'),
+            join_path(prefix, 'test'))
