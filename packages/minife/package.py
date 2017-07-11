@@ -24,7 +24,6 @@
 ##############################################################################
 
 import tarfile
-import re
 
 from spack import *
 
@@ -42,36 +41,53 @@ class Minife(MakefilePackage):
     version('2.0.1', '3113d7c8fc01495d08552672b0dbd015')
 
     variant('build', default='ref', description='Type of Parallelism',
-            values=('ref', 'openmp_ref', 'qthreads'))
+            values=('ref', 'openmp', 'qthreads', 'kokkos'))
 
     depends_on('mpi')
     depends_on('qthreads', when='build=qthreads')
 
-    type_of_build = 'ref'
-    build_version = ''
+    @property
+    def type_of_build(self):
+        build = 'ref'
+
+        if 'build=openmp' in self.spec:
+            build = 'openmp_ref'
+
+        if 'build=qthreads' in self.spec:
+            build = 'qthreads'
+
+        if 'build=kokkos' in self.spec:
+            build = 'kokkos'
+
+        return build
+
+    @property
+    def build_version(self):
+        return self.version.up_to(2)
+
+    @property
+    def build_targets(self):
+        targets = [
+            '--directory=miniFE-{0}_{1}/src'.format(self.build_version,
+                                                    self.type_of_build),
+            'CXX={0}'.format(self.spec['mpi'].mpicxx),
+            'CC={0}'.format(self.spec['mpi'].mpicc)
+        ]
+
+        return targets
 
     def edit(self, spec, prefix):
-        build_search = re.search('build=([.\S]+)', str(spec))
-        self.type_of_build = build_search.group(1)
-
-        self.build_version = self.version.up_to(2)
-
-        inner_tar = tarfile.open(name='miniFE-{}_{}.tgz'.format(
+        inner_tar = tarfile.open(name='miniFE-{0}_{1}.tgz'.format(
                                  self.build_version, self.type_of_build))
         inner_tar.extractall()
 
-        makefile = FileFilter('miniFE-{}_{}/src/Makefile'.format(
+        makefile = FileFilter('miniFE-{0}_{1}/src/Makefile'.format(
                               self.build_version, self.type_of_build))
 
         makefile.filter('-fopenmp', self.compiler.openmp_flag, string=True)
 
-        self.build_targets.extend(['--directory=miniFE-{}_{}/src'.format(
-                                   self.build_version, self.type_of_build)])
-        self.build_targets.extend(['CXX={}'.format(spec['mpi'].mpicxx)])
-        self.build_targets.extend(['CC={}'.format(spec['mpi'].mpicc)])
-
     def install(self, spec, prefix):
         mkdirp(prefix.bin)
-        install('miniFE-{}_{}/src/miniFE.x'.format(
+        install('miniFE-{0}_{1}/src/miniFE.x'.format(
                 self.build_version, self.type_of_build),
                 prefix.bin)

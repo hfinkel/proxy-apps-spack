@@ -23,8 +23,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
 
-from os import listdir
-
 from spack import *
 
 
@@ -38,27 +36,21 @@ class Pathfinder(MakefilePackage):
 
     version('1.0.0', '374269e8d42c305eda3e392444e22dde')
 
-    build_targets = ['--directory=PathFinder_ref']
+    build_targets = ['--directory=PathFinder_ref', 'CC=cc']
 
     def edit(self, spec, prefix):
         makefile = FileFilter('PathFinder_ref/Makefile')
-        makefile.filter('CC=.*', 'CC=cc')
         makefile.filter('CFLAGS += .*',
                         'CFLAGS += {}'.format(self.compiler.openmp_flag))
 
     def install(self, spec, prefix):
         # Manual installation
         mkdirp(prefix.bin)
-        mkdirp(prefix.doc.generatedData)
-        mkdirp(prefix.doc.scaleData)
+        mkdirp(prefix.doc)
 
         install('PathFinder_ref/PathFinder.x', prefix.bin)
+        install('PathFinder_ref/MicroTestData.adj_list', prefix.bin)
         install('README', prefix.doc)
-        install('COPYING', prefix.doc)
-        install('COPYING.LESSER', prefix.doc)
 
-        # Install Sample Run Data
-        for f in listdir(join_path(self.build_directory, 'generatedData')):
-            install('generatedData/{}'.format(f), prefix.doc.generatedData)
-        for f in listdir(join_path(self.build_directory, 'scaleData')):
-            install('scaleData/{}'.format(f), prefix.doc.scaleData)
+        install_tree('generatedData/', prefix.doc.generatedData)
+        install_tree('scaleData/', prefix.doc.scaleData)

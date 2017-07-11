@@ -22,46 +22,44 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-#
-# This is a template package file for Spack.  We've put "FIXME"
-# next to all the things you'll want to change. Once you've handled
-# them, you can save this file and test your package like this:
-#
-#     spack install cohmm
-#
-# You can edit this file again by typing:
-#
-#     spack edit cohmm
-#
-# See the Spack documentation for more information on packaging.
-# If you submit this package back to Spack as a pull request,
-# please first remove this boilerplate and all FIXME comments.
-#
 from spack import *
+import glob
 
 
 class Cohmm(MakefilePackage):
-    """An anticipated important use-case for next-generation supercomputing 
-    is multiscale modeling, in which continuum equations for large-scale 
-    material deformation are augmented with high-fidelity, fine-scale 
-    simulations that provide constitutive data on demand
+    """ An anticipated important use-case for next-generation supercomputing
+        is multiscale modeling, in which continuum equations for large-scale
+        material deformation are augmented with high-fidelity, fine-scale
+        simulations that provide constitutive data on demand
+        tags: proxy-app
+    """
 
-    tags: proxy-app exp-proxy-app"""
-
-    tags = ['exp-proxy-app','proxy-app']
+    tags = ['proxy-app']
     homepage = "http://www.exmatex.org/cohmm.html"
-    url      = "https://github.com/exmatex/CoHMM/archive/sad.tar.gz"
+    url = "https://github.com/exmatex/CoHMM/archive/sad.tar.gz"
 
-    version('sad', git='https://github.com/exmatex/CoHMM.git',description='Sad Branch')
+    version('develop', git='https://github.com/exmatex/CoHMM.git',
+            branch='sad', description='Sad Branch')
 
-    # FIXME: Add dependencies if required.
-    # depends_on('foo')
+    variant('serial', default=True, description='Serial Build')
+    variant('openmp', default=True, description='Build with OpenMP Support')
+    variant('gnuplot', default=True, description='Enable gnu plot Support')
 
     def edit(self, spec, prefix):
-        pass
-        # FIXME: Edit the Makefile if necessary
-        # FIXME: If not needed delete this function
-        # makefile = FileFilter('Makefile')
-        # makefile.filter('CC = .*', 'CC = cc')
+        if '+openmp' in spec:
+            filter_file('DO_OPENMP = O.*', 'DO_OPENMP = ON', 'Makefile')
+        if '+gnuplot' in spec:
+            filter_file('DO_GNUPLOT = O.*', 'DO_GNUPLOT = ON', 'Makefile')
+
+    def build(self, spec, prefix):
+        make()
+
     def install(self, spec, prefix):
-        pass
+        mkdirp(prefix.bin)
+        mkdirp(prefix.input)
+        mkdirp(prefix.doc)
+        install('cohmm', prefix.bin)
+        install('README.md', prefix.doc)
+        install('LICENSE.md', prefix.doc)
+        for files in glob.glob('input/*.*'):
+            install(files, prefix.input)

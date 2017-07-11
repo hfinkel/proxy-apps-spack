@@ -22,46 +22,52 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-#
-# This is a template package file for Spack.  We've put "FIXME"
-# next to all the things you'll want to change. Once you've handled
-# them, you can save this file and test your package like this:
-#
-#     spack install cosp2
-#
-# You can edit this file again by typing:
-#
-#     spack edit cosp2
-#
-# See the Spack documentation for more information on packaging.
-# If you submit this package back to Spack as a pull request,
-# please first remove this boilerplate and all FIXME comments.
-#
 from spack import *
+import shutil
+import glob
 
 
 class Cosp2(MakefilePackage):
-    """Proxy Application. CoSP2 represents a sparse linear algebra 
-    parallel algorithm for calculating the density matrix in electronic 
-    tructure theory. The algorithm is based on a recursive second-order 
-    Fermi-Operator expansion method (SP2) and is tailored for density 
-    functional based tight-binding calculations of non-metallic systems 
-    
-    tags : proxy-add ecp-proxy-app """
-
-    tags = ['proxy-app','ecp-proxy-app']
-
+    """ Proxy Application. CoSP2 represents a sparse linear algebra
+        parallel algorithm for calculating the density matrix in electronic
+        tructure theory. The algorithm is based on a recursive second-order
+        Fermi-Operator expansion method (SP2) and is tailored for density
+        functional based tight-binding calculations of non-metallic systems
+        tags : proxy-app
+    """
+    tags = ['proxy-app']
     homepage = "http://www.exmatex.org/cosp2.html"
-    url      = "https://github.com/exmatex/CoSP2/archive/master.tar.gz"
 
-    version('master',git='https://github.com/exmatex/CoSP2.git',description='master')
-    variant('serial',default=True,description='Serial Build ')
-    variant('parallel',default=True,description='Serial Build ')
+    url = "https://github.com/exmatex/CoSP2/archive/master.tar.gz"
+    version('master', git='https://github.com/exmatex/CoSP2.git',
+            description='master')
 
-#    depends_on('')
+    variant('precision', default=True,
+            description='Flag to hold Precesion Status')
+    variant('serial', default=True, description='Serial Build')
+    variant('parallel', default=True, description='Build with MPI Support')
+
+    depends_on('mpi', when='+parallel')
+
+    build_directory = 'src-mpi'
+
     def edit(self, spec, prefix):
-        pass
-
+        with working_dir('src-mpi'):
+            filter_file(r'^CC\s*=.*', 'CC = %s' % self.spec['mpi'].mpicc,
+                        'Makefile.vanilla')
+            if '+precision' in spec:
+                filter_file('DOUBLE_PRECISION = O.*', 'DOUBLE_PRECISION = OFF',
+                            'Makefile.vanilla')
+            shutil.copy('Makefile.vanilla', 'Makefile')
 
     def install(self, spec, prefix):
-        pass
+        shutil.move('bin', prefix)
+        mkdirp(prefix.examples)
+        mkdirp(prefix.pots)
+        mkdirp(prefix.doc)
+        install('README.md', prefix.doc)
+        install('LICENSE.md', prefix.doc)
+        for files in glob.glob('examples/*.*'):
+            install(files, prefix.examples)
+        for files in glob.glob('pots/*.*'):
+            install(files, prefix.examples)

@@ -22,53 +22,36 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-#
-# This is a template package file for Spack.  We've put "FIXME"
-# next to all the things you'll want to change. Once you've handled
-# them, you can save this file and test your package like this:
-#
-#     spack install amg
-#
-# You can edit this file again by typing:
-#
-#     spack edit amg
-#
-# See the Spack documentation for more information on packaging.
-# If you submit this package back to Spack as a pull request,
-# please first remove this boilerplate and all FIXME comments.
-#
 from spack import *
+import glob
 
 
 class Amg(MakefilePackage):
-    """The "Monte Carlo Benchmark" (MCB) is intended for use in 
-    exploring the computational performance of Monte Carlo algorithms 
-    on parallel architectures. It models the solution of a simple 
-    heuristic transport equation using a Monte Carlo technique. 
-    The MCB employs typical features of Monte Carlo algorithms 
-    such as particle creation, particle tracking, tallying particle 
-    information, and particle destruction. Particles are also traded 
-    among processors using MPI calls."""
-
+    """ The "Monte Carlo Benchmark" (MCB) is intended for use in 
+        exploring the computational performance of Monte Carlo algorithms 
+        on parallel architectures. It models the solution of a simple 
+        heuristic transport equation using a Monte Carlo technique. 
+        The MCB employs typical features of Monte Carlo algorithms 
+        such as particle creation, particle tracking, tallying particle 
+        information, and particle destruction. Particles are also traded 
+        among processors using MPI calls.
+        tags: proxy-app
+    """
+    tags = ['proxy-app']
     homepage = "https://codesign.llnl.gov/amg2013.php"
     url      = "https://codesign.llnl.gov/amg2013/amg2013.tgz"
 
     version('2013', '9d918d2a69528b83e6e0aba6ba601fef')
-    #build_targets = ['--directory'='utilities','--directory'='krylov','--directory'='IJ_mv','--directory'='parcsr_ls', '--directory'='parcsr_mv','--directory'='seq_mv', '--directory'='struct_mv','--directory'='sstruct_mv', '--directory'='test']
-    #build_targets = ['--directory= *']
+
     
     variant('mpi', default=True, description='Build with MPI support')
     variant('openmp', default=False, description='Build with OpenMP support')
     
-    # FIXME: Add dependencies if required.
-    # depends_on('foo')
-    depends_on('mpi')
-    depends_on('openmp',when="+openmp")
-
+    depends_on('mpi',when='+mpi')
 
 
     def edit(self, spec, prefix):
-        makefile = FileFilter('*/Makefile')
+        makefile = FileFilter('Makefile')
         makefile.filter('INCLUDE_CFLAGS =', 'INCLUDE_CFLAGS = -DTIMER_USE_MPI')
         makefile.filter('CXX=.*', 'CXX={}'.format(spec['mpi'].mpicxx))
         makefile.filter('LINKER=.*', 'LINKER={}'.format(spec['mpi'].mpicxx))
@@ -87,11 +70,11 @@ class Amg(MakefilePackage):
 
 
     def install(self, spec, prefix):
-        # Manual installation
         mkdirp(prefix.doc)
-        install('docs', prefix.doc)
+        for file in glob.glob('doc/*.*'):
+            install(file, prefix.doc)
         install('COPYRIGHT', prefix.doc)
-        install('COPYRIGHT.LESSER', prefix.doc)
+        install('COPYING.LESSER', prefix.doc)
 
 
 

@@ -1,4 +1,4 @@
-##############################################################################
+#############################################################################
 # Copyright (c) 2013-2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
 #
@@ -23,8 +23,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
 
-from shutil import copytree
-
 from spack import *
 
 
@@ -43,13 +41,15 @@ class Miniaero(MakefilePackage):
 
     depends_on('kokkos')
 
-    build_targets = ['--directory=kokkos']
+    @property
+    def build_targets(self):
+        targets = [
+            '--directory=kokkos',
+            'CXX=c++',
+            'KOKKOS_PATH={0}'.format(self.spec['kokkos'].prefix)
+        ]
 
-    def edit(self, spec, prefix):
-        makefile = FileFilter('kokkos/Makefile')
-        makefile.filter('CXX = .*', 'CXX = c++')
-        makefile.filter('KOKKOS_PATH = .*',
-                        'KOKKOS_PATH = {}'.format(spec['kokkos'].prefix))
+        return targets
 
     def install(self, spec, prefix):
         # Manual Installation
@@ -59,4 +59,4 @@ class Miniaero(MakefilePackage):
         install('kokkos/miniAero.host', prefix.bin)
         install('kokkos/README', prefix.doc)
         install('kokkos/tests/3D_Sod_Serial/miniaero.inp', prefix.bin)
-        copytree('kokkos/tests', prefix.doc.tests)
+        install_tree('kokkos/tests', prefix.doc.tests)
