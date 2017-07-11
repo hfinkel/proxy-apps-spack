@@ -28,36 +28,37 @@ import glob
 
 
 class Cosp2(MakefilePackage):
-    """ Proxy Application. CoSP2 represents a sparse linear algebra 
-        parallel algorithm for calculating the density matrix in electronic 
-        tructure theory. The algorithm is based on a recursive second-order 
-        Fermi-Operator expansion method (SP2) and is tailored for density 
-        functional based tight-binding calculations of non-metallic systems 
-        tags : proxy-app 
+    """ Proxy Application. CoSP2 represents a sparse linear algebra
+        parallel algorithm for calculating the density matrix in electronic
+        tructure theory. The algorithm is based on a recursive second-order
+        Fermi-Operator expansion method (SP2) and is tailored for density
+        functional based tight-binding calculations of non-metallic systems
+        tags : proxy-app
     """
-
     tags = ['proxy-app']
-
     homepage = "http://www.exmatex.org/cosp2.html"
-    url      = "https://github.com/exmatex/CoSP2/archive/master.tar.gz"
 
-    version('master', git='https://github.com/exmatex/CoSP2.git', description='master')
-    
-    variant('precision', default=True, description='Flag to hold Precesion Status')
+    url = "https://github.com/exmatex/CoSP2/archive/master.tar.gz"
+    version('master', git='https://github.com/exmatex/CoSP2.git',
+            description='master')
+
+    variant('precision', default=True,
+            description='Flag to hold Precesion Status')
     variant('serial', default=True, description='Serial Build')
     variant('parallel', default=True, description='Build with MPI Support')
- 
+
     depends_on('mpi', when='+parallel')
-    
+
     build_directory = 'src-mpi'
-    
+
     def edit(self, spec, prefix):
         with working_dir('src-mpi'):
-            filter_file(r'^CC\s*=.*', 'CC = %s' % self.spec['mpi'].mpicc, 
-                'Makefile.vanilla')
-        if '+precision' in spec:
-            makefile.filter('DOUBLE_PRECISION = O.*', 'DOUBLE_PRECISION = OFF')
-        shutil.copy('Makefile.vanilla', 'Makefile')   
+            filter_file(r'^CC\s*=.*', 'CC = %s' % self.spec['mpi'].mpicc,
+                        'Makefile.vanilla')
+            if '+precision' in spec:
+                filter_file('DOUBLE_PRECISION = O.*', 'DOUBLE_PRECISION = OFF',
+                            'Makefile.vanilla')
+            shutil.copy('Makefile.vanilla', 'Makefile')
 
     def install(self, spec, prefix):
         shutil.move('bin', prefix)
