@@ -23,42 +23,43 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
 from spack import *
+import glob
 
 
 class Cohmm(MakefilePackage):
-    """ An anticipated important use-case for next-generation supercomputing 
-        is multiscale modeling, in which continuum equations for large-scale 
-        material deformation are augmented with high-fidelity, fine-scale 
+    """ An anticipated important use-case for next-generation supercomputing
+        is multiscale modeling, in which continuum equations for large-scale
+        material deformation are augmented with high-fidelity, fine-scale
         simulations that provide constitutive data on demand
-
         tags: proxy-app
     """
 
     tags = ['proxy-app']
     homepage = "http://www.exmatex.org/cohmm.html"
-    url      = "https://github.com/exmatex/CoHMM/archive/sad.tar.gz"
+    url = "https://github.com/exmatex/CoHMM/archive/sad.tar.gz"
 
-    version('develop', git='https://github.com/exmatex/CoHMM.git',description='Sad Branch')
+    version('develop', git='https://github.com/exmatex/CoHMM.git',
+            branch='sad', description='Sad Branch')
 
-    variant('serial', default=True, description='Serial Build')    
+    variant('serial', default=True, description='Serial Build')
     variant('openmp', default=True, description='Build with OpenMP Support')
     variant('gnuplot', default=True, description='Enable gnu plot Support')
 
-
     def edit(self, spec, prefix):
         if '+openmp' in spec:
-            makefile.filter('DO_OPENMP = O.*', 'DO_OPENMP = ON')
+            filter_file('DO_OPENMP = O.*', 'DO_OPENMP = ON', 'Makefile')
         if '+gnuplot' in spec:
-            makefile.filter('DO_GNUPLOT = O.*','DO_GNUPLOT = ON')
+            filter_file('DO_GNUPLOT = O.*', 'DO_GNUPLOT = ON', 'Makefile')
+
     def build(self, spec, prefix):
-            make()
+        make()
+
     def install(self, spec, prefix):
         mkdirp(prefix.bin)
         mkdirp(prefix.input)
         mkdirp(prefix.doc)
-        install('cohmm',prefix.bin)
+        install('cohmm', prefix.bin)
         install('README.md', prefix.doc)
         install('LICENSE.md', prefix.doc)
         for files in glob.glob('input/*.*'):
-            install(files,prefix.input)
-
+            install(files, prefix.input)
