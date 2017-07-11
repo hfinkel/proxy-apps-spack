@@ -58,15 +58,12 @@ class Nut(CMakePackage):
         branch='openmp')
 
     depends_on('random123')
-    depends_on('openmp', when='@omp')
 
     def cmake_args(self):
         cmakefile = FileFilter('CMakeLists.txt')
-        cmakefile.filter(
-            '# create variable.*',
-            'set(ENV{RANDOM123_DIR} prefix/../random123*)')
-        cmakefile.filter('# set compiler .*', 'set(ENV{CC} cc)')
-        cmakefile.filter('# GNU .*', 'set(ENV{CXX} c++)')
+        env['RANDOM123_DIR'] = '{0}'.format(self.spec['random123'].prefix)
+        env['CC'] = 'cc'
+        env['CXX'] = 'c++'
 
         self.build_targets.extend(
             ['VERBOSE=on -j 4 2>&1 | tee -a make.out'])
