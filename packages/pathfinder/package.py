@@ -36,11 +36,10 @@ class Pathfinder(MakefilePackage):
 
     version('1.0.0', '374269e8d42c305eda3e392444e22dde')
 
-    build_targets = ['--directory=PathFinder_ref']
+    build_targets = ['--directory=PathFinder_ref', 'CC=cc']
 
     def edit(self, spec, prefix):
         makefile = FileFilter('PathFinder_ref/Makefile')
-        makefile.filter('CC=.*', 'CC=cc')
         makefile.filter('CFLAGS += .*',
                         'CFLAGS += {}'.format(self.compiler.openmp_flag))
 
