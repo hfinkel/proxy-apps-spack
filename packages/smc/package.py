@@ -41,27 +41,50 @@ from spack import *
 
 
 class Smc(MakefilePackage):
-    """A minimalist high-order finite difference algorithm for combustion problems. It includes core discretizations for advection, diffusive transport and chemical kinetics. The models for computing diffusive transport coefficients have been replaced by a simplified approximation but the full structure of the discretization of the diffusive terms have been preserved."""
+    """A minimalist high-order finite difference algorithm
+    for combustion problems. It includes core discretizations
+    for advection, diffusive transport and chemical kinetics.
+    The models for computing diffusive transport coefficients
+    have been replaced by a simplified approximation
+    but the full structure of the discretization of
+    the diffusive terms have been preserved."""
 
     homepage = "https://ccse.lbl.gov/ExaCT/index.html"
     url      = "https://ccse.lbl.gov/ExaCT/SMC.tar.gz"
 
-    variant('mpi', default=True, description='Build with MPI support')
-    variant('openmp', default=True, description='Build with OpenMP support')
-    variant('ndebug', default=False, description='Turn off debugging')
-    variant('mic', default=False, description='Compile for Intel Xeon Phi')
-    variant('k_use_automatic', default=True, description='Some arrays in kernels.F90 will be automatic')
-    variant('mkverbose', default=True, description='Verbosity of building process')
+    variant(
+        'mpi', default=True,
+        description='Build with MPI support')
+    variant(
+        'openmp', default=True,
+        description='Build with OpenMP support')
+    variant(
+        'ndebug', default=False,
+        description='Turn off debugging')
+    # variant(
+        # 'mic', default=False,
+        # description='Compile for Intel Xeon Phi')
+    variant(
+        'k_use_automatic', default=True,
+        description='Some arrays in kernels.F90 will be automatic')
+    variant(
+        'mkverbose', default=True,
+        description='Verbosity of building process')
+    variant(
+        'comp', default='GNU', description='Compiler of choice',
+        values=('GNU', 'Intel'))
 
     depends_on('mpi', when='+mpi')
-    depends_on('openmp', when='+openmp')
 
-    # def edit(self, spec, prefix):
-        # FIXME: Edit the Makefile if necessary
-        # FIXME: If not needed delete this function
-        # makefile = FileFilter('Makefile')
-        # makefile.filter('CC = .*', 'CC = cc')
-        # if '+ndebug' in spec:
-        # if '+mic' in spec:
-        # if '-k_use_automatic' not in spec:
-        # if '-mkverbose' not in spec:
+    def edit(self, spec, prefix):
+        makefile = FileFilter('GNUmakefile')
+        if '~mpi' in spec:
+            makefile.filter('MPI := t', '#')
+        if '~openmp' in spec:
+            makefile.filter('OMP := t', '#')
+        if '~ndebug' in spec:
+            makefile.filter('NDEBUG :=', '#')
+        if '~k_use_automatic' in spec:
+            makefile.filter('K_U.*:= t', '#')
+        if '~mkverbose' in spec:
+            makefile.filter('MKV.*:= t', '#')

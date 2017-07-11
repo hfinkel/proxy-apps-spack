@@ -41,17 +41,31 @@ from spack import *
 
 
 class Plasma(MakefilePackage):
-    """PlasmaApp is a flexible implicit charge and energy conserving implicit PIC framework. This codes aims to demonstrate the potential of using a fluid plasma model to accelerate a kinetic model through a High-Low order system coupling. The multi-granularity of this problem gives it the ability to map well to emerging heterogeneous architectures with multiple levels of parallelism."""
+    """PlasmaApp is a flexible implicit charge and
+       energy conserving implicit PIC framework.
+       This codes aims to demonstrate the potential of using
+       a fluid plasma model to accelerate a kinetic model
+       through a High-Low order system coupling.
+       The multi-granularity of this problem gives it the ability
+       to map well to emerging heterogeneous architectures
+       with multiple levels of parallelism."""
 
     homepage = "https://github.com/cocomans/plasma/"
     url      = ""
-    tags     = ['proxy-app', 'ecp-proxy-app']
+    tags     = ['proxy-app']
 
-    version('master', git='https://github.com/cocomans/plasma.git')
+    version('plasma', git='https://github.com/cocomans/plasma.git')
+    version('plasma3d', git='https://github.com/cocomans/plasma.git')
 
-    variant('cuda', default='False', description='Build with CUDA support')
-    variant('single_p', default='False', description='Use single precision')
-    variant('nohandvec', default='False', description='Disable hand vectorization')
+    variant(
+        'cuda', default='False',
+        description='Build with CUDA support')
+    variant(
+        'single_p', default='False',
+        description='Use single precision')
+    variant(
+        'nohandvec', default='False',
+        description='Disable hand vectorization')
 
     depends_on('gmake', type='build')
     depends_on('mpi')
@@ -61,22 +75,20 @@ class Plasma(MakefilePackage):
         makefile = FileFilter('./PlasmaApp/Makefile')
         makefile.filter('CC=.*', 'CC = cc')
         makefile.filter('CXX=.*', 'CXX = {}'.format(spec['mpi'].mpicxx))
-
-        makefile.filter('.*Makefile.export.NOX.*' ,'\t\t\t\t\tMakefile.export.NOX \\\n\t\t\t\t\tMakefile.export.Teuchos')
         
         if '+cuda' in spec:
             makefile.filter('CC=.*', 'CC = nvcc')
+            self.build_target.append('USECUDA=1')
 
-    def build(self, spec, prefix):
-        opt = ''
-        if '+cuda' in spec:
-            opt += 'USECUDA=1 '
         if '+nohandvec' in spec:
-            opt += 'NOHANDVEC=1 '
+            self.build_target.append('NOHANDVEC=1')
 
-        with working_dir(join_path(self.build_directory, 'PlasmaApp')):
-            gmake('{0}packages'.format(opt))
-            # gmake('{0}tests'.format(opt))
+        self.build_target.extend('packages')
+        self.build_target.extend('tests')
+
+    # def build(self, spec, prefix):
+        # if '@omp' in spec:
+            
 
     def install(self, spec, prefix):       
         mkdirp(prefix.bin)

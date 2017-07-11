@@ -38,30 +38,63 @@
 # please first remove this boilerplate and all FIXME comments.
 #
 from spack import *
-
+import re
 
 class AmrExpParabolic(MakefilePackage):
-    """ simplified block-structured adaptive mesh refinement algorithm in two and three dimensions with subcycling in time. The algorithm solves a linear advection diffusion equation with a simple numerical method. This proxy app is intended to capture the communication pattern of an explicit AMR algorithm but does not represent an accurate characterization of floating point effort or relative costs of communication to computation."""
+    """Simplified block-structured adaptive mesh refinement algorithm
+    in two and three dimensions with subcycling in time.
+    The algorithm solves a linear advection diffusion equation
+    with a simple numerical method. This proxy app is intended to
+    capture the communication pattern of an explicit AMR algorithm
+    but does not represent an accurate characterization of
+    floating point effort or
+    relative costs of communication to computation."""
 
     homepage = "https://ccse.lbl.gov/ExaCT/index.html"
     url      = "https://ccse.lbl.gov/ExaCT/AMR_Exp_Parabolic.tgz"
 
-    variant('ndebug', default=False, description='Turn off debugging')
-    variant('mpi', default=True, description='Build with MPI support')
-    variant('openmp', default=False, description='Build with OpenMP support')
-    variant('prof', default=False, description='Use profiler')
-    variant('mkverbose', default=True, description='Verbosity of building process')
+    version(
+        'release', '330604d9cc755dad8a2cdfaa7ff8f6a4',
+        url='https://ccse.lbl.gov/ExaCT/AMR_Exp_Parabolic.tgz')
+
+    variant(
+        'ndebug', default=True, description='Turn off debugging')
+    variant(
+        'mpi', default=True, description='Build with MPI support')
+    variant(
+        'openmp', default=False, 
+        description='Build with OpenMP support')
+    variant(
+        'prof', default=False, description='Use profiler')
+    variant(
+        'mkverbose', default=True, 
+        description='Verbosity of building process')
+    variant(
+        'comp', default='gfortran', description='Compiler of choice', 
+        values=('gfortran', 'G95', 'XLF', 'IBM', 'Intel', 'Linux',
+            'Cray', 'xt4', 'PGI', 'SunStudio', 'PathScale',
+            'NAG', 'Lahey'))
 
     depends_on('mpi', when='+mpi')
-    depends_on('openmp', when='+openmp')
 
+    def edit(self, spec, prefix):
+        makefile = FileFilter('./MiniApps/AMR_Adv_Diff_F90/GNUmakefile')
+        if '~ndebug' in spec:
+            makefile.filter('NDEBUG.*:= t', '#')
+        if '~mpi' in spec:
+            makefile.filter('MPI.*:= t', '#')
+        if '+openmp' in spec:
+            makefile.filter('OMP.*:=', 'OMP := t')
+        if '+prof' in spec:
+            makefile.filter('PROF.*:=', 'PROF := t')
+        if '~mkverbose' in spec:
+            makefile.filter('MKVERBOSE.*:=', '#')
+        comp_search = re.search('comp=([.\S]+)', str(spec))
+        self.comp_name = comp_search.group(1)
+        makefile.filter(
+            'COMP.*:= gfortran',
+            'COMP := {0}'.format(self.comp_name))
 
-    # def edit(self, spec, prefix):
-        # FIXME: Edit the Makefile if necessary
-        # FIXME: If not needed delete this function
-        # makefile = FileFilter('Makefile')
-        # makefile.filter('CC = .*', 'CC = cc')
-        # if '+ndebug' in spec:
-        # if '+mic' in spec:
-        # if '-k_use_automatic' not in spec:
-        # if '-mkverbose' not in spec:
+    def build(self, spec, prefix):
+        with working_dir(join_path(self.build_directory, 'MiniApps', 'AMR_Adv_Diff_F90')):
+            make()
