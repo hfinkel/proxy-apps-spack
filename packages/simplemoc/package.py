@@ -55,25 +55,9 @@ class Simplemoc(MakefilePackage):
     # FIXME: Add proper versions and checksums here.
     version('1.2.3', 'd8827221a4ae76e9766a32e16d143e60')
 
-    variant('debug',
-            default=False,
-            description='Enable debugging.')
-
-    variant('optimize',
-            default=False,
-            description='Do Optimizations.')
-
-    variant('papi',
-            default=False,
-            description='Enable PAPI support.')
-
     variant('mpi',
             default=False,
             description='Built with MPI support.')
-
-    variant('openmp',
-            default=False,
-            description='Built with OpenMP support.')
 
     # FIXME: Add dependencies if required.
     depends_on('mpi', when='+mpi')
@@ -82,12 +66,7 @@ class Simplemoc(MakefilePackage):
 
     def edit(self, spec, prefix):
 
-        makefile = FileFilter('src/Makefile')
-
-        cflags = '-std=gnu99'
-        ldflags = '-lm'
-
-        if len(self.compiler.name) <= 0 or self.compiler.name == 'gcc':
+        if self.compiler.name == 'gcc':
             self.build_targets.extend(['COMPILER=gnu'])
 
         if self.compiler.name == 'icc':
@@ -95,40 +74,9 @@ class Simplemoc(MakefilePackage):
 
         if self.compiler.name == 'mpicc':
             self.build_targets.extend(['COMPILER=bluegene'])
-            cflags += ' ' + '-O5 -qhot -qsimd=auto -qalias=ansi:allptrs'
-            + '-qarch=qp -DIBM -DMPI'
-
-        if '+debug' in spec:
-            cflags += ' ' + '-g'
-
-        if '+profile' in spec:
-            cflags += ' ' + '-pg'
-
-        if '+optimize' in spec and self.compiler.name == 'gcc':
-            cflags += ' ' + '-Ofast -ffast-math -ftree-vectorize -msse2'
-
-        if '+optimize' in spec and self.compiler.name == 'icc':
-            cflags += ' ' + '-O3 -xhost -ansi-alias -no-prec-div -DINTEL'
-
-        if '+papi' in spec:
-            cflags += ' ' + '-DPAPI -DOPENMP'
-            ldflags += ' ' + '-lpapi'
-
-        if '+papi' in spec and self.compiler.name == 'gcc':
-            cflags += ' ' + self.compiler.openmp_flag
-
-        if '+papi' in spec and self.compiler.name == 'icc':
-            cflags += ' ' + self.compiler.openmp_flag
-
-        if '+papi' in spec and self.compiler.name == 'mpicc':
-            cflags += ' ' + '-qsmp'
-
-        if '+papi' in spec and self.compiler.name == 'icc':
-            cflags += ' ' + self.compiler.openmp_flag
-
-        makefile.filter('CFLAGS .*', 'CFLAGS = {0}'.format(cflags))
 
     def install(self, spec, prefix):
         # FIXME: Unknown build system
         mkdir(prefix.bin)
         make('src/SimpleMOC', prefix.bin)
+

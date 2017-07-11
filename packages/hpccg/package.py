@@ -44,24 +44,27 @@ class Hpccg(MakefilePackage):
     # Optional dependencies
     depends_on('mpi', when='+mpi')
 
-    def edit(self, spec, prefix):
-        makefile = FileFilter('Makefile')
-        makefile.filter('CXX=.*', 'CXX=c++')
-        makefile.filter('LINKER=.*', 'LINKER=c++')
-
-        if '%gcc' not in self.spec:
-            makefile.filter('CPP_OPT_FLAGS = .*', '#')
+    @property
+    def build_targets(self):
+        targets = []
 
         if '+mpi' in self.spec:
-            makefile.filter('USE_MPI =', 'USE_MPI = -DUSING_MPI')
-            makefile.filter('CXX=.*', 'CXX={}'.format(spec['mpi'].mpicxx))
-            makefile.filter('LINKER=.*',
-                            'LINKER={}'.format(spec['mpi'].mpicxx))
+            targets.append('CXX={0}'.format(self.spec['mpi'].mpicxx))
+            targets.append('LINKER={0}'.format(self.spec['mpi'].mpicxx))
+            targets.append('USE_MPI=-DUSING_MPI')
+        else:
+            targets.append('CXX=c++')
+            targets.append('LINKER=c++')
 
         if '+openmp' in self.spec:
-            makefile.filter('USE_OMP =', 'USE_OMP = -DUSING_OMP')
-            makefile.filter('#OMP_FLAGS = .*',
-                            'OMP_FLAGS = {}'.format(self.compiler.openmp_flag))
+            targets.append('USE_OMP=-DUSING_OMP')
+            targets.append('OMP_FLAGS={0}'.format(self.compiler.openmp_flag))
+
+        # Remove Compiler Specific Optimization Flags
+        if '%gcc' not in self.spec:
+            targets.append('CPP_OPT_FLAGS=')
+
+        return targets
 
     def install(self, spec, prefix):
         # Manual installation
@@ -70,5 +73,5 @@ class Hpccg(MakefilePackage):
 
         install('test_HPCCG', prefix.bin)
         install('README', prefix.doc)
-        install('weakScalingRunScript', prefix.doc)
-        install('strongScalingRunScript', prefix.doc)
+        install('weakScalingRunScript', prefix.bin)
+        install('strongScalingRunScript', prefix.bin)

@@ -41,16 +41,17 @@ from spack import *
 
 
 class Ebms(Package):
-    """This is a miniapp for the Energy Banding Monte Carlo (EBMC) neutron transportation
-	simulation code.  It is adapted from a similar miniapp provided by Andrew Siegel,
-        whose algorithm is described in [1], where only one process in a compute node
-	is used, and the compute nodes are divided into memory nodes and tracking nodes.
-	Memory nodes do not participate in particle tracking. Obviously, there is a lot
-	of resource waste in this design."""
+    """This is a miniapp for the Energy Banding Monte Carlo (EBMC)
+       neutron transportation simulation code.  It is adapted from a
+       similar miniapp provided by Andrew Siegel, whose algorithm is
+       described in [1], where only one process in a compute node
+       is used, and the compute nodes are divided into memory nodes
+       and tracking nodes.    Memory nodes do not participate in particle
+       tracking. Obviously, there is a lot of resource waste in this design."""
 
     # FIXME: Add a proper url for your package's homepage here.
     homepage = "http://www.example.com"
-    url      = "https://github.com/ANL-CESAR/EBMS/archive/master.tar.gz"
+    url = "https://github.com/ANL-CESAR/EBMS/archive/master.tar.gz"
 
     tags = ['proxy-app']
 
@@ -61,7 +62,8 @@ class Ebms(Package):
 
     def install(self, spec, prefix):
         # FIXME: Unknown build system
-	mkdir(prefix.bin)
+        mkdir(prefix.bin)
         make()
-	install('ebmc-iallgather', prefix.bin)
-	install('ebmc-rget', prefix.bin)
+        install('ebmc-iallgather', prefix.bin)
+        install('ebmc-rget', prefix.bin)
+
