@@ -29,8 +29,10 @@ from spack import *
 
 
 class Cloverleaf3d(MakefilePackage):
-    """Proxy Application. CloverLeaf3D is 3D version
-       of the CloverLeaf mini-app.
+    """Proxy Application. CloverLeaf3D is 3D version of the
+       CloverLeaf mini-app. CloverLeaf is a mini-app that solves
+       the compressible Euler equations on a Cartesian grid,
+       using an explicit, second-order accurate method.
     """
 
     homepage = "http://uk-mac.github.io/CloverLeaf3D/"
@@ -40,50 +42,52 @@ class Cloverleaf3d(MakefilePackage):
 
     version('1.0', '2e86cadd7612487f9da4ddeb1a6de939')
 
-    variant('OpenACC', default=False, description='Enable OpenACC Support')
+    variant('openacc', default=False, description='Enable OpenACC Support')
 
     depends_on('mpi')
 
-    type_of_build = 'ref'
+    @property
+    def type_of_build(self):
+        build = 'ref'
 
-    def edit(self, spec, prefix):
-        if '+OpenACC' in spec:
-            self.type_of_build = 'OpenACC'
+        if '+openacc' in self.spec:
+            build = 'OpenACC'
 
-        self.build_targets.extend(
-            ['--directory=CloverLeaf3D_{}'.format(self.type_of_build)])
+        return build
 
-        self.build_targets.extend(
-            ['MPI_COMPILER={}'.format(spec['mpi'].mpifc),
-             'C_MPI_COMPILER={}'.format(spec['mpi'].mpicc)])
+    @property
+    def build_targets(self):
+        targets = [
+            'MPI_COMPILER={0}'.format(self.spec['mpi'].mpifc),
+            'C_MPI_COMPILER={0}'.format(self.spec['mpi'].mpicc),
+            '--directory=CloverLeaf3D_{0}'.format(self.type_of_build)
+        ]
 
-        # Use Makefile compiler specific flags
-        if '%gcc' in spec:
-            self.build_targets.extend(['COMPILER=GNU'])
-        elif '%cce' in spec:
-            self.build_targets.extend(['COMPILER=CRAY'])
-        elif '%intel' in spec:
-            self.build_targets.extend(['COMPILER=INTEL'])
-        elif '%pgi' in spec:
-            self.build_targets.extend(['COMPILER=PGI'])
-        elif 'xl' in spec:
-            self.build_targets.extend(['COMPILER=XLF'])
+        if '%gcc' in self.spec:
+            targets.append('COMPILER=GNU')
+        elif '%cce' in self.spec:
+            targets.append('COMPILER=CRAY')
+        elif '%intel' in self.spec:
+            targets.append('COMPILER=INTEL')
+        elif '%pgi' in self.spec:
+            targets.append('COMPILER=PGI')
+        elif '%xl' in self.spec:
+            targets.append('COMPILER=XLF')
+
+        return targets
 
     def install(self, spec, prefix):
         # Manual Installation
         mkdirp(prefix.bin)
-        mkdirp(prefix.doc.tests)
+        mkdirp(prefix.doc.samples)
 
-        install('COPYING', prefix.doc)
-        install('COPYING.LESSER', prefix.doc)
         install('README.md', prefix.doc)
 
-        if self.type_of_build:
-            install('CloverLeaf3D_{}/clover_leaf'.format(self.type_of_build),
-                    prefix.bin)
-            install('CloverLeaf3D_{}/clover.in'.format(self.type_of_build),
-                    prefix.bin)
+        install('CloverLeaf3D_{0}/clover_leaf'.format(self.type_of_build),
+                prefix.bin)
+        install('CloverLeaf3D_{0}/clover.in'.format(self.type_of_build),
+                prefix.bin)
 
-            for f in glob.glob(
-                    'CloverLeaf3D_{}/*.in'.format(self.type_of_build)):
-                install(f, prefix.doc.tests)
+        for f in glob.glob(
+                'CloverLeaf3D_{0}/*.in'.format(self.type_of_build)):
+            install(f, prefix.doc.samples)

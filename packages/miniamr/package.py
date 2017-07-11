@@ -42,16 +42,19 @@ class Miniamr(MakefilePackage):
 
     depends_on('mpi', when="+mpi")
 
-    def edit(self, spec, prefix):
-        if '+mpi' in spec:
-            makefile = FileFilter('miniAMR_ref/Makefile.mpi')
-            makefile.filter('CC   = .*', 'CC = {}'.format(spec['mpi'].mpicc))
-            self.build_targets.extend(['--directory=miniAMR_ref',
-                                       '--file=Makefile.mpi',
-                                       'LDLIBS=-lm'])
+    @property
+    def build_targets(self):
+        targets = []
+        if '+mpi' in self.spec:
+            targets.append('CC={0}'.format(self.spec['mpi'].mpicc))
+            targets.append('LDLIBS=-lm')
+            targets.append('--file=Makefile.mpi')
+            targets.append('--directory=miniAMR_ref')
         else:
-            self.build_targets.extend(['--directory=miniAMR_serial',
-                                       '--file=Makefile.serial'])
+            targets.append('--file=Makefile.serial')
+            targets.append('--directory=miniAMR_serial')
+
+        return targets
 
     def install(self, spec, prefix):
         # Manual installation
