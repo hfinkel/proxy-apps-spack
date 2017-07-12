@@ -67,7 +67,9 @@ class Amg(MakefilePackage):
         if '+qsmp' in self.spec:
             makefile.filter('INCLUDE_CFLAGS =', 'INCLUDE_CFLAGS = -O2 -DTIMER_USE_MPI -DHYPRE_USING_OPENMP -DHYPRE_LONG_LONG -DHYPRE_NO_GLOBAL_PARTITION')
             makefile.filter('#INCLUDE_LFLAGS = -lm -fopenmp -qsmp ', 'INCLUDE_LFLAGS = {}'.format(self.compiler.openmp_flag))
-
+    
+    def build(self, spec, prefix):
+        make()
 
     def install(self, spec, prefix):
         mkdirp(prefix.doc)
