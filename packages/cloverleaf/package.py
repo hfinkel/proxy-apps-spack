@@ -93,12 +93,11 @@ class Cloverleaf(MakefilePackage):
         install('README.md', prefix.doc)
         install('documentation.txt', prefix.doc)
 
-        if self.type_of_build:
-            install('CloverLeaf_{}/clover_leaf'.format(self.type_of_build),
-                    prefix.bin)
-            install('CloverLeaf_{}/clover.in'.format(self.type_of_build),
-                    prefix.bin)
+        install('CloverLeaf_{}/clover_leaf'.format(self.type_of_build),
+                prefix.bin)
+        install('CloverLeaf_{}/clover.in'.format(self.type_of_build),
+                prefix.bin)
 
-            for f in glob.glob(
-                    'CloverLeaf_{}/*.in'.format(self.type_of_build)):
-                install(f, prefix.doc.tests)
+        for f in glob.glob(
+                'CloverLeaf_{}/*.in'.format(self.type_of_build)):
+            install(f, prefix.doc.tests)
