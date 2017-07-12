@@ -22,7 +22,6 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-import os
 
 from spack import *
 
@@ -43,49 +42,37 @@ class Minixyce(MakefilePackage):
 
     depends_on('mpi', when='+mpi')
 
-    def edit(self, spec, prefix):
-        makefile = FileFilter('miniXyce_ref/Makefile')
+    @property
+    def build_targets(self):
+        targets = []
 
-        if '+mpi' in spec:
-            makefile.filter('CXX=.*', 'CXX = {}'.format(spec['mpi'].mpicxx))
-            makefile.filter('LINKER=.*',
-                            'LINKER = {}'.format(spec['mpi'].mpicxx))
-            makefile.filter('USE_MPI = .*',
-                            'USE_MPI = -DHAVE_MPI -DMPICH_IGNORE_CXX_SEEK')
+        if '+mpi' in self.spec:
+            targets.append('CXX={0}'.format(self.spec['mpi'].mpicxx))
+            targets.append('LINKER={0}'.format(self.spec['mpi'].mpicxx))
+            targets.append('USE_MPI=-DHAVE_MPI -DMPICH_IGNORE_CXX_SEEK')
         else:
-            makefile.filter('CXX=.*', 'CXX = c++')
-            makefile.filter('LINKER=.*', 'LINKER = c++')
-            makefile.filter('USE_MPI = .*', 'USE_MPI = ')
+            targets.append('CXX=c++')
+            targets.append('LINKER=c++')
+            targets.append('USE_MPI=')
 
-        if '%gcc' in spec:
-            makefile.filter('CPP_OPT_FLAGS = .*',
-                            'CPP_OPT_FLAGS = -O3 -funroll-all-loops')
-        else:
-            makefile.filter('CPP_OPT_FLAGS = .*', 'CPP_OPT_FLAGS = ')
+        if '%gcc' not in self.spec:
+            targets.append('CPP_OPT_FLAGS=')
+
+        return targets
 
     def build(self, spec, prefix):
-        os.chdir('miniXyce_ref')
-        # Script targets must be called in order for created files
-        make('generate_info')
-        make('common_files')
-        make()
+        with working_dir('miniXyce_ref'):
+            make('generate_info')
+            make('common_files')
+            make(*self.build_targets)
 
     def install(self, spec, prefix):
         # Manual Installation
         mkdirp(prefix.bin)
-        mkdirp(prefix.doc.tests)
-        install('miniXyce.x', prefix.bin)
-        install('default_params.txt', prefix.bin)
-        install('../README', prefix.doc)
+        mkdirp(prefix.doc)
 
-        # Install test data files
-        for f in os.listdir('tests'):
-            if os.path.isfile(join_path(self.build_directory,
-                                        'tests/{}'.format(f))) is True:
-                install('tests/{}'.format(f), prefix.doc.tests)
-            else:
-                mkdirp(join_path(prefix.doc.tests, f))
-                for d in os.listdir(join_path(self.build_directory,
-                                              'tests/{}'.format(f))):
-                    install('tests/{}/{}'.format(f, d),
-                            join_path(prefix.doc.tests, f))
+        install('miniXyce_ref/miniXyce.x', prefix.bin)
+        install('miniXyce_ref/default_params.txt', prefix.bin)
+        install('README', prefix.doc)
+
+        install_tree('miniXyce_ref/tests/', prefix.doc.tests)
