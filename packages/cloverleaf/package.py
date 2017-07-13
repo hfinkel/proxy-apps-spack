@@ -23,7 +23,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
 
-import re
 import glob
 
 from spack import *
@@ -43,61 +42,62 @@ class Cloverleaf(MakefilePackage):
     version('1.1', '65652b30a64eb237ec844a6fdd4cd518')
 
     variant('build', default='ref', description='Type of Parallelism Build',
-            values=('CUDA', 'MPI', 'OpenACC_CRAY', 'OpenMP', 'ref', 'Serial'))
+            values=('cuda', 'mpi', 'openacc_cray', 'openmp', 'ref', 'serial'))
 
     depends_on('mpi')
-    depends_on('cuda', when='build=CUDA')
+    depends_on('cuda', when='build=cuda')
 
-    # Holds build variant value
-    type_of_build = ''
+    @property
+    def type_of_build(self):
+        build = 'ref'
 
-    def edit(self, spec, prefix):
-        # Capture build value in spec
-        build_search = re.search('build=([.\S]+)', str(spec))
-        self.type_of_build = build_search.group(1)
+        if 'build=cuda' in self.spec:
+            build = 'CUDA'
+        elif 'build=mpi' in self.spec:
+            build = 'MPI'
+        elif 'build=openacc_cray' in self.spec:
+            build = 'OpenACC_CRAY'
+        elif 'build=openmp' in self.spec:
+            build = 'OpenMP'
+        elif 'build=serial' in self.spec:
+            build = 'Serial'
 
-        # OpenMP build folder depends on openMP version
-        if self.type_of_build:
-            if self.type_of_build == 'OpenMP':
-                if '%gcc' in spec and int(self.compiler.version.up_to(1)) >= 5:
-                    self.type_of_build = 'OpenMP4'
-                else:
-                    self.type_of_build = 'OpenMP'
+        return build
 
-            self.build_targets.extend(
-                ['--directory=CloverLeaf_{}'.format(self.type_of_build)])
+    @property
+    def build_targets(self):
+        targets = [
+            'MPI_COMPILER={0}'.format(self.spec['mpi'].mpifc),
+            'C_MPI_COMPILER={0}'.format(self.spec['mpi'].mpicc),
+            '--directory=CloverLeaf_{0}'.format(self.type_of_build)
+        ]
 
-        self.build_targets.extend(
-            ['MPI_COMPILER={}'.format(spec['mpi'].mpifc),
-             'C_MPI_COMPILER={}'.format(spec['mpi'].mpicc)])
+        if '%gcc' in self.spec:
+            targets.append('COMPILER=GNU')
+        elif '%cce' in self.spec:
+            targets.append('COMPILER=CRAY')
+        elif '%intel' in self.spec:
+            targets.append('COMPILER=INTEL')
+        elif '%pgi' in self.spec:
+            targets.append('COMPILER=PGI')
+        elif '%xl' in self.spec:
+            targets.append('COMPILER=XLF')
 
-        # Use Makefile compiler specific flags
-        if '%gcc' in spec:
-            self.build_targets.extend(['COMPILER=GNU'])
-        elif '%cce' in spec:
-            self.build_targets.extend(['COMPILER=CRAY'])
-        elif '%intel' in spec:
-            self.build_targets.extend(['COMPILER=INTEL'])
-        elif '%pgi' in spec:
-            self.build_targets.extend(['COMPILER=PGI'])
-        elif 'xl' in spec:
-            self.build_targets.extend(['COMPILER=XLF'])
+        return targets
 
     def install(self, spec, prefix):
         # Manual Installation
         mkdirp(prefix.bin)
         mkdirp(prefix.doc.tests)
 
-        install('COPYING', prefix.doc)
-        install('COPYING.LESSER', prefix.doc)
         install('README.md', prefix.doc)
         install('documentation.txt', prefix.doc)
 
-        install('CloverLeaf_{}/clover_leaf'.format(self.type_of_build),
+        install('CloverLeaf_{0}/clover_leaf'.format(self.type_of_build),
                 prefix.bin)
-        install('CloverLeaf_{}/clover.in'.format(self.type_of_build),
+        install('CloverLeaf_{0}/clover.in'.format(self.type_of_build),
                 prefix.bin)
 
         for f in glob.glob(
-                'CloverLeaf_{}/*.in'.format(self.type_of_build)):
+                'CloverLeaf_{0}/*.in'.format(self.type_of_build)):
             install(f, prefix.doc.tests)

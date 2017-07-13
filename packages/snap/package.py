@@ -50,12 +50,23 @@ class Snap(MakefilePackage):
     version('master', git='https://github.com/lanl/SNAP.git')
 
     variant('openmp', default=True, description='Build with OpenMP support')
+    variant('opt', default=True, description='Build with debugging')
+    variant('mpi', default=True, description='Build with MPI support')
 
-    depends_on('mpi')
-    # depends_on('fortran')
+    depends_on('mpi', when='+mpi')
 
-    # def edit(self, spec, prefix):
-        # FIXME: Edit the Makefile if necessary
-        # FIXME: If not needed delete this function
-        # makefile = FileFilter('Makefile')
-        # makefile.filter('CC = .*', 'CC = cc')
+    @property
+    def build_directory(self):
+        return join_path(self.stage.source_path, 'src')
+
+    def edit(self, spec, prefix):
+        makefile = FileFilter(join_path(self.build_directory, 'Makefile'))
+        if '~opt' in spec:
+            makefile.filter('OPT = yes', 'OPT = no')
+        if '~mpi' in spec:
+            makefile.filter('MPI = yes', 'MPI = no')
+        if '~openmp' in spec:
+            makefile.filter('OPENMP = yes', 'OPENMP = no')
+
+    def install(self, spec, prefix):
+        install('../README.md', prefix)

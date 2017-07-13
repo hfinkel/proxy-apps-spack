@@ -22,21 +22,6 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-#
-# This is a template package file for Spack.  We've put "FIXME"
-# next to all the things you'll want to change. Once you've handled
-# them, you can save this file and test your package like this:
-#
-#     spack install nut
-#
-# You can edit this file again by typing:
-#
-#     spack edit nut
-#
-# See the Spack documentation for more information on packaging.
-# If you submit this package back to Spack as a pull request,
-# please first remove this boilerplate and all FIXME comments.
-#
 from spack import *
 
 
@@ -59,8 +44,14 @@ class Nut(CMakePackage):
 
     depends_on('random123')
 
+    # must be built with clang
+    conflicts('%gcc')
+    conflicts('%intel')
+    conflicts('%pgi')
+    conflicts('%xl')
+    conflicts('%nag')
+
     def cmake_args(self):
-        cmakefile = FileFilter('CMakeLists.txt')
         env['RANDOM123_DIR'] = '{0}'.format(self.spec['random123'].prefix)
         env['CC'] = 'cc'
         env['CXX'] = 'c++'

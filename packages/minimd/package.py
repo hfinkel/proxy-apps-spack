@@ -43,19 +43,23 @@ class Minimd(MakefilePackage):
 
     depends_on('openmpi')
 
+    @property
+    def build_targets(self):
+        targets = [
+            'LINK={0}'.format(self.spec['openmpi'].mpicxx),
+            'CC={0}'.format(self.spec['openmpi'].mpicxx),
+            'CCFLAGS={0} -DMPICH_IGNORE_CXX_SEEK -DNOCHUNK'.format(
+                self.compiler.openmp_flag),
+            '--directory=miniMD_ref',
+            'openmpi'
+        ]
+
+        return targets
+
     def edit(self, spec, prefix):
         inner_tar = tarfile.open(name='miniMD_{}_ref.tgz'.format(
                                  self.version.up_to(2)))
         inner_tar.extractall()
-
-        self.build_targets.extend(['--directory=miniMD_ref'])
-        self.build_targets.extend(['LINK={}'.format(spec['mpi'].mpicxx)])
-        self.build_targets.extend(['CC={}'.format(spec['mpi'].mpicxx)])
-        self.build_targets.extend(
-            ['CCFLAGS={} -DMPICH_IGNORE_CXX_SEEK -DNOCHUNK'.format(
-                self.compiler.openmp_flag)])
-
-        self.build_targets.extend(['openmpi'])
 
     def install(self, spec, prefix):
         # Manual Installation
