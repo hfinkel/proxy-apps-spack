@@ -22,22 +22,8 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-#
-# This is a template package file for Spack.  We've put "FIXME"
-# next to all the things you'll want to change. Once you've handled
-# them, you can save this file and test your package like this:
-#
-#     spack install plasma
-#
-# You can edit this file again by typing:
-#
-#     spack edit plasma
-#
-# See the Spack documentation for more information on packaging.
-# If you submit this package back to Spack as a pull request,
-# please first remove this boilerplate and all FIXME comments.
-#
 from spack import *
+import inspect
 
 
 class Plasma(MakefilePackage):
@@ -54,41 +40,46 @@ class Plasma(MakefilePackage):
     url      = ""
     tags     = ['proxy-app']
 
-    version('plasma', git='https://github.com/cocomans/plasma.git')
-    version('plasma3d', git='https://github.com/cocomans/plasma.git')
+    version('master', git='https://github.com/cocomans/plasma.git')
 
     variant(
-        'cuda', default='False',
+        'cuda', default=False,
         description='Build with CUDA support')
     variant(
-        'single_p', default='False',
+        'single_p', default=False,
         description='Use single precision')
     variant(
-        'nohandvec', default='False',
+        'nohandvec', default=False,
         description='Disable hand vectorization')
+    variant(
+        '3d', default=False,
+        description='Build PlasmaApp3D')
 
     depends_on('gmake', type='build')
     depends_on('mpi')
     depends_on('cuda', when='+cuda')
 
     def edit(self, spec, prefix):
-        makefile = FileFilter('./PlasmaApp/Makefile')
+        if '+3d' in spec:
+            self.plasma_dir = join_path(self.build_directory, 'PlasmaApp3D')
+        else:
+            self.plasma_dir = join_path(self.build_directory, 'PlasmaApp')
+
+        makefile = FileFilter(join_path(self.plasma_dir, 'Makefile'))
         makefile.filter('CC=.*', 'CC = cc')
         makefile.filter('CXX=.*', 'CXX = {}'.format(spec['mpi'].mpicxx))
         
         if '+cuda' in spec:
-            makefile.filter('CC=.*', 'CC = nvcc')
+            makefile.filter('NVCC =.*', 'NVCC = nvcc')
             self.build_target.append('USECUDA=1')
 
         if '+nohandvec' in spec:
             self.build_target.append('NOHANDVEC=1')
 
-        self.build_target.extend('packages')
-        self.build_target.extend('tests')
-
-    # def build(self, spec, prefix):
-        # if '@omp' in spec:
-            
+    def build(self, spec, prefix):
+        with working_dir(self.plasma_dir):
+            gmake()
+            gmake('tests')
 
     def install(self, spec, prefix):       
         mkdirp(prefix.bin)
