@@ -55,6 +55,7 @@ class Minixyce(MakefilePackage):
             targets.append('LINKER=c++')
             targets.append('USE_MPI=')
 
+        # Remove Compiler Specific Optimization Flags
         if '%gcc' not in self.spec:
             targets.append('CPP_OPT_FLAGS=')
 
@@ -62,6 +63,7 @@ class Minixyce(MakefilePackage):
 
     def build(self, spec, prefix):
         with working_dir('miniXyce_ref'):
+            # Call Script Targets First to Generate Needed Files
             make('generate_info')
             make('common_files')
             make(*self.build_targets)
