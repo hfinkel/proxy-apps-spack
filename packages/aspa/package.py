@@ -7,7 +7,7 @@
 # LLNL-CODE-647188
 #
 # For details, see https://github.com/llnl/spack
-# Please also see the LICENSE file for our notice and the LGPL.
+# Please also see the NOTICE and LICENSE files for our notice and the LGPL.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License (as
@@ -22,57 +22,51 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-
 from spack import *
+import glob
 
 
-class Minixyce(MakefilePackage):
-    """Proxy Application. A portable proxy of some of the key
-       capabilities in the electrical modeling Xyce.
+class Aspa(MakefilePackage):
+    """A fundamental premise in ExMatEx is that scale-bridging performed in
+        heterogeneous MPMD materials science simulations will place important
+        demands upon the exascale ecosystem that need to be identified and
+        quantified.
+        tags = proxy-app
     """
-
-    homepage = "https://mantevo.org"
-    url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/MiniXyce/miniXyce_1.0.tar.gz"
-
     tags = ['proxy-app']
+    homepage = "http://www.exmatex.org/aspa.html"
+    url = "https://github.com/exmatex/ASPA/archive/master.tar.gz"
 
-    version('1.0', '6fc0e5a561af0b8ff581d9f704194133')
-
+    version('master', git='https://github.com/exmatex/ASPA.git',
+            description='master')
     variant('mpi', default=True, description='Build with MPI Support')
 
+    depends_on('lapack')
+    depends_on('blas')
     depends_on('mpi', when='+mpi')
+    depends_on('hdf5')
 
     @property
     def build_targets(self):
-        targets = []
-
-        if '+mpi' in self.spec:
-            targets.append('CXX={0}'.format(self.spec['mpi'].mpicxx))
-            targets.append('LINKER={0}'.format(self.spec['mpi'].mpicxx))
-            targets.append('USE_MPI=-DHAVE_MPI -DMPICH_IGNORE_CXX_SEEK')
-        else:
-            targets.append('CXX=c++')
-            targets.append('LINKER=c++')
-            targets.append('USE_MPI=')
-
-        if '%gcc' not in self.spec:
-            targets.append('CPP_OPT_FLAGS=')
-
+        targets = [
+            '--directory=exec',
+            '--file=Makefile',
+            'LIBS={0} {1} {2}'.format(self.spec['lapack'].libs.ld_flags,
+                                      self.spec['blas'].libs.ld_flags,
+                                      self.spec['hdf5'].libs.ld_flags),
+            'CXX={0}'.format(self.spec['mpi'].mpicxx)
+        ]
         return targets
 
-    def build(self, spec, prefix):
-        with working_dir('miniXyce_ref'):
-            make('generate_info')
-            make('common_files')
-            make(*self.build_targets)
-
     def install(self, spec, prefix):
-        # Manual Installation
         mkdirp(prefix.bin)
         mkdirp(prefix.doc)
-
-        install('miniXyce_ref/miniXyce.x', prefix.bin)
-        install('miniXyce_ref/default_params.txt', prefix.bin)
-        install('README', prefix.doc)
-
-        install_tree('miniXyce_ref/tests/', prefix.doc.tests)
+        mkdirp(prefix.input)
+        install('exec/aspa', prefix.bin)
+        install('exec/README', prefix.doc)
+        install('exec/aspa.inp', prefix.input)
+        install('exec/kriging_model_centers.txt', prefix.input)
+        install('exec/point_data.txt', prefix.input)
+        install('exec/value_data.txt', prefix.input)
+        for files in glob.glob('doc/*.*'):
+            install(files, prefix.doc)
