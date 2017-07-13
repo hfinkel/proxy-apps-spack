@@ -50,14 +50,15 @@ class Minismac2d(MakefilePackage):
             'FC={0}'.format(self.spec['mpi'].mpifc),
             'LD={0}'.format(self.spec['mpi'].mpifc),
             'MPIDIR=-I{0}/include'.format(self.spec['mpi'].prefix),
-            '--file=Makefile_mpi_only',
-            'FFLAGS=-c -DD_PRECISION'
+            'FFLAGS=-O3 -c -DD_PRECISION',
+            'LDFLAGS=-O3'
+            '--file=Makefile_mpi_only'
         ]
 
         return targets
 
     def edit(self, spec, prefix):
-        # Editing input file to point to install data files
+        # Editing input file to point to installed data files
         param_file = FileFilter('smac2d.in')
         param_file.filter('bcmain_directory=.*', "bcmain_directory='.'")
         param_file.filter('bcmain_filename=.*',
