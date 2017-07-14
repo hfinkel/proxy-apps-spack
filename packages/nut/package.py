@@ -51,9 +51,8 @@ class Nut(CMakePackage):
     conflicts('%xl')
     conflicts('%nag')
 
-    def cmake_args(self):
-        env['RANDOM123_DIR'] = self.spec['random123'].prefix
-        return []
+    def setup_environment(self, spack_env, run_env):
+        spack_env.set('RANDOM123_DIR', self.spec['random123'].prefix)
 
     build_targets = ['VERBOSE=on -j 4 2>&1 | tee -a make.out']
 
