@@ -27,19 +27,19 @@ import glob
 
 
 class Cohmm(MakefilePackage):
-    """ An anticipated important use-case for next-generation supercomputing
+    """An anticipated important use-case for next-generation supercomputing
         is multiscale modeling, in which continuum equations for large-scale
         material deformation are augmented with high-fidelity, fine-scale
         simulations that provide constitutive data on demand
-        tags: proxy-app
+        tags = proxy-app
     """
-
     tags = ['proxy-app']
+    
     homepage = "http://www.exmatex.org/cohmm.html"
     url = "https://github.com/exmatex/CoHMM/archive/sad.tar.gz"
 
     version('develop', git='https://github.com/exmatex/CoHMM.git',
-            branch='sad', description='Sad Branch')
+            branch='sad')
 
     variant('serial', default=True, description='Serial Build')
     variant('openmp', default=True, description='Build with OpenMP Support')
@@ -50,9 +50,6 @@ class Cohmm(MakefilePackage):
             filter_file('DO_OPENMP = O.*', 'DO_OPENMP = ON', 'Makefile')
         if '+gnuplot' in spec:
             filter_file('DO_GNUPLOT = O.*', 'DO_GNUPLOT = ON', 'Makefile')
-
-    def build(self, spec, prefix):
-        make()
 
     def install(self, spec, prefix):
         mkdirp(prefix.bin)
