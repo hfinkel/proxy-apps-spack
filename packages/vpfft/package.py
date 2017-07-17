@@ -48,8 +48,10 @@ class Vpfft(CMakePackage):
 
     def cmake_args(self):
         pass
-    #   args = []
-    #   return args
+
+
+    def install(self, spec, prefix):
+        pass
 
 
 
