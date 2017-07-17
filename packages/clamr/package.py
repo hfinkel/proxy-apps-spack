@@ -27,12 +27,12 @@ from spack import *
 
 class Clamr(CMakePackage):
     """The CLAMR code is a cell-based adaptive mesh refinement (AMR)
-       mini-app developed as a testbed for hybrid algorithm development
-       using MPI and OpenCL GPU code.
+    mini-app developed as a testbed for hybrid algorithm development
+    using MPI and OpenCL GPU code.
     """
 
     homepage = "https://github.com/lanl/CLAMR"
-    url      = ""
+    url      = "https://github.com/lanl/CLAMR.git"
     tags     = ['proxy-app']
 
     version('master', git='https://github.com/lanl/CLAMR.git')
@@ -42,8 +42,8 @@ class Clamr(CMakePackage):
         values=('opengl', 'mpe', 'none'),
         description='Build with specified graphics support')
     variant(
-        'build', default='RelWithDebInfo',
-        values=('Debug', 'Release', 'RelWithDebInfo'),
+        'build', default='relwithdebinfo',
+        values=('debug', 'release', 'relwithdebinfo'),
         description='Build type')
     variant(
         'precision', default='mixed',
@@ -54,25 +54,27 @@ class Clamr(CMakePackage):
     depends_on('mpe', when='graphics=mpe')
 
     def build_type(self):
-        if 'build=Debug':
+        spec = self.spec
+        if 'build=debug' in spec:
             return 'Debug'
-        elif 'build=Release':
+        elif 'build=release' in spec:
             return 'Release'
         else:
             return 'RelWithDebInfo'
 
     def cmake_args(self):
+        spec = self.spec
         cmake_args = []
-        if 'graphics=none':
+        if 'graphics=none' in spec:
             cmake_args.append('-DGRAPHICS_TYPE=None')
-        elif 'graphics=mpe':
+        elif 'graphics=mpe' in spec:
             cmake_args.append('-DGRAPHICS_TYPE=MPE')
         else:
             cmake_args.append('-DGRAPHICS_TYPE=OpenGL')
 
-        if 'precision=full':
+        if 'precision=full' in spec:
             cmake_args.append('-DPRECISION_TYPE=full_precision')
-        elif 'precision=single':
+        elif 'precision=single' in spec:
             cmake_args.append('-DPRECISION_TYPE=minimum_precision')
         else:
             cmake_args.append('-DPRECISION_TYPE=mixed_precision')
