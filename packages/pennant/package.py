@@ -57,7 +57,7 @@ class Pennant(MakefilePackage):
 
         if self.compiler.name == 'intel':
             opt += ' -fast -fno-alias'
-        if self.compiler.name == 'gpi':
+        if self.compiler.name == 'pgi':
             opt += ' -fastsse'
 
         makefile.filter(
@@ -91,7 +91,7 @@ class Pennant(MakefilePackage):
         def install_dir(dirname):
             install_tree(dirname, join_path(prefix, dirname))
 
-        mkdirp('bin')
+        mkdirp(prefix.bin)
         install('build/pennant', prefix.bin)
         install_dir('doc')
         install_dir('test')
