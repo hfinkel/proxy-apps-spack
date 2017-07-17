@@ -35,8 +35,6 @@ class Minismac2d(MakefilePackage):
     homepage = "http://mantevo.org"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/MiniSMAC2D/miniSMAC2D-2.0.tgz"
 
-    tags = ['proxy-app']
-
     version('2.0', '1bb1a52cea21bc9162bf7a71a6ddf37d')
 
     depends_on('mpi')
@@ -50,8 +48,9 @@ class Minismac2d(MakefilePackage):
             'FC={0}'.format(self.spec['mpi'].mpifc),
             'LD={0}'.format(self.spec['mpi'].mpifc),
             'MPIDIR=-I{0}/include'.format(self.spec['mpi'].prefix),
-            'FFLAGS=-O3 -c -DD_PRECISION',
-            'LDFLAGS=-O3'
+            'CPPFLAGS=-P -traditional  -DD_PRECISION',
+            'FFLAGS=-O3 -c -g -DD_PRECISION',
+            'LDFLAGS=-O3',
             '--file=Makefile_mpi_only'
         ]
 

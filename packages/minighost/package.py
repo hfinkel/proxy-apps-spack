@@ -37,8 +37,6 @@ class Minighost(MakefilePackage):
     homepage = "http://mantevo.org"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/MiniGhost/miniGhost_1.0.1.tar.gz"
 
-    tags = ['proxy-app']
-
     version('1.0.1', '2a4ac4383e9be00f87b6067c3cfe6463')
 
     variant('mpi', default=True, description='Enable MPI Support')
@@ -76,7 +74,7 @@ class Minighost(MakefilePackage):
 
     def edit(self, spec, prefix):
         inner_tar = tarfile.open(
-            'miniGhost_ref_{}.tar.gz'.format(self.version.up_to(3)))
+            'miniGhost_ref_{0}.tar.gz'.format(self.version.up_to(3)))
         inner_tar.extractall()
 
     def install(self, spec, prefix):
