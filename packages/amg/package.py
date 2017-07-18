@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public
 # License along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 0s2111-1307 USA
 ##############################################################################
 from spack import *
 import glob
@@ -67,14 +67,10 @@ class Amg(MakefilePackage):
         if '+qsmp' in self.spec:
             makefile.filter('INCLUDE_CFLAGS =', 'INCLUDE_CFLAGS = -O2 -DTIMER_USE_MPI -DHYPRE_USING_OPENMP -DHYPRE_LONG_LONG -DHYPRE_NO_GLOBAL_PARTITION')
             makefile.filter('#INCLUDE_LFLAGS = -lm -fopenmp -qsmp ', 'INCLUDE_LFLAGS = {}'.format(self.compiler.openmp_flag))
-    
-    def build(self, spec, prefix):
-        make()
+
 
     def install(self, spec, prefix):
-        mkdirp(prefix.doc)
-        for file in glob.glob('doc/*.*'):
-            install(file, prefix.doc)
+        install_tree('docs', prefix.doc)
         install('COPYRIGHT', prefix.doc)
         install('COPYING.LESSER', prefix.doc)
 
