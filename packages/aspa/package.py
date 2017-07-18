@@ -31,7 +31,6 @@ class Aspa(MakefilePackage):
         heterogeneous MPMD materials science simulations will place important
         demands upon the exascale ecosystem that need to be identified and
         quantified.
-        tags = proxy-app
     """
     tags = ['proxy-app']
     homepage = "http://www.exmatex.org/aspa.html"

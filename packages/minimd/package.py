@@ -37,27 +37,27 @@ class Minimd(MakefilePackage):
     homepage = "http://mantevo.org"
     url      = "http://mantevo.org/downloads/releaseTarballs/miniapps/MiniMD/miniMD_1.2.tgz"
 
-    tags = ['proxy-app']
-
     version('1.2', '893ef1ca5062e32b43a8d11bcfe1a056')
 
-    depends_on('openmpi')
+    depends_on('mpi')
+
+    build_directory = 'miniMD_ref'
 
     @property
     def build_targets(self):
         targets = [
-            'LINK={0}'.format(self.spec['openmpi'].mpicxx),
-            'CC={0}'.format(self.spec['openmpi'].mpicxx),
+            'LINK={0}'.format(self.spec['mpi'].mpicxx),
+            'CC={0}'.format(self.spec['mpi'].mpicxx),
             'CCFLAGS={0} -DMPICH_IGNORE_CXX_SEEK -DNOCHUNK'.format(
                 self.compiler.openmp_flag),
-            '--directory=miniMD_ref',
+            'EXE=miniMD_mpi',
             'openmpi'
         ]
 
         return targets
 
     def edit(self, spec, prefix):
-        inner_tar = tarfile.open(name='miniMD_{}_ref.tgz'.format(
+        inner_tar = tarfile.open(name='miniMD_{0}_ref.tgz'.format(
                                  self.version.up_to(2)))
         inner_tar.extractall()
 
@@ -66,7 +66,7 @@ class Minimd(MakefilePackage):
         mkdirp(prefix.bin)
         mkdirp(prefix.doc)
 
-        install('miniMD_ref/miniMD_openmpi', prefix.bin)
+        install('miniMD_ref/miniMD_mpi', prefix.bin)
         install('miniMD_ref/in.lj.miniMD', prefix.bin)
         install('miniMD_ref/README', prefix.doc)
 
