@@ -64,9 +64,9 @@ class Smc(MakefilePackage):
     variant(
         'debug', default=False,
         description='Build with debugging')
-    # variant(
-        # 'mic', default=False,
-        # description='Compile for Intel Xeon Phi')
+#   variant(
+#       'mic', default=False,
+#       description='Compile for Intel Xeon Phi')
     variant(
         'k_use_automatic', default=True,
         description='Some arrays in kernels.F90 will be automatic')
