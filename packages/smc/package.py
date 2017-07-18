@@ -71,13 +71,11 @@ class Smc(MakefilePackage):
         'k_use_automatic', default=True,
         description='Some arrays in kernels.F90 will be automatic')
     variant(
-        'mkverbose', default=True,
-        description='Verbosity of building process')
-    variant(
         'comp', default='GNU', description='Compiler of choice',
         values=('GNU', 'Intel'))
 
     depends_on('mpi', when='+mpi')
+    depends_on('gmake', type='build')
 
     def edit(self, spec, prefix):
         makefile = FileFilter('GNUmakefile')
@@ -89,8 +87,6 @@ class Smc(MakefilePackage):
             makefile.filter('NDEBUG :=', '#')
         if '~k_use_automatic' in spec:
             makefile.filter('K_U.*:= t', '#')
-        if '~mkverbose' in spec:
-            makefile.filter('MKV.*:= t', '#')
 
     def install(self, spec, prefix):
         files = glob.glob(join_path(self.build_directory, '*.exe'))
