@@ -52,6 +52,7 @@ class Smc(MakefilePackage):
 
     homepage = "https://ccse.lbl.gov/ExaCT/index.html"
     url      = "https://ccse.lbl.gov/ExaCT/SMC.tar.gz"
+    tags     = ['proxy-app']
 
     version('master', '94a4ea94abbc5e61397c2a4d1fb56ed6')
 
