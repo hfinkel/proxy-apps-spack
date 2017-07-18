@@ -38,6 +38,7 @@
 # please first remove this boilerplate and all FIXME comments.
 #
 from spack import *
+import glob
 
 
 class Smc(MakefilePackage):
@@ -52,6 +53,8 @@ class Smc(MakefilePackage):
     homepage = "https://ccse.lbl.gov/ExaCT/index.html"
     url      = "https://ccse.lbl.gov/ExaCT/SMC.tar.gz"
 
+    version('master', '94a4ea94abbc5e61397c2a4d1fb56ed6')
+
     variant(
         'mpi', default=True,
         description='Build with MPI support')
@@ -59,8 +62,8 @@ class Smc(MakefilePackage):
         'openmp', default=True,
         description='Build with OpenMP support')
     variant(
-        'ndebug', default=False,
-        description='Turn off debugging')
+        'debug', default=False,
+        description='Build with debugging')
     # variant(
         # 'mic', default=False,
         # description='Compile for Intel Xeon Phi')
@@ -82,9 +85,15 @@ class Smc(MakefilePackage):
             makefile.filter('MPI := t', '#')
         if '~openmp' in spec:
             makefile.filter('OMP := t', '#')
-        if '~ndebug' in spec:
+        if '+debug' in spec:
             makefile.filter('NDEBUG :=', '#')
         if '~k_use_automatic' in spec:
             makefile.filter('K_U.*:= t', '#')
         if '~mkverbose' in spec:
             makefile.filter('MKV.*:= t', '#')
+
+    def install(self, spec, prefix):
+        files = glob.glob(join_path(self.build_directory, '*.exe'))
+        for f in files:
+            install(f, prefix)
+        install('inputs_SMC', prefix)
