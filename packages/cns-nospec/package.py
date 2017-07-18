@@ -38,6 +38,7 @@
 # please first remove this boilerplate and all FIXME comments.
 #
 from spack import *
+import glob
 
 
 class CnsNospec(MakefilePackage):
@@ -46,10 +47,33 @@ class CnsNospec(MakefilePackage):
     homepage = "https://ccse.lbl.gov/ExaCT/index.html"
     url      = "https://ccse.lbl.gov/ExaCT/CNS_Nospec.tgz"
 
-    # depends_on('fortran')
+    version('master', '14ff5be62539d829b30b17281688ee3f')
 
-    # def edit(self, spec, prefix):
-        # FIXME: Edit the Makefile if necessary
-        # FIXME: If not needed delete this function
-        # makefile = FileFilter('Makefile')
-        # makefile.filter('CC = .*', 'CC = cc')
+    variant('mpi', default=False, description='Build with MPI support')
+    variant('debug', default=True, description='Build with debugging')
+    variant('mkverbose', default=True, description='Build with verbose')
+    variant('omp', default=False, description='Build with OpenMP support')
+    variant('prof', default=False, description='Build with profiling')
+
+    @property
+    def build_directory(self):
+        return join_path(self.stage.source_path, 'MiniApps', 'CNS_NoSpec')
+
+    def edit(self, spec, prefix):
+        makefile = FileFilter('GNUmakefile')
+        if '+mpi' in spec:
+            makefile.filter('MPI .*', 'MPI := t')
+        if '+debug' not in spec:
+            makefile.filter('NDEBUG.*', '#')
+        if '+mkverbose' not in spec:
+            makefile.filter('MKVERBOSE.*', '#')
+        if '+omp' in spec:
+            makefile.filter('OMP.*', 'OMP := t')
+        if '+prof' in spec:
+            makefile.filter('PROF.*', 'PROF := t')
+
+    def install(self, spec, prefix):
+        mkdirp(prefix.bin)
+        files = glob.glob(join_path(self.build_directory, '*.exe'))
+        for f in files:
+            install(f, prefix.bin)
