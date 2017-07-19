@@ -49,24 +49,24 @@ class Snap(MakefilePackage):
 
     version('master', git='https://github.com/lanl/SNAP.git')
 
-    variant('openmp', default=True, description='Build with OpenMP support')
+    variant('openmp', default=False, description='Build with OpenMP support')
     variant('opt', default=True, description='Build with debugging')
     variant('mpi', default=True, description='Build with MPI support')
 
     depends_on('mpi', when='+mpi')
 
-    @property
-    def build_directory(self):
-        return join_path(self.stage.source_path, 'src')
+    build_directory = 'src'
 
     def edit(self, spec, prefix):
-        makefile = FileFilter(join_path(self.build_directory, 'Makefile'))
-        if '~opt' in spec:
-            makefile.filter('OPT = yes', 'OPT = no')
-        if '~mpi' in spec:
-            makefile.filter('MPI = yes', 'MPI = no')
-        if '~openmp' in spec:
-            makefile.filter('OPENMP = yes', 'OPENMP = no')
+        with working_dir(self.build_directory):
+            makefile = FileFilter('Makefile')
+            if '~opt' in spec:
+                makefile.filter('OPT = yes', 'OPT = no')
+            if '~mpi' in spec:
+                makefile.filter('MPI = yes', 'MPI = no')
+            if '~openmp' in spec:
+                makefile.filter('OPENMP = yes', 'OPENMP = no')
 
     def install(self, spec, prefix):
-        install('../README.md', prefix)
+        install('README.md', prefix)
+        install_tree('qasnap', prefix.qasnap)
