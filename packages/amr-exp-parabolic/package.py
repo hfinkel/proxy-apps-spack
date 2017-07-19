@@ -22,23 +22,9 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-#
-# This is a template package file for Spack.  We've put "FIXME"
-# next to all the things you'll want to change. Once you've handled
-# them, you can save this file and test your package like this:
-#
-#     spack install amr-exp-parabolic
-#
-# You can edit this file again by typing:
-#
-#     spack edit amr-exp-parabolic
-#
-# See the Spack documentation for more information on packaging.
-# If you submit this package back to Spack as a pull request,
-# please first remove this boilerplate and all FIXME comments.
-#
 from spack import *
-import re
+import glob
+
 
 class AmrExpParabolic(MakefilePackage):
     """Simplified block-structured adaptive mesh refinement algorithm
@@ -52,49 +38,41 @@ class AmrExpParabolic(MakefilePackage):
 
     homepage = "https://ccse.lbl.gov/ExaCT/index.html"
     url      = "https://ccse.lbl.gov/ExaCT/AMR_Exp_Parabolic.tgz"
+    tags     = ['proxy-app']
 
     version(
         'release', '330604d9cc755dad8a2cdfaa7ff8f6a4',
         url='https://ccse.lbl.gov/ExaCT/AMR_Exp_Parabolic.tgz')
 
     variant(
-        'ndebug', default=True, description='Turn off debugging')
+        'debug', default=False, description='Turn on debugging')
     variant(
         'mpi', default=True, description='Build with MPI support')
     variant(
-        'openmp', default=False, 
+        'openmp', default=False,
         description='Build with OpenMP support')
     variant(
         'prof', default=False, description='Use profiler')
-    variant(
-        'mkverbose', default=True, 
-        description='Verbosity of building process')
-    variant(
-        'comp', default='gfortran', description='Compiler of choice', 
-        values=('gfortran', 'G95', 'XLF', 'IBM', 'Intel', 'Linux',
-            'Cray', 'xt4', 'PGI', 'SunStudio', 'PathScale',
-            'NAG', 'Lahey'))
 
     depends_on('mpi', when='+mpi')
+    depends_on('gmake', type='build')
+
+    build_directory = 'MiniApps/AMR_Adv_Diff_F90'
 
     def edit(self, spec, prefix):
-        makefile = FileFilter('./MiniApps/AMR_Adv_Diff_F90/GNUmakefile')
-        if '~ndebug' in spec:
-            makefile.filter('NDEBUG.*:= t', '#')
-        if '~mpi' in spec:
-            makefile.filter('MPI.*:= t', '#')
-        if '+openmp' in spec:
-            makefile.filter('OMP.*:=', 'OMP := t')
-        if '+prof' in spec:
-            makefile.filter('PROF.*:=', 'PROF := t')
-        if '~mkverbose' in spec:
-            makefile.filter('MKVERBOSE.*:=', '#')
-        comp_search = re.search('comp=([.\S]+)', str(spec))
-        self.comp_name = comp_search.group(1)
-        makefile.filter(
-            'COMP.*:= gfortran',
-            'COMP := {0}'.format(self.comp_name))
+        with working_dir(self.build_directory):
+            makefile = FileFilter('GNUmakefile')
+            if '+debug' in spec:
+                makefile.filter('NDEBUG.*:= t', '#')
+            if '~mpi' in spec:
+                makefile.filter('MPI.*:= t', '#')
+            if '+openmp' in spec:
+                makefile.filter('OMP.*:=', 'OMP := t')
+            if '+prof' in spec:
+                makefile.filter('PROF.*:=', 'PROF := t')
 
-    def build(self, spec, prefix):
-        with working_dir(join_path(self.build_directory, 'MiniApps', 'AMR_Adv_Diff_F90')):
-            make()
+    def install(self, spec, prefix):
+        mkdirp(prefix.bin)
+        files = glob.glob(join_path(self.build_directory, '*.exe'))
+        for f in files:
+            install(f, prefix.bin)
