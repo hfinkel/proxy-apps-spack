@@ -51,7 +51,7 @@ class Mcb(MakefilePackage):
 
         with working_dir('src'):
             filter_file(r'^BOOST_PREFIX\s*=.*',
-                        'BOOST_PREFIX = ../boost_headers/boost',
+                        'BOOST_PREFIX = ../boost_headers/boost/',
                         'Makefile')
             filter_file(r'^CXX\s*=.*', 'CXX = %s' % self.spec['mpi'].mpicc,
                         'Makefile')
