@@ -35,7 +35,6 @@ class Amg(MakefilePackage):
         such as particle creation, particle tracking, tallying particle 
         information, and particle destruction. Particles are also traded 
         among processors using MPI calls.
-        tags: proxy-app
     """
     tags = ['proxy-app']
     homepage = "https://codesign.llnl.gov/amg2013.php"
@@ -53,8 +52,8 @@ class Amg(MakefilePackage):
     def edit(self, spec, prefix):
         makefile = FileFilter('Makefile')
         makefile.filter('INCLUDE_CFLAGS =', 'INCLUDE_CFLAGS = -DTIMER_USE_MPI')
-        makefile.filter('CXX=.*', 'CXX={}'.format(spec['mpi'].mpicxx))
-        makefile.filter('LINKER=.*', 'LINKER={}'.format(spec['mpi'].mpicxx))
+        makefile.filter('CXX=.*', 'CXX={0}'.format(spec['mpi'].mpicxx))
+        makefile.filter('LINKER=.*', 'LINKER={0}'.format(spec['mpi'].mpicxx))
 
         if '+openmp' in self.spec:
             makefile.filter('INCLUDE_CFLAGS =', 'INCLUDE_CFLAGS = --DHYPRE_USING_OPENMP -DTIMER_USE_MPI')
