@@ -41,7 +41,12 @@ from spack import *
 
 
 class Snap(MakefilePackage):
-    """SNAP serves as a proxy application to model the performance of a modern discrete ordinates neutral particle transport application. SNAP may be considered an update to Sweep3D, intended for hybrid computing architectures. It is modeled off the Los Alamos National Laboratory code PARTISN."""
+    """SNAP serves as a proxy application to model
+    the performance of a modern discrete ordinates
+    neutral particle transport application.
+    SNAP may be considered an update to Sweep3D,
+    intended for hybrid computing architectures.
+    It is modeled off the Los Alamos National Laboratory code PARTISN."""
 
     homepage = "https://github.com/lanl/SNAP"
     url      = ""
