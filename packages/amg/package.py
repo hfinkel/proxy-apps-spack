@@ -45,30 +45,38 @@ class Amg(MakefilePackage):
     
     variant('mpi', default=True, description='Build with MPI support')
     variant('openmp', default=False, description='Build with OpenMP support')
+    variant('assumepartition', default=False, description='Assumed partition (for thousands of processors)')
     
     depends_on('mpi',when='+mpi')
 
+    @property
+    def build_targets(self):
+        targets = []
 
-    def edit(self, spec, prefix):
-        makefile = FileFilter('Makefile')
-        makefile.filter('INCLUDE_CFLAGS =', 'INCLUDE_CFLAGS = -DTIMER_USE_MPI')
-        makefile.filter('CXX=.*', 'CXX={0}'.format(spec['mpi'].mpicxx))
-        makefile.filter('LINKER=.*', 'LINKER={0}'.format(spec['mpi'].mpicxx))
+        include_cflags = ''
+        include_lflags = '-lm '
 
-        if '+openmp' in self.spec:
-            makefile.filter('INCLUDE_CFLAGS =', 'INCLUDE_CFLAGS = --DHYPRE_USING_OPENMP -DTIMER_USE_MPI')
-            makefile.filter('#INCLUDE_LFLAGS = -fopenmp', 'INCLUDE_LFLAGS = {}'.format(self.compiler.openmp_flag))
+        if self.compiler.name == 'intel':
+            include_lflags += '-qsmp '
 
-        if '+lm' in self.spec:
-            makefile.filter('INCLUDE_CFLAGS =', 'INCLUDE_CFLAGS = -DTIMER_USE_MPI -DHYPRE_USING_OPENMP -DHYPRE_NO_GLOBAL_PARTITION')
-            makefile.filter('#INCLUDE_LFLAGS = -lm  -fopenmp ', 'INCLUDE_LFLAGS = {}'.format(self.compiler.openmp_flag))
-        
-        if '+qsmp' in self.spec:
-            makefile.filter('INCLUDE_CFLAGS =', 'INCLUDE_CFLAGS = -O2 -DTIMER_USE_MPI -DHYPRE_USING_OPENMP -DHYPRE_LONG_LONG -DHYPRE_NO_GLOBAL_PARTITION')
-            makefile.filter('#INCLUDE_LFLAGS = -lm -fopenmp -qsmp ', 'INCLUDE_LFLAGS = {}'.format(self.compiler.openmp_flag))
+        if '+mpi' in self.spec:
+            if '+openmp' in self.spec:
+                include_cflags += '-DHYPRE_USING_OPENMP' + ' '
+            if '+assumepartition' in self.spec:
+                include_cflags += '-DHYPRE_NO_GLOBAL_PARTITION' + ' '
 
+            include_cflags += '-DTIMER_USE_MPI' + ' ' + self.compiler.openmp_flag
+
+            include_lflags += ' ' + self.compiler.openmp_flag
+            targets.append('INCLUDE_CFLAGS={0}'.format(include_cflags))
+            targets.append('INCLUDE_LFLAGS={0}'.format(include_lflags))
+            targets.append('CC={0}'.format(self.spec['mpi'].mpicc))
+
+        return targets
 
     def install(self, spec, prefix):
+        mkdirp(prefix.bin)
+        install('test/amg2013',prefix.bin)
         install_tree('docs', prefix.doc)
         install('COPYRIGHT', prefix.doc)
         install('COPYING.LESSER', prefix.doc)
