@@ -23,18 +23,14 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 0s2111-1307 USA
 ##############################################################################
 from spack import *
-import glob
 
 
 class Amg(MakefilePackage):
-    """ The "Monte Carlo Benchmark" (MCB) is intended for use in 
-        exploring the computational performance of Monte Carlo algorithms 
-        on parallel architectures. It models the solution of a simple 
-        heuristic transport equation using a Monte Carlo technique. 
-        The MCB employs typical features of Monte Carlo algorithms 
-        such as particle creation, particle tracking, tallying particle 
-        information, and particle destruction. Particles are also traded 
-        among processors using MPI calls.
+    """ AMG2013 is a parallel algebraic multigrid solver for linear
+        systems arising from problems on unstructured grids.
+        It has been derived directly from the BoomerAMG solver in the
+        hypre library, a large linear solver library that is being developed
+        in the Center for Applied Scientific Computing (CASC) at LLNL.
     """
     tags = ['proxy-app']
     homepage = "https://codesign.llnl.gov/amg2013.php"
@@ -42,12 +38,11 @@ class Amg(MakefilePackage):
 
     version('2013', '9d918d2a69528b83e6e0aba6ba601fef')
 
-    
     variant('mpi', default=True, description='Build with MPI support')
     variant('openmp', default=False, description='Build with OpenMP support')
     variant('assumepartition', default=False, description='Assumed partition (for thousands of processors)')
-    
-    depends_on('mpi',when='+mpi')
+
+    depends_on('mpi', when='+mpi')
 
     @property
     def build_targets(self):
@@ -65,7 +60,7 @@ class Amg(MakefilePackage):
             if '+assumepartition' in self.spec:
                 include_cflags += '-DHYPRE_NO_GLOBAL_PARTITION' + ' '
 
-            include_cflags += '-DTIMER_USE_MPI' + ' ' + self.compiler.openmp_flag
+            include_cflags += '-DTIMER_USE_MPI ' + self.compiler.openmp_flag
 
             include_lflags += ' ' + self.compiler.openmp_flag
             targets.append('INCLUDE_CFLAGS={0}'.format(include_cflags))
@@ -76,23 +71,7 @@ class Amg(MakefilePackage):
 
     def install(self, spec, prefix):
         mkdirp(prefix.bin)
-        install('test/amg2013',prefix.bin)
+        install('test/amg2013', prefix.bin)
         install_tree('docs', prefix.doc)
         install('COPYRIGHT', prefix.doc)
         install('COPYING.LESSER', prefix.doc)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
