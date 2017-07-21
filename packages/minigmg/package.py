@@ -54,7 +54,11 @@ class Minigmg(Package):
 
     def build(self, spec, prefix):
         cc = Executable(spec['mpi'].mpicc)
-        cc('-O3', '{0}'.format(self.compiler.openmp_flag), 'miniGMG.c', 'mg.c', 'box.c', 'solver.c', 'operators.ompif.c', 'timer.x86.c', '-D__MPI', '-D__COLLABORATIVE_THREADING=6', '-D__TEST_MG_CONVERGENCE', '-D__PRINT_NORM', '-D__USE_BICGSTAB', '-o', 'run.miniGMG', '-lm')
+        cc('-O3', '{0}'.format(self.compiler.openmp_flag), 'miniGMG.c',
+            'mg.c', 'box.c', 'solver.c', 'operators.ompif.c', 'timer.x86.c',
+            '-D__MPI', '-D__COLLABORATIVE_THREADING=6',
+            '-D__TEST_MG_CONVERGENCE', '-D__PRINT_NORM', '-D__USE_BICGSTAB',
+            '-o', 'run.miniGMG', '-lm')
 
     def install(self, spec, prefix):
         mkdir(prefix.bin)
