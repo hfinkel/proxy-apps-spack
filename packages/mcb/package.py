@@ -30,8 +30,8 @@ from distutils.dir_util import copy_tree
 
 class Mcb(MakefilePackage):
     """The "Monte Carlo Benchmark" (MCB) is intended for use in exploring
-        the computational performance of Monte Carlo algorithms on parallel
-        architectures.
+    the computational performance of Monte Carlo algorithms on parallel
+    architectures.
     """
 
     tags = ['proxy-app']
@@ -65,7 +65,7 @@ class Mcb(MakefilePackage):
                         'MPI_INCLUDE = -I%s' % self.spec['mpi'].prefix.include,
                         'Makefile')
             filter_file(r'^CXXFLAGS\s*=.*',
-                        'CXXFLAGS = -O2 -xHost $(CXXDEFINES) $(OPENMPFLAG) -compiler gcc',
+                        'CXXFLAGS = -O2 -xHost $(CXXDEFINES) $(OPENMPFLAG)',
                         'Makefile')
 
 
