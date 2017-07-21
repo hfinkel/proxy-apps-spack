@@ -45,16 +45,14 @@ class Minigmg(Package):
     url      = "http://crd.lbl.gov/assets/Uploads/FTG/Projects/miniGMG/miniGMG.tar.gz"
 
     version('master', '975a2a118403fc0024b5e04cef280e95')
-    version('cuda', url='http://crd.lbl.gov/assets/Uploads/FTG/Projects/miniGMG/miniGMG.cuda.tar.gz')
 
     depends_on('mpi')
-    depends_on('cuda', when='@cuda')
 
     phases = ['build', 'install']
 
     def build(self, spec, prefix):
         cc = Executable(spec['mpi'].mpicc)
-        cc('-O3', '{0}'.format(self.compiler.openmp_flag), 'miniGMG.c',
+        cc('-O3', self.compiler.openmp_flag, 'miniGMG.c',
             'mg.c', 'box.c', 'solver.c', 'operators.ompif.c', 'timer.x86.c',
             '-D__MPI', '-D__COLLABORATIVE_THREADING=6',
             '-D__TEST_MG_CONVERGENCE', '-D__PRINT_NORM', '-D__USE_BICGSTAB',
@@ -64,6 +62,6 @@ class Minigmg(Package):
         mkdir(prefix.bin)
         install('run.miniGMG', prefix.bin)
         mkdir(prefix.jobs)
-        files = glob.glob(join_path('./', 'job*'))
+        files = glob.glob('job*')
         for f in files:
             install(f, prefix.jobs)
