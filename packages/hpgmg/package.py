@@ -22,28 +22,20 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-#
-# This is a template package file for Spack.  We've put "FIXME"
-# next to all the things you'll want to change. Once you've handled
-# them, you can save this file and test your package like this:
-#
-#     spack install hpgmg
-#
-# You can edit this file again by typing:
-#
-#     spack edit hpgmg
-#
-# See the Spack documentation for more information on packaging.
-# If you submit this package back to Spack as a pull request,
-# please first remove this boilerplate and all FIXME comments.
-#
 from spack import *
 import inspect
-import platform
 
 
 class Hpgmg(AutotoolsPackage):
-    """HPGMG implements full multigrid (FMG) algorithms using finite-volume and finite-element methods. Different algorithmic variants adjust the arithmetic intensity and architectural properties that are tested. These FMG methods converge up to discretization error in one F-cycle, thus may be considered direct solvers. An F-cycle visits the finest level a total of two times, the first coarsening (8x smaller) 4 times, the second coarsening 6 times, etc."""
+    """HPGMG implements full multigrid (FMG) algorithms using
+    finite-volume and finite-element methods.
+    Different algorithmic variants adjust the arithmetic intensity
+    and architectural properties that are tested. These FMG methods
+    converge up to discretization error in one F-cycle,
+    thus may be considered direct solvers. An F-cycle visits
+    the finest level a total of two times,
+    the first coarsening (8x smaller) 4 times,
+    the second coarsening 6 times, etc."""
 
     homepage = "https://bitbucket.org/hpgmg/hpgmg"
     url      = "https://bitbucket.org/hpgmg/hpgmg/get/master.tar.gz"
@@ -52,8 +44,8 @@ class Hpgmg(AutotoolsPackage):
     version('master', '4a2b139e1764c84ed7fe06334d3f8d8a')
 
     variant(
-        'fe_fv', default='both', 
-        values=('both', 'fe', 'fv'), 
+        'fe_fv', default='both',
+        values=('both', 'fe', 'fv'),
         description='Build finite element, finite volume, or both solvers')
     variant('mpi', default=True, description='Build with MPI support')
     variant('cuda', default=False, description='Build with CUDA')
@@ -64,28 +56,24 @@ class Hpgmg(AutotoolsPackage):
     depends_on('cuda', when='+cuda')
     depends_on('python', type='build')
 
-    # def setup_environment(self, spack_env, run_env):
-      #  spack_env.set('PETSC_DIR', self.spec['petsc'].prefix)
-       #  spack_env.set('PETSC_ARCH', 'lib/petsc')
-
     def configure_args(self):
         args = []
         if 'fe_fv=fv' in self.spec:
-            args.extend(['--no-fe'])
+            args.append(['--no-fe'])
         else:
-            args.extend(['--fe'])
+            args.append(['--fe'])
 
         if 'fe_fv=fe' in self.spec:
             if '+mpi' in self.spec:
-                args.extend(['--no-fv-mpi'])
+                args.append(['--no-fv-mpi'])
             else:
-                args.extend(['--no-fv'])
+                args.append(['--no-fv'])
 
         if 'fe_fv=fv' or 'fe_fv=both' in self.spec:
-            args.extend(['--CFLAGS=' + self.compiler.openmp_flag])
+            args.append(['--CFLAGS=' + self.compiler.openmp_flag])
 
         if '+mpi' in self.spec:
-            args.extend(['--CC={0}'.format(self.spec['mpi'].mpicc)])
+            args.append(['--CC={0}'.format(self.spec['mpi'].mpicc)])
 
         return args
 
@@ -94,10 +82,6 @@ class Hpgmg(AutotoolsPackage):
 
         with working_dir(self.build_directory, create=True):
             inspect.getmodule(self).configure(*options)
-
-    def build(self, spec, prefix):
-        with working_dir(self.build_directory):
-            make()
 
     def install(self, spec, prefix):
         install_tree('build/bin', prefix.bin)
