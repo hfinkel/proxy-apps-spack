@@ -22,73 +22,71 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-
 from spack import *
 import shutil
-import os
+
 
 class Comd(MakefilePackage):
+    """CoMD is a reference implementation of classical molecular dynamics
+    algorithms and workloads as used in materials science. It is created and
+    maintained by The Exascale Co-Design Center for Materials in Extreme
+    Environments (ExMatEx). The code is intended to serve as a vehicle for
+    co-design by allowing others to extend and/or reimplement it as needed to
+    test performance of new architectures, programming models, etc. New
+    versions of CoMD will be released to incorporate the lessons learned from
+    the co-design process."""
 
-    """The molecular dynamics (MD) computer simulation method is a 
-        well-established and important tool for the study of the dynamical 
-        properties of liquids, solids, and other systems of interest in 
-        Materials Science and Engineering, Chemistry and Biology. 
-        A material is represented in terms of atoms and molecules.
-
-        tags : proxy-app
-    """
     tags = ['proxy-app']
 
     homepage = "http://www.exmatex.org/comd.html"
     url      = "https://github.com/exmatex/CoMD/archive/master.tar.gz"
 
-    version('master', git='https://github.com/exmatex/CoMD.git', branch='master')    
-    
-    variant('serial', default=False, description='Build without MPI support')
+    version('master', git='https://github.com/exmatex/CoMD.git', branch='master')
+
     variant('mpi', default=True, description='Build with MPI support')
     variant('openmp', default=False, description='Build with OpenMP support')
-    variant('precision', default=True, description='Toggle Precesion Options')
-    variant('graphs',default=True, description='Enable graph visuals')
+    variant('double', default=True, description='Build with double precision instead of single')
+    variant('graphs', default=True, description='Enable graph visuals')
 
-    depends_on('mpi', when ='+mpi')    
-    depends_on('graphviz', when ='+graphs')
+    depends_on('mpi', when='+mpi')
+    depends_on('graphviz', when='+graphs')
 
-    conflicts('+openmp', when='~serial')
+    def edit(self, spec, prefix):
+        if '+openmp' in spec:
+            work_dir = 'src-openmp'
+        else:
+            work_dir = 'src-mpi'
+        with working_dir(work_dir):
+            shutil.copy('Makefile.vanilla', 'Makefile')
 
     @property
     def build_targets(self):
-        targets = ['--file=Makefile.vanilla']
+        targets = []
         cflags = ' -std=c99 '
         optflags = ' -g -O5 '
         clib = ' -lm '
         comd_variant = 'CoMD'
-        includes = ''
         cc = spack_cc
 
         if '+openmp' in self.spec:
-            targets.append('--directory = src-openmp')
-            targets.append('CC = {0}'.format('spack_cc'))
+            targets.append('--directory=src-openmp')
             comd_variant += '-openmp'
-            cflags += ' -fopenmp '
-            if '+mpi' in self.spec:
-                comd_variant += '-mpi'
-                targets.append('CC = {0}'.format(self.spec['mpi'].mpicc))
-
+            cflags += ' ' + self.compiler.openmp_flag + ' '
+            if '~mpi' in self.spec:
+                targets.append('CC = {0}'.format('spack_cc'))
         else:
-            targets.append('--directory = src-mpi')
-            if '+serial' in self.spec:
+            targets.append('--directory=src-mpi')
+            if '~mpi' in self.spec:
                 comd_variant += '-serial'
                 targets.append('CC = {0}'.format(cc))
-            else:
-                comd_variant += '-mpi'
-                targets.append('CC = {0}'.format(self.spec['mpi'].mpicc))
-                
         if '+mpi' in self.spec:
+            comd_variant += '-mpi'
+            targets.append('CC = {0}'.format(self.spec['mpi'].mpicc))
             cflags += '-DDO_MPI'
-            targets.append('LDFLAGS = {0}'.format(self.spec['mpi'].prefix.lib))
-            targets.append('INCLUDES = {0}'.format (self.spec['mpi'].prefix.include))            
+            targets.append(
+                'INCLUDES = {0}'.format(self.spec['mpi'].prefix.include))
 
-        if '+precision' in self.spec:
+        if '+double' in self.spec:
             cflags += ' -DDOUBLE '
         else:
             cflags += ' -DSINGLE '
@@ -97,13 +95,13 @@ class Comd(MakefilePackage):
         targets.append('CFLAGS = {0}'.format(cflags))
         targets.append('OPTFLAGS = {0}'.format(optflags))
         targets.append('C_LIB = {0}'.format(clib))
-        
+
         return targets
 
     def install(self, spec, prefix):
-        install_tree('bin',prefix.bin)
-        install_tree('examples',prefix.examples)
-        install_tree('pots',prefix.pots)
+        install_tree('bin', prefix.bin)
+        install_tree('examples', prefix.examples)
+        install_tree('pots', prefix.pots)
         mkdirp(prefix.doc)
         install('README.md', prefix.doc)
         install('LICENSE.md', prefix.doc)
