@@ -44,51 +44,66 @@ class Comd(MakefilePackage):
 
     version('master', git='https://github.com/exmatex/CoMD.git', branch='master')    
     
-    variant('precision', default=True, description='for Precision options')
-    variant('serial', default=True, description='Build without MPI support')
+    variant('serial', default=False, description='Build without MPI support')
     variant('mpi', default=True, description='Build with MPI support')
-    variant('openmp', default=True, description='Build with OpenMP support')
-   
-    depends_on('mpi', when='+mpi')    
-    
-    def edit(self, spec, prefix):
-        shutil.copy('src-openmp/Makefile.vanilla', 'src-openmp/Makefile')
-        shutil.copy('src-mpi/Makefile.vanilla', 'src-mpi/Makefile')
-        
-        if '+openmp' in spec:
-            self.build_targets.extend(['--directory=src-openmp', '--file=Makefile'])
-            makefile = FileFilter('src-openmp/Makefile')
-            makefile.filter('CFLAGS = .*', 'CFLAGS = -std=c99 -fopenmp')
+    variant('openmp', default=False, description='Build with OpenMP support')
+    variant('precision', default=True, description='Toggle Precesion Options')
+    variant('graphs',default=True, description='Enable graph visuals')
+
+    depends_on('mpi', when ='+mpi')    
+    depends_on('graphviz', when ='+graphs')
+
+    conflicts('+openmp', when='~serial')
+
+    @property
+    def build_targets(self):
+        targets = ['--file=Makefile.vanilla']
+        cflags = ' -std=c99 '
+        optflags = ' -g -O5 '
+        clib = ' -lm '
+        comd_variant = 'CoMD'
+        includes = ''
+        cc = spack_cc
+
+        if '+openmp' in self.spec:
+            targets.append('--directory = src-openmp')
+            targets.append('CC = {0}'.format('spack_cc'))
+            comd_variant += '-openmp'
+            cflags += ' -fopenmp '
+            if '+mpi' in self.spec:
+                comd_variant += '-mpi'
+                targets.append('CC = {0}'.format(self.spec['mpi'].mpicc))
+
         else:
-            self.build_targets.extend(['--directory=src-mpi', '--file=Makefile'])
-            makefile = FileFilter('src-mpi/Makefile')
-            makefile.filter('CFLAGS = .*', 'CFLAGS = -std=c99')
+            targets.append('--directory = src-mpi')
+            if '+serial' in self.spec:
+                comd_variant += '-serial'
+                targets.append('CC = {0}'.format(cc))
+            else:
+                comd_variant += '-mpi'
+                targets.append('CC = {0}'.format(self.spec['mpi'].mpicc))
+                
+        if '+mpi' in self.spec:
+            cflags += '-DDO_MPI'
+            targets.append('LDFLAGS = {0}'.format(self.spec['mpi'].prefix.lib))
+            targets.append('INCLUDES = {0}'.format (self.spec['mpi'].prefix.include))            
+
+        if '+precision' in self.spec:
+            cflags += ' -DDOUBLE '
+        else:
+            cflags += ' -DSINGLE '
+
+        targets.append('CoMD_VARIANT = {0}'.format(comd_variant))
+        targets.append('CFLAGS = {0}'.format(cflags))
+        targets.append('OPTFLAGS = {0}'.format(optflags))
+        targets.append('C_LIB = {0}'.format(clib))
         
-        makefile.filter('CC   = .*', 'CXX={}'.format(spec['mpi'].mpicxx))
-        makefile.filter('C_LIB = .*', 'C_LIB = -lm')
-
-        if '+mpi' not in spec:
-            makefile.filter('CC   = .*', 'CC = gcc')
-            makefile.filter('DO_MPI = .*', 'DO_MPI = OFF')
-
-        if '+precision' in spec:
-            makefile.filter('DOUBLE_PRECISION = O.*', 'DOUBLE_PRECISION = OFF')
+        return targets
 
     def install(self, spec, prefix):
-        mkdirp(prefix.bin)
-        mkdirp(prefix.examples)
-        mkdirp(prefix.pots)
+        install_tree('bin',prefix.bin)
+        install_tree('examples',prefix.examples)
+        install_tree('pots',prefix.pots)
         mkdirp(prefix.doc)
         install('README.md', prefix.doc)
         install('LICENSE.md', prefix.doc)
-
-        if '+openmp' in spec:
-            if '+mpi' in spec:
-                install('bin/CoMD-openmp-mpi', prefix.bin)
-            else:
-                install('bin/CoMD-openmp', prefix.bin)
-        else:
-            if '+mpi' in spec:
-                install('bin/CoMD-mpi', prefix.bin)
-            else:
-                install('bin/CoMD-serial', prefix.bin)
