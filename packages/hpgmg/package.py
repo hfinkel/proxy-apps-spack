@@ -38,6 +38,8 @@
 # please first remove this boilerplate and all FIXME comments.
 #
 from spack import *
+import inspect
+import platform
 
 
 class Hpgmg(AutotoolsPackage):
@@ -47,19 +49,53 @@ class Hpgmg(AutotoolsPackage):
     url      = "https://bitbucket.org/hpgmg/hpgmg/get/master.tar.gz"
     tags     = ['proxy-app']
 
-    variant('fe', default=True, description='Build Finite Element FAS solver')
-    variant('fv', default=True, description='Build Finite Volume solver')
-    variant('mpi', default=False, description='Build with MPI support')
+    version('master', '4a2b139e1764c84ed7fe06334d3f8d8a')
+
+    variant(
+        'fe_fv', default='both', 
+        values=('both', 'fe', 'fv'), 
+        description='Build finite element, finite volume, or both solvers')
+    variant('mpi', default=True, description='Build with MPI support')
     variant('cuda', default=False, description='Build with CUDA')
 
-    depends_on('petsc', when='+fe')
-    # depends_on('openmp', when='+fv')
+    depends_on('petsc', when='fe_fv=fe')
+    depends_on('petsc', when='fe_fv=both')
     depends_on('mpi', when='+mpi')
+    depends_on('cuda', when='+cuda')
+    depends_on('python', type='build')
+
+    # def setup_environment(self, spack_env, run_env):
+      #  spack_env.set('PETSC_DIR', self.spec['petsc'].prefix)
+       #  spack_env.set('PETSC_ARCH', 'lib/petsc')
 
     def configure_args(self):
         args = []
-        if '-fe' in spec:
-            args.append('--no-fe')
-        if '-fv' in spec:
-            args.append('--no-fv') 
+        if 'fe_fv=fv' in self.spec:
+            args.extend(['--no-fe'])
+        else:
+            args.extend(['--fe'])
+
+        if 'fe_fv=fe' in self.spec:
+            args.extend(['--no-fv'])
+
+        if 'fe_fv=fv' or 'fe_fv=both' in self.spec:
+            args.extend(['--CFLAGS=' + self.compiler.openmp_flag])
+
+        if '+mpi' in self.spec:
+            args.extend(['--CC={0}'.format(self.spec['mpi'].mpicc)])
+
         return args
+
+    def configure(self, spec, prefix):
+        options = self.configure_args()
+
+        with working_dir(self.build_directory, create=True):
+            inspect.getmodule(self).configure(*options)
+
+    def build(self, spec, prefix):
+        with working_dir(self.build_directory):
+            make()
+
+        if 'fe_fv=fv' or 'fe_fv=both':
+            with working_dir(self.build_directory):
+                make('test')
