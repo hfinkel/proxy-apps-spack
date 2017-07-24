@@ -87,6 +87,9 @@ class Hpgmg(AutotoolsPackage):
         return args
 
     def configure(self, spec, prefix):
+        makefile = FileFilter('finite-element/test/hpgmg-sharness.sh')
+        makefile.filter('MPIEXEC=$.*', 'MPIEXEC=$(awk \'/MPIEXEC/{print $3}\' \"${PETSC_DIR}/lib/petsc/conf/petscvariables\")')
+
         options = self.configure_args()
 
         with working_dir(self.build_directory, create=True):
