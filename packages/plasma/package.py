@@ -59,28 +59,32 @@ class Plasma(MakefilePackage):
     depends_on('mpi')
     depends_on('cuda', when='+cuda')
 
-    def edit(self, spec, prefix):
-        if '+3d' in spec:
-            self.plasma_dir = join_path(self.build_directory, 'PlasmaApp3D')
+    @property
+    def build_directory(self):
+        if '+3d' in self.spec:
+            build_directory = join_path(self.stage.source_path, 'PlasmaApp3D')
         else:
-            self.plasma_dir = join_path(self.build_directory, 'PlasmaApp')
+            build_directory = join_path(self.stage.source_path, 'PlasmaApp')
+        return build_directory
 
-        makefile = FileFilter(join_path(self.plasma_dir, 'Makefile'))
+    def edit(self, spec, prefix):
+        makefile = FileFilter('{0}/Makefile'.format(self.build_directory))
+        makefile.filter('TOP_DIR=.*', 'TOP_DIR={0}'.format(self.build_directory))
         makefile.filter('CC=.*', 'CC = cc')
         makefile.filter('CXX=.*', 'CXX = {}'.format(spec['mpi'].mpicxx))
         
         if '+cuda' in spec:
             makefile.filter('NVCC =.*', 'NVCC = nvcc')
-            self.build_target.append('USECUDA=1')
+            self.build_targets.append('USECUDA=1')
 
         if '+nohandvec' in spec:
-            self.build_target.append('NOHANDVEC=1')
+            self.build_targets.append('NOHANDVEC=1')
 
     def build(self, spec, prefix):
-        with working_dir(self.plasma_dir):
-            gmake()
-            gmake('tests')
+        with working_dir(self.build_directory):
+            make('packages')
+            make()
 
     def install(self, spec, prefix):       
         mkdirp(prefix.bin)
-        install('PlasmaApp/src/tests', prefix.tests)
+        install('/src/tests', prefix.tests)

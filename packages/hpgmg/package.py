@@ -22,44 +22,69 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
-#
-# This is a template package file for Spack.  We've put "FIXME"
-# next to all the things you'll want to change. Once you've handled
-# them, you can save this file and test your package like this:
-#
-#     spack install hpgmg
-#
-# You can edit this file again by typing:
-#
-#     spack edit hpgmg
-#
-# See the Spack documentation for more information on packaging.
-# If you submit this package back to Spack as a pull request,
-# please first remove this boilerplate and all FIXME comments.
-#
 from spack import *
+import inspect
 
 
-class Hpgmg(AutotoolsPackage):
-    """HPGMG implements full multigrid (FMG) algorithms using finite-volume and finite-element methods. Different algorithmic variants adjust the arithmetic intensity and architectural properties that are tested. These FMG methods converge up to discretization error in one F-cycle, thus may be considered direct solvers. An F-cycle visits the finest level a total of two times, the first coarsening (8x smaller) 4 times, the second coarsening 6 times, etc."""
+class Hpgmg(Package):
+    """HPGMG implements full multigrid (FMG) algorithms using
+    finite-volume and finite-element methods.
+    Different algorithmic variants adjust the arithmetic intensity
+    and architectural properties that are tested. These FMG methods
+    converge up to discretization error in one F-cycle,
+    thus may be considered direct solvers. An F-cycle visits
+    the finest level a total of two times,
+    the first coarsening (8x smaller) 4 times,
+    the second coarsening 6 times, etc."""
 
     homepage = "https://bitbucket.org/hpgmg/hpgmg"
     url      = "https://bitbucket.org/hpgmg/hpgmg/get/master.tar.gz"
     tags     = ['proxy-app']
 
-    variant('fe', default=True, description='Build Finite Element FAS solver')
-    variant('fv', default=True, description='Build Finite Volume solver')
-    variant('mpi', default=False, description='Build with MPI support')
+    version('master', '4a2b139e1764c84ed7fe06334d3f8d8a')
+
+    variant(
+        'fe_fv', default='both',
+        values=('both', 'fe', 'fv'),
+        description='Build finite element, finite volume, or both solvers')
+    variant('mpi', default=True, description='Build with MPI support')
     variant('cuda', default=False, description='Build with CUDA')
 
-    depends_on('petsc', when='+fe')
-    # depends_on('openmp', when='+fv')
+    depends_on('petsc', when='fe_fv=fe')
+    depends_on('petsc', when='fe_fv=both')
     depends_on('mpi', when='+mpi')
+    depends_on('cuda', when='+cuda')
+    depends_on('python', type='build')
 
+    phases = ['configure', 'build', 'install']
+
+    @property
     def configure_args(self):
         args = []
-        if '-fe' in spec:
+        if 'fe_fv=fv' in self.spec:
             args.append('--no-fe')
-        if '-fv' in spec:
-            args.append('--no-fv') 
+        else:
+            args.append('--fe')
+
+        if 'fe_fv=fe' in self.spec:
+            if '+mpi' in self.spec:
+                args.append('--no-fv-mpi')
+            else:
+                args.append('--no-fv')
+
+        if 'fe_fv=fv' or 'fe_fv=both' in self.spec:
+            args.append('--CFLAGS=' + self.compiler.openmp_flag)
+
+        if '+mpi' in self.spec:
+            args.append('--CC={0}'.format(self.spec['mpi'].mpicc))
+
         return args
+
+    def configure(self, spec, prefix):
+        configure(*self.configure_args)
+
+    def build(self, spec, prefix):
+            make()
+
+    def install(self, spec, prefix):
+        install_tree('build/bin', prefix.bin)
