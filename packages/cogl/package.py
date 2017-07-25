@@ -29,20 +29,29 @@ class Cogl(CMakePackage):
     """CoGL is a meso-scale simulation proxy app used to analyze CoGL
     pattern formation in ferroelastic materials using the ginzburg-landau 
     approach. It has been publicly released on the ExMatEx Project Github Repo.
-
-    tags = proxy-app, ecp-proxy-app"""
+    """
 
     homepage = "http://www.exmatex.org/cogl.html"
     url      = "https://github.com/exmatex/CoGL/archive/master.tar.gz"
 
-    version('master',git='https://github.com/exmatex/CoGL.git',description='master')
+    version('master', git='https://github.com/exmatex/CoGL.git', description='master')
 
-    # depends_on('foo')
+    variant('cuda', default=True,description='Enable CUDA')
+    variant('interop', default=True,description='Enable INTEROP')
+    variant('mac', default=True, description='Apple Verison`')
+
+    depends_on('cuda', when='+cuda')
+
 
     def cmake_args(self):
+        cmake_args = []
+        if '+mac' in self.spec:
+            cmake_args.append('--APPLE=ON')
+        if '+interop' in self.spec:
+            cmake_args.append('--ENABLE_INTEROP=ON')
+        if '+cuda' in self.spec:
+            cmake_args.append('--USE_CUDA=ON')
+        return cmake_args
+
+    def install(self, spec, prefix):
         pass
-        # FIXME: Add arguments other than
-        # FIXME: CMAKE_INSTALL_PREFIX and CMAKE_BUILD_TYPE
-        # FIXME: If not needed delete this function
-        #args = []
-        #return args
