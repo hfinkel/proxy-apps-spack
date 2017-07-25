@@ -44,11 +44,11 @@ class Mcb(MakefilePackage):
 
     build_directory = 'src'
     def edit(self, spec, prefix):
-        for fname in glob.glob('*.*'):
-            if (fname.endswith("tgz")):
-                tar = tarfile.open(fname, "r:gz")
-                tar.extractall()
-                tar.close()
+#        for fname in glob.glob('*.*'):
+#            if (fname.endswith("tgz")):
+#                tar = tarfile.open(fname, "r:gz")
+#                tar.extractall()
+#                tar.close()
         with working_dir('src'):
             filter_file(r'^BOOST_INCLUDE\s*=.*',
                         'BOOST_INCLUDE = -I{0} '.format(self.spec['boost'].prefix.include.boost),

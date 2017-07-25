@@ -26,17 +26,15 @@ from spack import *
 
 
 class Vpfft(CMakePackage):
-    """ Proxy Application. VPFFT is an implementation of a mesoscale micromechanical materials 
-    model. By solving the viscoplasticity model, VPFFT simulates the evolution
-     of a material under deformation. The solution time to the viscoplasticity 
-     model, described by a set of partial differential equations, is 
-     significantly reduced by the application of Fast Fourier Transform 
-     in the VPFFT algorithm.
+    """ Proxy Application. VPFFT is an implementation of a mesoscale 
+    micromechanical materials model. By solving the viscoplasticity 
+    model, VPFFT simulates the evolution of a material under deformation.
+    The solution time to the viscoplasticity model, described by a set
+    of partial differential equations, is significantly reduced by the
+    application of Fast Fourier Transform in the VPFFT algorithm.
+    """
 
-    tags : proxy-app ecp-proxy-app
-     """
-
-    tag = ['proxy-app','ecp-proxy-app']
+    tag = ['proxy-app']
     homepage = "http://www.exmatex.org/vpfft.html"
     url      = "https://github.com/exmatex/VPFFT/archive/master.tar.gz"
 
