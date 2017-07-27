@@ -40,13 +40,10 @@ class Vpfft(CMakePackage):
 
     version('master', git='https://github.com/exmatex/VPFFT.git',description='git master')
 
-#    variant('',default=True, description='')
-    # FIXME: Add dependencies if required.
-#    depends_on('',when='+')
+    #depends_on('cmake@2.4:', type='build')
 
     def cmake_args(self):
         pass
-
 
     def install(self, spec, prefix):
         pass
