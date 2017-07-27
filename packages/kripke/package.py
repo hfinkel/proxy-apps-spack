@@ -27,33 +27,36 @@ from spack import *
 
 class Kripke(CMakePackage):
     """Kripke is a simple, scalable, 3D Sn deterministic particle transport
-    code. Its primary purpose is to research how data layout, programming 
-    paradigms and architectures effect the implementation and performance 
-    of Sn transport. A main goal of Kripke is investigating how different 
-    data-layouts effect instruction, thread and task level parallelism, 
+    code. Its primary purpose is to research how data layout, programming
+    paradigms and architectures effect the implementation and performance
+    of Sn transport. A main goal of Kripke is investigating how different
+    data-layouts effect instruction, thread and task level parallelism,
     and what the implications are on overall solver performance."""
 
-    # FIXME: Add a proper url for your package's homepage here.
     homepage = "https://codesign.llnl.gov/kripke.php"
     url      = "https://codesign.llnl.gov/downloads/kripke-openmp-1.1.tar.gz"
 
+    tags = ['proxy-app']
     version('1.1', '7fe6f2b26ed983a6ce5495ab701f85bf')
 
     variant('mpi', default=True, description='Build with MPI')
     variant('openmp', default=True, description='Build with with OpenMP')
-    # FIXME: Add dependencies if required.
-    depends_on('mpi')
 
-    def cmake_args(self):
-        pass
-        # FIXME: Add arguments other than
-        # FIXME: CMAKE_INSTALL_PREFIX and CMAKE_BUILD_TYPE
-        # FIXME: If not needed delete this function
-        #args = []
-        #return args
-     #   pass
+    depends_on('mpi', when="+mpi")
 
+    def install(self, spec, prefix):
+        with working_dir('build', create=True):
+            def enabled(variant):
+                return (1 if variant in spec else 0)
 
+            cmake('-DCMAKE_INSTALL_PREFIX:PATH=.',
+                  '-DENABLE_OPENMP=%d' % enabled('+openmp'),
+                  '-DENABLE_MPI=%d' % enabled('+mpi'),
+                  '..',
+                  *std_cmake_args)
+            make()
 
-
-
+            # Kripke does not provide install target, so we have to copy
+            # things into place.
+            mkdirp(prefix.bin)
+            install('kripke', prefix.bin)
