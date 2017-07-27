@@ -28,13 +28,14 @@ from spack import *
 class Lulesh(MakefilePackage):
     """LULESH is a highly simplified application, hard-coded to only
     style typical in scientific C or C++ based applications. Hard
-    code to only solve a Sedov blast problem with analytic answer 
+    code to only solve a Sedov blast problem with analytic answer
     """
     tags = ['proxy-app']
     homepage = "https://codesign.llnl.gov/lulesh.php"
     url      = "https://codesign.llnl.gov/lulesh/lulesh2.0.3.tgz"
 
     version('2.0.3', '336644a8750f71c7c6b9d2960976e7aa')
+
     variant('mpi', default=True, description='Build with MPI support')
     variant('openmp', default=True, description='Build with OpenMP support')
     variant('visual', default=False,
@@ -50,9 +51,10 @@ class Lulesh(MakefilePackage):
         cxxflag = ' -g -O3 -I. -Wall '
         ldflags = ' -g -O3 '
 
-        targets.append('CXX = {0}'.format(spack_cxx, ' -DUSE_MPI=0 '))
-        targets.append('MPI_INC = {0}'.format(self.spec['mpi'].prefix.include))
-        targets.append('MPI_LIB = {0}'.format(self.spec['mpi'].prefix.lib))
+        targets.append('CXX = {0} {1}'.format(spack_cxx, ' -DUSE_MPI=0 '))
+        if '+mpi' in self.spec:
+            targets.append('MPI_INC = {0}'.format(self.spec['mpi'].prefix.include))
+            targets.append('MPI_LIB = {0}'.format(self.spec['mpi'].prefix.lib))
         if '+visual' in self.spec:
             targets.append(
                 'SILO_INCDIR = {0}'.format(self.spec['silo'].prefix.include))
@@ -62,9 +64,11 @@ class Lulesh(MakefilePackage):
             ldflags = ' -g -L${SILO_LIBDIR} -Wl,-rpath -Wl,'
             ldflags += '${SILO_LIBDIR} -lsiloh5 -lhdf5 '
 
-        if '+mpi' in self.spec:
+        if '+openmp' in self.spec:
             cxxflag += self.compiler.openmp_flag
             ldflags += self.compiler.openmp_flag
+
+        if '+mpi' in self.spec:
             targets.append(
                 'CXX = {0} {1}'.format(self.spec['mpi'].mpicxx,
                                        ' -DUSE_MPI=1'))
@@ -75,7 +79,7 @@ class Lulesh(MakefilePackage):
 
     def install(self, spec, prefix):
         mkdirp(prefix.bin)
-        install('lulesh2.0', prefix.bin)
+        install('lulesh{0}'.format(self.version.up_to(2)), prefix.bin)
         mkdirp(prefix.doc)
         install('README', prefix.doc)
         install('TODO', prefix.doc)
