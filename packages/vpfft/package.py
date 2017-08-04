@@ -23,6 +23,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
 from spack import *
+import shutil
 
 
 class Vpfft(CMakePackage):
@@ -38,33 +39,19 @@ class Vpfft(CMakePackage):
     homepage = "http://www.exmatex.org/vpfft.html"
     url      = "https://github.com/exmatex/VPFFT/archive/master.tar.gz"
 
-    version('master', git='https://github.com/exmatex/VPFFT.git',description='git master')
+    version('master', git='https://github.com/exmatex/VPFFT.git')
 
-    #depends_on('cmake@2.4:', type='build')
+    depends_on('cmake@2.4:', type='build')
+    depends_on('eigen')
+    depends_on('fftw')
 
-    def cmake_args(self):
-        pass
+    phases = ['edit', 'cmake', 'build', 'install']
 
-    def install(self, spec, prefix):
-        pass
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def edit(self, spec, prefix):
+        with working_dir(self.stage.source_path):
+            shutil.move('CMakeBuild/CMakeLists.txt.example', 'CMakeLists.txt')
+            cmake_file = FileFilter('CMakeLists.txt')
+            cmake_file.filter('set.*CMAKE_C_COMPILER.*', 'set(CMAKE_C_COMPILER "{0}")'.format(self.spec['mpi'].mpicc))
+            cmake_file.filter('set.*CMAKE_CXX_COMPILER.*', 'set(CMAKE_CXX_COMPILER "{0}")'.format(self.spec['mpi'].mpicxx))
+            cmake_file.filter('set.*EIGEN_PATH.*', 'set(EIGEN_PATH "{0}/include/eigen3")'.format(self.spec['eigen'].prefix))
+            cmake_file.filter('set.*FFTW_PATH.*', 'set(FFTW_PATH "{0}/include")'.format(self.spec['fftw'].prefix))
