@@ -65,3 +65,5 @@ class Minigmg(Package):
         files = glob.glob('job*')
         for f in files:
             install(f, prefix.jobs)
+        install('README', prefix)
+        install('LICENSE', prefix)
