@@ -55,9 +55,13 @@ class Plasma(MakefilePackage):
         '3d', default=False,
         description='Build PlasmaApp3D')
 
+    depends_on('trilinos', when='~3d')
+    depends_on('paraview', when='~3d')
+    depends_on('mesa', when='~3d')
     depends_on('gmake', type='build')
     depends_on('mpi')
     depends_on('cuda', when='+cuda')
+    depends_on('cuda', when='+3d')
 
     @property
     def build_directory(self):
@@ -73,8 +77,8 @@ class Plasma(MakefilePackage):
         makefile.filter('CC=.*', 'CC = cc')
         makefile.filter('CXX=.*', 'CXX = {}'.format(spec['mpi'].mpicxx))
         
-        if '+cuda' in spec:
-            makefile.filter('NVCC =.*', 'NVCC = nvcc')
+        if '+3d' in spec:
+            makefile.filter('NVCC =.*', 'NVCC = %s/bin/nvcc' % spec['cuda'].prefix)
             self.build_targets.append('USECUDA=1')
 
         if '+nohandvec' in spec:
@@ -82,9 +86,16 @@ class Plasma(MakefilePackage):
 
     def build(self, spec, prefix):
         with working_dir(self.build_directory):
-            make('packages')
-            make()
+            #make('packages')
+            if '~3d' in spec:
+                with working_dir(join_path(self.build_directory, 'src')):
+                    make('all')
+            else:
+                make('USECUDA=1')
 
     def install(self, spec, prefix):       
-        mkdirp(prefix.bin)
-        install('/src/tests', prefix.tests)
+        if '~3d' in spec:
+            install('/src/tests', prefix.tests)
+        else:
+            install_tree('PlasmaApp3D/bin', prefix.bin)
+            install_tree('PlasmaApp3D/tests', prefix.tests)
