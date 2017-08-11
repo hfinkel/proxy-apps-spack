@@ -39,33 +39,29 @@ class Amg2013(MakefilePackage):
     version('master', '9d918d2a69528b83e6e0aba6ba601fef',
             url='https://codesign.llnl.gov/amg2013/amg2013.tgz')
 
-    variant('mpi', default=True, description='Build with MPI support')
-    variant('openmp', default=False, description='Build with OpenMP support')
+    variant('openmp', default=True, description='Build with OpenMP support')
     variant('assumepartition', default=False, description='Assumed partition (for thousands of processors)')
 
     depends_on('mpi')
-
-    conflicts('+openmp', when='~mpi')
-    conflicts('+assumepartition', when='~mpi')
 
     @property
     def build_targets(self):
         targets = []
 
-        include_cflags = ''
-        include_lflags = '-lm '
+        include_cflags = ' -DTIMER_USE_MPI '
+        include_lflags = ' -lm '
 
-        if self.compiler.name == 'intel':
-            include_lflags += '-qsmp '
-        if '+openmp' in self.spec:
-            include_cflags += '-DHYPRE_USING_OPENMP' + ' '
         if '+assumepartition' in self.spec:
-            include_cflags += '-DHYPRE_NO_GLOBAL_PARTITION' + ' '
-        include_cflags += '-DTIMER_USE_MPI ' + self.compiler.openmp_flag
-        include_lflags += ' ' + self.compiler.openmp_flag
-        targets.append('INCLUDE_CFLAGS={0}'.format(include_cflags))
-        targets.append('INCLUDE_LFLAGS={0}'.format(include_lflags))
-        targets.append('CC={0}'.format(self.spec['mpi'].mpicc))
+            include_cflags += ' -DHYPRE_NO_GLOBAL_PARTITION '
+
+        if '+openmp' in self.spec:
+            include_cflags += ' -DHYPRE_USING_OPENMP '
+            include_cflags += self.compiler.openmp_flag
+            include_lflags += ' ' + self.compiler.openmp_flag
+
+        targets.append('INCLUDE_CFLAGS={0}'.format(' '.join(include_cflags)))
+        targets.append('INCLUDE_LFLAGS={0}'.format(' '.join(include_lmflags)))
+        targets.append('CC= {0} '.format(self.spec['mpi'].mpicc))
 
         return targets
 
